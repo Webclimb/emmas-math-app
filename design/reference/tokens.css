@@ -1,0 +1,67 @@
+/* GENERATED from ../tokens.json by the design build. Reference only: the app generates its own. */
+:root, [data-theme="light"] {
+  --bg: #F3F5F9;
+  --grid: #D3DAE6;
+  --surface: #FFFFFF;
+  --surface-2: #EAEEF5;
+  --hover: #E6EBF3;
+  --ink: #0F1B2D;
+  --ink-soft: #4A5568;
+  --line: #D5DCE6;
+  --line-strong: #7B8798;
+  --sky: #3A55C4;
+  --counter-2: #B86E00;
+  --accent: #2547D0;
+  --accent-ink: #FFFFFF;
+  --accent-soft: #E3E9FF;
+  --accent-text: #2547D0;
+  --focus: #2547D0;
+  --star: #FFC21A;
+  --star-ink: #0F1B2D;
+  --item: #6D4AE0;
+  --item-detail: #FFFFFF;
+  --good: #13795B;
+  --good-soft: #DDF3EA;
+  --warm: #A2461F;
+  --warm-soft: #FBE6DC;
+  --blk: #86A0F4;
+  --blk-line: #2F4AB0;
+  --scrim: rgba(15, 27, 45, 0.45);
+  --font-display: "Space Grotesk", "Segoe UI", system-ui, sans-serif;
+  --font-body: "Atkinson Hyperlegible", Verdana, "Segoe UI", system-ui, sans-serif;
+}
+[data-theme="dark"] {
+  --bg: #0E1420;
+  --grid: #1E283A;
+  --surface: #172030;
+  --surface-2: #212C40;
+  --hover: #26324A;
+  --ink: #EDF1F7;
+  --ink-soft: #A7B2C4;
+  --line: #2C3850;
+  --line-strong: #6E7C94;
+  --sky: #93A6FF;
+  --counter-2: #FFB547;
+  --accent: #8AA4FF;
+  --accent-ink: #0E1420;
+  --accent-soft: #1E2A4F;
+  --accent-text: #8AA4FF;
+  --focus: #8AA4FF;
+  --star: #FFC21A;
+  --star-ink: #0E1420;
+  --item: #B39CFF;
+  --item-detail: #172030;
+  --good: #4FD1A1;
+  --good-soft: #143A31;
+  --warm: #FF9F7A;
+  --warm-soft: #43261C;
+  --blk: #4A63CC;
+  --blk-line: #C3CEFF;
+  --scrim: rgba(0, 0, 0, 0.6);
+}
+[data-accent="ocean"] { --accent: #0A6E8A; --accent-ink: #FFFFFF; --accent-soft: #DCEFF5; --accent-text: #0A6E8A; --focus: #0A6E8A; }
+[data-theme="dark"][data-accent="ocean"] { --accent: #5CC8E6; --accent-ink: #0E1420; --accent-soft: #173843; --accent-text: #5CC8E6; --focus: #5CC8E6; }
+[data-accent="berry"] { --accent: #A8326C; --accent-ink: #FFFFFF; --accent-soft: #F7DCEA; --accent-text: #A8326C; --focus: #A8326C; }
+[data-theme="dark"][data-accent="berry"] { --accent: #FF7DBA; --accent-ink: #0E1420; --accent-soft: #43213A; --accent-text: #FF7DBA; --focus: #FF7DBA; }
+[data-accent="graphite"] { --accent: #2F3A4A; --accent-ink: #FFFFFF; --accent-soft: #E4E8EE; --accent-text: #2F3A4A; --focus: #2F3A4A; }
+[data-theme="dark"][data-accent="graphite"] { --accent: #C9D2DE; --accent-ink: #0E1420; --accent-soft: #2A3445; --accent-text: #C9D2DE; --focus: #C9D2DE; }

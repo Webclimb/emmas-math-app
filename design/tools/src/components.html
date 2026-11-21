@@ -1,0 +1,421 @@
+<!doctype html>
+<html lang="en-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Number Sky · Star Lines components</title>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="components.css">
+<style>
+  .g-wrap { max-width: 1180px; margin: 0 auto; padding: 32px clamp(16px, 4vw, 48px) 80px; display: flex; flex-direction: column; gap: 28px; }
+  .g-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px; }
+  .g-sec { background: var(--surface); border: 1.5px solid var(--ink); border-radius: 16px; padding: 22px; display: flex; flex-direction: column; gap: 16px; }
+  .g-sec > header { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 16px; align-items: baseline; }
+  .g-row { display: flex; flex-wrap: wrap; gap: 18px; align-items: flex-start; }
+  .g-state { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
+  .g-state > small { font-size: 13px; color: var(--ink-soft); font-weight: 700; }
+  .g-note { font-size: 14px; color: var(--ink-soft); }
+  .g-toc { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 14px; }
+  .g-toc a { color: var(--accent-text); }
+</style>
+</head>
+<body class="ns ns-page" data-theme="light">
+<div class="g-wrap">
+  <div class="g-head">
+    <div>
+      <h1 class="ns-h1">Star Lines components</h1>
+      <p class="ns-small">Every component in every state. Specs in COMPONENTS.md; colours from tokens.json.</p>
+    </div>
+    <button class="ns-btn" onclick="document.body.dataset.theme = document.body.dataset.theme === 'dark' ? 'light' : 'dark'">Light / dark</button>
+  </div>
+  <nav class="g-toc" aria-label="Sections">
+    <a href="#buttons">Buttons</a><a href="#chips">Chips, level, gems, avatar</a><a href="#parts">Session parts</a><a href="#strip">Number-sentence strip</a><a href="#options">Answer options</a><a href="#keypad">Keypad</a><a href="#stepper">Stepper</a><a href="#manip">Tray and plates</a><a href="#help">Hint, nudge, status</a><a href="#feedback">Feedback cards</a><a href="#dialog">Dialog and toast</a><a href="#map">Star map</a><a href="#week">Week goal</a><a href="#lesson">Lesson player</a><a href="#sayit">Say it</a><a href="#vocab">Vocabulary</a><a href="#facts">Facts and quick round</a><a href="#feel">How did that feel?</a><a href="#checkup">Check-up</a><a href="#maths">Maths displays</a><a href="#custom">Customize tiles and settings</a><a href="#grownup">Grown-up components</a>
+  </nav>
+
+  <section class="g-sec" id="buttons">
+    <header><h2 class="ns-h2">Buttons</h2><span class="g-note">Primary: one per screen. Hover is pointer-only; focus ring is keyboard-only.</span></header>
+    <div class="g-row">
+      <div class="g-state"><small>Primary</small><button class="ns-btn ns-btn--primary">Start today's practice <!--kit:icon-arrow-right--></button></div>
+      <div class="g-state"><small>Hover</small><button class="ns-btn ns-btn--primary is-hover">Start today's practice <!--kit:icon-arrow-right--></button></div>
+      <div class="g-state"><small>Focus</small><button class="ns-btn ns-btn--primary is-focus">Start today's practice <!--kit:icon-arrow-right--></button></div>
+      <div class="g-state"><small>Pressed</small><button class="ns-btn ns-btn--primary is-pressed">Start today's practice <!--kit:icon-arrow-right--></button></div>
+      <div class="g-state"><small>Disabled</small><button class="ns-btn ns-btn--primary" disabled>Start today's practice</button></div>
+    </div>
+    <div class="g-row">
+      <div class="g-state"><small>Secondary</small><button class="ns-btn"><!--kit:icon-undo--> Undo</button></div>
+      <div class="g-state"><small>Hover</small><button class="ns-btn is-hover"><!--kit:icon-undo--> Undo</button></div>
+      <div class="g-state"><small>Focus</small><button class="ns-btn is-focus"><!--kit:icon-undo--> Undo</button></div>
+      <div class="g-state"><small>Disabled</small><button class="ns-btn" disabled><!--kit:icon-undo--> Undo</button></div>
+      <div class="g-state"><small>Ghost</small><button class="ns-btn ns-btn--ghost">Grown-ups (hold)</button></div>
+      <div class="g-state"><small>Icon only (aria-label)</small><button class="ns-btn ns-btn--icon" aria-label="Read aloud"><!--kit:icon-read-aloud--></button></div>
+    </div>
+    <div class="g-row">
+      <div class="g-state" style="width: 240px"><small>Help aside (wide)</small>
+        <button class="ns-btn ns-btn--aside"><!--kit:icon-hint--> Hint</button>
+        <button class="ns-btn ns-btn--aside"><!--kit:icon-show-me-how--> Show me how</button>
+        <button class="ns-btn ns-btn--aside"><!--kit:icon-not-sure--> I'm not sure</button>
+      </div>
+      <div class="g-state"><small>Help row (compact)</small>
+        <div style="display: grid; grid-template-columns: repeat(3, 110px); gap: 8px">
+          <button class="ns-btn ns-btn--stack"><!--kit:icon-hint-->Hint</button>
+          <button class="ns-btn ns-btn--stack"><!--kit:icon-show-me-how-->Show me how</button>
+          <button class="ns-btn ns-btn--stack"><!--kit:icon-not-sure-->I'm not sure</button>
+        </div>
+      </div>
+      <div class="g-state"><small>Stop</small><button class="ns-btn"><!--kit:icon-close--> Stop for now</button></div>
+    </div>
+  </section>
+
+  <section class="g-sec" id="chips">
+    <header><h2 class="ns-h2">Chips, level, gems, avatar</h2><span class="g-note">Level = three squares plus the word. Never squares alone.</span></header>
+    <div class="g-row">
+      <div class="g-state"><small>Skill chip</small><span class="ns-chip">Sharing equally</span></div>
+      <div class="g-state"><small>Level: hands-on</small><span class="ns-level"><i class="on"></i><i></i><i></i><span>Hands-on</span></span></div>
+      <div class="g-state"><small>Level: pictures</small><span class="ns-level"><i class="on"></i><i class="on"></i><i></i><span>Pictures</span></span></div>
+      <div class="g-state"><small>Level: numbers</small><span class="ns-level"><i class="on"></i><i class="on"></i><i class="on"></i><span>Numbers</span></span></div>
+      <div class="g-state"><small>Gems</small><span class="ns-gems" aria-label="46 gems"><!--kit:gem--> 46</span></div>
+      <div class="g-state"><small>Avatar: monogram</small><button class="ns-avatar" aria-label="Your badge and style">S</button></div>
+      <div class="g-state"><small>Avatar: emblem</small><button class="ns-avatar" aria-label="Your badge and style"><!--kit:avatar-emblem-orbit--></button></div>
+      <div class="g-state"><small>Tag</small><span class="ns-tag">Now</span></div>
+    </div>
+  </section>
+
+  <section class="g-sec" id="parts">
+    <header><h2 class="ns-h2">Session parts</h2><span class="g-note">Replaces question-count dots. Shows where she is in the session, never time left.</span></header>
+    <div class="g-row">
+      <div class="g-state" style="width: 400px"><small>Part 2 of 4: focus</small>
+        <div class="ns-parts" role="img" aria-label="Part 2 of 4: focus">
+          <div class="ns-part done"><div class="ns-part__rail"><span class="ns-part__dot"></span></div><span class="ns-part__label"><!--kit:icon-check-->Warm-up</span></div>
+          <div class="ns-part now"><div class="ns-part__rail"><span class="ns-part__dot"></span></div><span class="ns-part__label">Focus</span></div>
+          <div class="ns-part"><div class="ns-part__rail"><span class="ns-part__dot"></span></div><span class="ns-part__label">Facts</span></div>
+          <div class="ns-part"><div class="ns-part__rail"><span class="ns-part__dot"></span></div><span class="ns-part__label">Wrap-up</span></div>
+        </div>
+      </div>
+      <div class="g-state" style="width: 400px"><small>Part 3 of 4: facts</small>
+        <div class="ns-parts" role="img" aria-label="Part 3 of 4: facts">
+          <div class="ns-part done"><div class="ns-part__rail"><span class="ns-part__dot"></span></div><span class="ns-part__label"><!--kit:icon-check-->Warm-up</span></div>
+          <div class="ns-part done"><div class="ns-part__rail"><span class="ns-part__dot"></span></div><span class="ns-part__label"><!--kit:icon-check-->Focus</span></div>
+          <div class="ns-part now"><div class="ns-part__rail"><span class="ns-part__dot"></span></div><span class="ns-part__label">Facts</span></div>
+          <div class="ns-part"><div class="ns-part__rail"><span class="ns-part__dot"></span></div><span class="ns-part__label">Wrap-up</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="g-sec" id="strip">
+    <header><h2 class="ns-h2">Number-sentence strip (F-3.AC-2)</h2><span class="g-note">Visible on every hands-on and pictures question. Fills in as she acts.</span></header>
+    <div class="g-row">
+      <div class="g-state" style="flex: 1 1 320px"><small>Unknown</small><div class="ns-strip" style="width: 100%" aria-label="15 divided by 3 equals unknown"><span>15</span><span aria-label="divided by">÷</span><span>3</span><span>=</span><span class="ns-slot">?</span></div></div>
+      <div class="g-state" style="flex: 1 1 320px"><small>Solved</small><div class="ns-strip" style="width: 100%" aria-label="15 divided by 3 equals 5"><span>15</span><span>÷</span><span>3</span><span>=</span><span class="ns-slot ns-slot--good">5<!--kit:icon-check--></span></div></div>
+    </div>
+    <div class="g-row">
+      <div class="g-state" style="flex: 1 1 320px"><small>Pictures level: choose the operation</small><div class="ns-strip" style="width: 100%"><span>12</span><button class="ns-slot ns-slot--choice is-focus" aria-label="Choose the operation">?</button><span>3</span><span>=</span><span>4</span></div></div>
+      <div class="g-state" style="flex: 1 1 320px"><small>Compact (feedback, 48px)</small><div class="ns-strip ns-strip--sm" style="width: 100%"><span>15</span><span>÷</span><span>3</span><span>=</span><span class="ns-slot">?</span></div></div>
+    </div>
+  </section>
+
+  <section class="g-sec" id="options">
+    <header><h2 class="ns-h2">Answer options</h2><span class="g-note">Correct = solid border + check. Not yet = dashed border + turn-around arrow. Never colour alone, never red.</span></header>
+    <div class="g-row">
+      <div class="g-state"><small>Default</small><button class="ns-option" style="width: 150px">18</button></div>
+      <div class="g-state"><small>Hover</small><button class="ns-option is-hover" style="width: 150px">18</button></div>
+      <div class="g-state"><small>Focus</small><button class="ns-option is-focus" style="width: 150px">18</button></div>
+      <div class="g-state"><small>Correct</small><button class="ns-option ns-option--correct" style="width: 150px" aria-label="5, correct">5 <!--kit:icon-check--></button></div>
+      <div class="g-state"><small>Not yet (her answer)</small><button class="ns-option ns-option--notyet" style="width: 150px" aria-label="12, your answer, not yet">12 <!--kit:icon-not-yet--></button></div>
+      <div class="g-state"><small>Unchosen after answer</small><button class="ns-option ns-option--dim" style="width: 150px" disabled>6</button></div>
+    </div>
+    <div class="g-row">
+      <div class="g-state" style="flex: 1 1 340px"><small>Text options (which sentence?)</small>
+        <div class="ns-options" style="width: 100%">
+          <button class="ns-option ns-option--text">15 + 3 = 18</button>
+          <button class="ns-option ns-option--text ns-option--correct">15 ÷ 3 = 5 <!--kit:icon-check--></button>
+          <button class="ns-option ns-option--text ns-option--notyet">15 − 3 = 12 <!--kit:icon-not-yet--></button>
+          <button class="ns-option ns-option--text ns-option--dim" disabled>15 × 3 = 45</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="g-sec" id="keypad">
+    <header><h2 class="ns-h2">Keypad and answer display</h2><span class="g-note">Numbers level (F-5.AC-3). On desktop the physical keyboard types into the display; the on-screen keypad stays.</span></header>
+    <div class="g-row">
+      <div class="g-state" style="width: 260px"><small>Empty</small><div class="ns-answer ns-answer--empty" style="width: 100%">Type your answer</div></div>
+      <div class="g-state" style="width: 260px"><small>With entry</small><div class="ns-answer" style="width: 100%">42<span class="ns-answer__caret"></span></div></div>
+    </div>
+    <div class="g-row">
+      <div class="g-state" style="width: 300px"><small>Keypad</small>
+        <div class="ns-keypad" style="width: 100%">
+          <button class="ns-key">1</button><button class="ns-key">2</button><button class="ns-key">3</button>
+          <button class="ns-key">4</button><button class="ns-key is-hover">5</button><button class="ns-key">6</button>
+          <button class="ns-key">7</button><button class="ns-key is-focus">8</button><button class="ns-key">9</button>
+          <button class="ns-key" aria-label="Delete"><!--kit:icon-backspace--></button><button class="ns-key">0</button><button class="ns-key ns-key--check">Check</button>
+        </div>
+      </div>
+      <div class="g-state" style="width: 300px"><small>Check disabled (nothing typed)</small>
+        <div class="ns-keypad" style="width: 100%"><button class="ns-key" aria-label="Delete"><!--kit:icon-backspace--></button><button class="ns-key">0</button><button class="ns-key ns-key--check" disabled>Check</button></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="g-sec" id="stepper">
+    <header><h2 class="ns-h2">Stepper</h2><span class="g-note">Blocks and equal-groups builders. The value is live text; minus disables at the minimum.</span></header>
+    <div class="g-row">
+      <div class="g-state"><small>Default</small><div class="ns-stepper"><span class="ns-stepper__label">Groups</span><button class="ns-stepper__btn" aria-label="Groups: fewer"><!--kit:icon-minus--></button><span class="ns-stepper__value">3</span><button class="ns-stepper__btn" aria-label="Groups: more"><!--kit:icon-plus--></button></div></div>
+      <div class="g-state"><small>At minimum</small><div class="ns-stepper"><span class="ns-stepper__label">In each</span><button class="ns-stepper__btn" disabled aria-label="In each group: fewer"><!--kit:icon-minus--></button><span class="ns-stepper__value">1</span><button class="ns-stepper__btn is-focus" aria-label="In each group: more"><!--kit:icon-plus--></button></div></div>
+    </div>
+  </section>
+
+  <section class="g-sec" id="manip">
+    <header><h2 class="ns-h2">Tray and plates</h2><span class="g-note">Plates are buttons: click, tap, or Tab then Space. Items use the chosen story theme.</span></header>
+    <div class="g-row" style="align-items: center">
+      <div class="g-state" style="width: 260px"><small>Tray</small><div class="ns-tray" style="width: 100%"><span role="status">Left to share: <b>12</b></span><div class="ns-tray__items"><!--kit:item-ticket--><!--kit:item-ticket--><!--kit:item-ticket--><!--kit:item-ticket--><!--kit:item-ticket--><!--kit:item-ticket--><!--kit:item-ticket--><!--kit:item-ticket--><!--kit:item-ticket--><!--kit:item-ticket--><!--kit:item-ticket--><!--kit:item-ticket--></div></div></div>
+      <div class="g-state"><small>Plate</small><div class="ns-plate-wrap"><button class="ns-plate" aria-label="Plate 1, has 2"><!--kit:item-ticket--><!--kit:item-ticket--></button>Plate 1</div></div>
+      <div class="g-state"><small>Hover</small><div class="ns-plate-wrap"><button class="ns-plate is-hover" aria-label="Plate 2, has 2"><!--kit:item-ticket--><!--kit:item-ticket--></button>Plate 2</div></div>
+      <div class="g-state"><small>Focus</small><div class="ns-plate-wrap"><button class="ns-plate is-focus" aria-label="Plate 3, has 1"><!--kit:item-ticket--></button>Plate 3</div></div>
+      <div class="g-state"><small>Box (grouping)</small><div class="ns-plate-wrap"><button class="ns-plate ns-plate--box" aria-label="Group 1, has 3"><!--kit:item-coin--><!--kit:item-coin--><!--kit:item-coin--></button>Group 1</div></div>
+    </div>
+  </section>
+
+  <section class="g-sec" id="help">
+    <header><h2 class="ns-h2">Hint, nudge, status</h2></header>
+    <div class="g-row">
+      <div class="g-state" style="flex: 1 1 320px"><small>Hint panel</small><div class="ns-hint" style="width: 100%"><!--kit:icon-hint--><span>Go around the plates one at a time, like dealing cards.</span></div></div>
+      <div class="g-state" style="flex: 1 1 320px"><small>Nudge (first wrong check on a build)</small><p class="ns-nudge" role="status" style="width: 100%">The plates aren't equal yet. Undo to move some back, then share again.</p></div>
+      <div class="g-state" style="flex: 1 1 320px"><small>Built correctly</small><p class="ns-status" role="status" style="width: 100%"><!--kit:icon-check--><span>15 shared into 3 equal groups is 5 in each group.</span></p></div>
+    </div>
+  </section>
+
+  <section class="g-sec" id="feedback">
+    <header><h2 class="ns-h2">Feedback cards</h2><span class="g-note">Order for not yet (F-6.AC-1): plain statement, pattern sentence, worked visual, answer.</span></header>
+    <div class="g-row">
+      <div class="ns-fb ns-fb--notyet" role="status" style="flex: 1 1 420px">
+        <div class="ns-fb__head"><span class="ns-fb__icon"><!--kit:icon-not-yet--></span><h3 class="ns-fb__title">Not yet. Let's look at it another way.</h3><span class="ns-fb__gain" aria-label="plus 1 gem for answering">+1 <!--kit:gem--></span></div>
+        <p class="ns-fb__pattern">12 comes from taking 3 away from 15. Dividing means sharing into equal groups.</p>
+        <figure class="ns-fb__visual">
+          <div style="display: flex; gap: 16px" role="img" aria-label="3 plates with 5 tickets on each">
+            <span class="ns-plate" style="width: 96px; height: 96px; padding: 16px 10px; gap: 3px"><!--kit:item-ticket--><!--kit:item-ticket--><!--kit:item-ticket--><!--kit:item-ticket--><!--kit:item-ticket--></span>
+            <span class="ns-plate" style="width: 96px; height: 96px; padding: 16px 10px; gap: 3px"><!--kit:item-ticket--><!--kit:item-ticket--><!--kit:item-ticket--><!--kit:item-ticket--><!--kit:item-ticket--></span>
+            <span class="ns-plate" style="width: 96px; height: 96px; padding: 16px 10px; gap: 3px"><!--kit:item-ticket--><!--kit:item-ticket--><!--kit:item-ticket--><!--kit:item-ticket--><!--kit:item-ticket--></span>
+          </div>
+          <div class="ns-strip ns-strip--sm" style="background: none"><span>15</span><span>÷</span><span>3</span><span>=</span><span class="ns-slot ns-slot--good">5</span></div>
+        </figure>
+        <p>15 shared into 3 equal groups is 5 in each group. The answer is <b>5</b>.</p>
+        <div class="ns-fb__actions"><button class="ns-btn ns-btn--warm"><!--kit:icon-show-me-how--> Show me how</button><button class="ns-btn ns-btn--primary">Got it, next <!--kit:icon-arrow-right--></button></div>
+      </div>
+      <div style="flex: 1 1 360px; display: flex; flex-direction: column; gap: 18px">
+        <div class="ns-fb ns-fb--good" role="status">
+          <div class="ns-fb__head"><span class="ns-fb__icon"><!--kit:icon-check--></span><h3 class="ns-fb__title">Yes. You shared them one at a time.</h3><span class="ns-fb__gain" aria-label="plus 2 gems">+2 <!--kit:gem--></span></div>
+          <p class="ns-small" style="color: var(--ink)">Praise names the strategy, never speed or being smart (F-15.AC-4).</p>
+          <button class="ns-btn ns-btn--primary">Next <!--kit:icon-arrow-right--></button>
+        </div>
+        <div class="ns-fb ns-fb--unsure" role="status">
+          <div class="ns-fb__head"><span class="ns-fb__icon"><!--kit:icon-info--></span><h3 class="ns-fb__title">Good call asking. Here's how to see it.</h3></div>
+          <p class="ns-small" style="color: var(--ink)">After "I'm not sure": neutral card, no warm colour, same worked visual and answer.</p>
+          <button class="ns-btn ns-btn--primary">Got it, next</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="g-sec" id="dialog">
+    <header><h2 class="ns-h2">Dialogs and toast</h2><span class="g-note">Dialogs trap focus, close with Escape, return focus. Reduced motion: no scale-in.</span></header>
+    <div class="g-row">
+      <div class="ns-scrim" style="flex: 1 1 300px">
+        <div class="ns-dialog" role="dialog" aria-labelledby="d1"><!--kit:badge-star-lit--><h3 class="ns-h2" id="d1">A star is lit: Equal groups</h3><p>You can now open × 2, 5, 10 and Sharing equally.</p><button class="ns-btn ns-btn--primary">Keep going</button></div>
+      </div>
+      <div class="ns-scrim" style="flex: 1 1 300px">
+        <div class="ns-dialog" role="dialog" aria-labelledby="d2"><!--kit:badge-level-up--><h3 class="ns-h2" id="d2">Up to pictures</h3><p>You're ready for Sharing equally with pictures.</p><button class="ns-btn ns-btn--primary">Keep going</button></div>
+      </div>
+      <div class="ns-scrim" style="flex: 1 1 300px">
+        <div class="ns-dialog" role="dialog" aria-labelledby="d3"><!--kit:badge-switch-level--><h3 class="ns-h2" id="d3">Let's switch it up</h3><p>We'll try this with things you can move for a bit. It makes it easier to see what's going on.</p><button class="ns-btn ns-btn--primary">Keep going</button></div>
+      </div>
+    </div>
+    <div class="g-row">
+      <div class="g-state"><small>Toast</small><span class="ns-toast" role="status"><!--kit:icon-check--> Progress saved</span></div>
+      <div class="g-state"><small>Toast: refresh</small><span class="ns-toast" role="status"><!--kit:icon-replay--> Quick refresh: Taking away</span></div>
+    </div>
+  </section>
+
+  <section class="g-sec" id="map">
+    <header><h2 class="ns-h2">Star map: lines and stops</h2><span class="g-note">Solid track joins lit or almost-lit stops; dashed track ahead. Every stop is a button with its state in the accessible name.</span></header>
+    <div style="overflow-x: auto">
+      <div style="min-width: 720px">
+        <div class="ns-line">
+          <div class="ns-line__head"><span class="ns-badge">Multiply</span><span class="ns-line__from">After Adding</span></div>
+          <div class="ns-line__track">
+            <span class="ns-seg" style="left: 70px"></span><span class="ns-seg ns-seg--off" style="left: 210px"></span><span class="ns-seg ns-seg--off" style="left: 350px"></span>
+            <button class="ns-station" style="left: 2px" aria-label="Equal groups, lit"><span><!--kit:station-lit--></span><span class="ns-station__label">Equal groups</span></button>
+            <button class="ns-station" style="left: 142px" aria-label="× 2, 5, 10, almost lit, check next time"><span><!--kit:station-pending--></span><span class="ns-station__label">× 2, 5, 10</span></button>
+            <button class="ns-station is-focus" style="left: 282px" aria-label="× 3 and 4, open"><span><!--kit:station-open--></span><span class="ns-station__label">× 3 and 4</span></button>
+            <button class="ns-station ns-station--locked" style="left: 422px" aria-label="× 6 to 9, not open yet"><span><!--kit:station-locked--></span><span class="ns-station__label">× 6 to 9</span></button>
+          </div>
+        </div>
+        <div class="ns-line">
+          <div class="ns-line__head"><span class="ns-badge">Divide</span><span class="ns-line__from">After Equal groups and Taking away</span></div>
+          <div class="ns-line__track">
+            <span class="ns-seg ns-seg--off" style="left: 70px"></span>
+            <button class="ns-station" style="left: 2px" aria-label="Sharing equally, practising now"><span><!--kit:station-now--><span class="ns-tag">Now</span></span><span class="ns-station__label">Sharing equally</span></button>
+            <button class="ns-station ns-station--locked" style="left: 142px" aria-label="Division facts, not open yet"><span><!--kit:station-locked--></span><span class="ns-station__label">Division facts</span></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="g-sec" id="week">
+    <header><h2 class="ns-h2">Week goal (F-14.AC-4)</h2><span class="g-note">Four markers, any four days. Missing days are never mentioned.</span></header>
+    <div class="g-row">
+      <div class="g-state"><small>2 of 4</small><div style="display: flex; align-items: center; gap: 12px"><div class="ns-week" role="img" aria-label="2 of 4 practice days this week"><i class="on"><!--kit:icon-check--></i><i class="on"><!--kit:icon-check--></i><i></i><i></i></div><b>2 of 4 days</b></div></div>
+      <div class="g-state"><small>Goal met</small><div style="display: flex; align-items: center; gap: 12px"><div class="ns-week" role="img" aria-label="4 of 4 practice days this week"><i class="on"><!--kit:icon-check--></i><i class="on"><!--kit:icon-check--></i><i class="on"><!--kit:icon-check--></i><i class="on"><!--kit:icon-check--></i></div><b>Week done</b></div></div>
+    </div>
+  </section>
+
+  <section class="g-sec" id="lesson">
+    <header><h2 class="ns-h2">Lesson player (F-4)</h2><span class="g-note">Watch, Together, Your turn. At most 6 steps. Replay counts as a hint during practice.</span></header>
+    <div class="ns-card" style="display: flex; flex-direction: column; gap: 18px">
+      <div class="ns-lessonbar">
+        <div class="ns-phases" role="img" aria-label="Lesson: together, step 4 of 6"><span class="ns-phase done">Watch</span><span class="ns-phase now">Together</span><span class="ns-phase">Your turn</span></div>
+        <div class="ns-stepdots" aria-hidden="true"><i class="done"></i><i class="done"></i><i class="done"></i><i class="now"></i><i></i><i></i></div>
+        <button class="ns-btn ns-btn--icon" style="margin-left: auto" aria-label="Read aloud"><!--kit:icon-read-aloud--></button>
+      </div>
+      <p class="ns-prompt">Now you finish it. 2 tickets are on each plate. Share the last 3 so every plate gets one more.</p>
+      <div class="ns-strip"><span>9</span><span>÷</span><span>3</span><span>=</span><span class="ns-slot">?</span></div>
+      <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: space-between">
+        <button class="ns-btn"><!--kit:icon-left--> Back</button>
+        <button class="ns-btn ns-btn--ghost"><!--kit:icon-replay--> Watch again</button>
+        <button class="ns-btn ns-btn--primary" disabled>Next <!--kit:icon-arrow-right--></button>
+      </div>
+    </div>
+  </section>
+
+  <section class="g-sec" id="sayit">
+    <header><h2 class="ns-h2">Say it (F-13.AC-2)</h2><span class="g-note">Never scored. One tap to skip. Radio group: arrow keys move, Space picks.</span></header>
+    <div class="g-row">
+      <div style="flex: 1 1 420px; display: flex; flex-direction: column; gap: 12px">
+        <p class="ns-prompt">Which sentence says what you just did?</p>
+        <div class="ns-choices" role="radiogroup" aria-label="Pick a sentence">
+          <button class="ns-choice" role="radio" aria-checked="false"><i></i>15 and 3 put together is 18.</button>
+          <button class="ns-choice" role="radio" aria-checked="true"><i></i>15 shared into 3 equal groups is 5 in each group.</button>
+          <button class="ns-choice" role="radio" aria-checked="false"><i></i>3 taken away from 15 leaves 12.</button>
+        </div>
+        <div style="display: flex; gap: 10px"><button class="ns-btn ns-btn--primary">That's it</button><button class="ns-btn ns-btn--ghost">Skip</button></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="g-sec" id="vocab">
+    <header><h2 class="ns-h2">Vocabulary term and pop-up (F-13.AC-3)</h2><span class="g-note">Dotted underline marks a term. Pop-up: definition, picture, example, non-example.</span></header>
+    <div class="g-row">
+      <p class="ns-prompt" style="flex: 1 1 300px">Make 4 <button class="ns-term">equal groups</button> with 3 in each group.</p>
+      <div class="ns-pop" role="dialog" aria-labelledby="v1">
+        <div style="display: flex; justify-content: space-between; align-items: center"><h3 class="ns-h3" id="v1">Equal groups</h3><button class="ns-btn ns-btn--icon" aria-label="Close"><!--kit:icon-close--></button></div>
+        <p>Groups that all have the same number in them.</p>
+        <div class="ns-pop__ex">
+          <div><!--kit:op-equal-groups--><b>Equal groups</b>3 groups of 2</div>
+          <div><svg viewBox="0 0 160 64" aria-hidden="true"><rect x="6" y="14" width="44" height="36" rx="10" style="fill:none;stroke:var(--ink);stroke-width:2"/><circle cx="28" cy="32" r="5" style="fill:var(--sky)"/><rect x="58" y="14" width="44" height="36" rx="10" style="fill:none;stroke:var(--ink);stroke-width:2"/><circle cx="72" cy="32" r="5" style="fill:var(--sky)"/><circle cx="88" cy="32" r="5" style="fill:var(--sky)"/><rect x="110" y="14" width="44" height="36" rx="10" style="fill:none;stroke:var(--ink);stroke-width:2"/><circle cx="120" cy="26" r="5" style="fill:var(--sky)"/><circle cx="134" cy="26" r="5" style="fill:var(--sky)"/><circle cx="127" cy="40" r="5" style="fill:var(--sky)"/></svg><b>Not equal</b>1, 2 and 3</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="g-sec" id="facts">
+    <header><h2 class="ns-h2">Facts set and quick round (F-10)</h2><span class="g-note">Fact states use a word and a shape. Quick round: slim bar only, no digits, always skippable.</span></header>
+    <div class="ns-facts">
+      <div class="ns-fact ns-fact--new"><b>6 × 7</b><span><!--kit:icon-plus-->New</span></div>
+      <div class="ns-fact"><b>6 × 4</b><span><!--kit:icon-hint-->Building</span></div>
+      <div class="ns-fact"><b>5 × 6</b><span><!--kit:icon-check-->Got it</span></div>
+      <div class="ns-fact ns-fact--solid"><b>2 × 8</b><span><!--kit:star-->Solid</span></div>
+    </div>
+    <div class="g-row">
+      <div class="g-state" style="flex: 1 1 420px"><small>Quick round header</small>
+        <div style="width: 100%; display: flex; align-items: center; gap: 14px">
+          <div class="ns-progress" style="flex: 1" role="progressbar" aria-label="Quick round progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="40"><i style="width: 40%"></i></div>
+          <button class="ns-btn ns-btn--ghost"><!--kit:icon-skip--> Skip</button>
+        </div>
+      </div>
+      <div class="g-state"><small>After the round</small><p style="font-size: 17px">You got 14 right. Your best was 12.</p></div>
+    </div>
+  </section>
+
+  <section class="g-sec" id="feel">
+    <header><h2 class="ns-h2">How did that feel? (F-14.AC-5)</h2><span class="g-note">Words with a line drawing, no faces. One tap. The lowest choice twice in a row shortens the next session (F-16.AC-4).</span></header>
+    <div class="ns-feel" role="group" aria-label="How did that feel?" style="max-width: 520px">
+      <button aria-pressed="false"><svg viewBox="0 0 40 24" aria-hidden="true"><path d="M2 12c4-8 8 8 12 0s8 8 12 0 8 8 12 0" style="fill:none;stroke:var(--ink);stroke-width:2.5;stroke-linecap:round"/></svg>Hard</button>
+      <button aria-pressed="true"><svg viewBox="0 0 40 24" aria-hidden="true"><path d="M4 12h32" style="fill:none;stroke:var(--ink);stroke-width:2.5;stroke-linecap:round"/></svg>OK</button>
+      <button aria-pressed="false"><svg viewBox="0 0 40 24" aria-hidden="true"><path d="M4 20L16 12l8 4L36 4" style="fill:none;stroke:var(--ink);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round"/></svg>Good</button>
+    </div>
+  </section>
+
+  <section class="g-sec" id="checkup">
+    <header><h2 class="ns-h2">Check-up (F-18)</h2><span class="g-note">20 questions, no hints, no feedback until the end. The end screen shows only gains.</span></header>
+    <div class="g-row">
+      <div class="g-state" style="flex: 1 1 420px"><small>Progress</small>
+        <div style="width: 100%; display: flex; flex-direction: column; gap: 6px"><span style="font-weight: 700">Check-up · question 7 of 20</span>
+          <div class="ns-ticks" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+      </div>
+      <div class="g-state" style="flex: 1 1 320px"><small>End</small><div class="ns-card ns-card--quiet" style="width: 100%"><h3 class="ns-h2">Done, thanks.</h3><p style="margin-top: 6px">You got better at: Sharing equally, × 2, 5, 10.</p></div></div>
+    </div>
+  </section>
+
+  <section class="g-sec" id="maths">
+    <header><h2 class="ns-h2">Maths displays with live text</h2><span class="g-note">Kit SVGs carry no text; numbers are HTML placed over them.</span></header>
+    <div class="g-row">
+      <div class="g-state"><small>Place-value table (shape headers, one block hue)</small>
+        <table class="ns-pv"><tr><th><span><!--kit:block-hundred-->Hundreds</span></th><th><span><!--kit:block-ten-->Tens</span></th><th><span><!--kit:block-one-->Ones</span></th></tr><tr><td>3</td><td class="is-asked">4</td><td>7</td></tr></table>
+      </div>
+      <div class="g-state"><small>Skip-count rows with running total</small>
+        <div class="ns-rows"><div><span class="dots"><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="total">6</span></div><div><span class="dots"><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="total">12</span></div><div><span class="dots"><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="total">18</span></div></div>
+      </div>
+    </div>
+    <div class="g-row">
+      <div class="g-state"><small>Number line with labels</small>
+        <div class="ns-nl"><!--kit:numberline-0-20-marker--><span class="ns-nl__label" style="left: 5%">0</span><span class="ns-nl__label" style="left: 27.5%">5</span><span class="ns-nl__label" style="left: 50%">10</span><span class="ns-nl__label" style="left: 72.5%">15</span><span class="ns-nl__label" style="left: 95%">20</span></div>
+      </div>
+      <div class="g-state"><small>Word problem: Total, unknown whole</small>
+        <div class="ns-wp"><!--kit:wp-total-unknown-whole--><span class="ns-wp__n" style="left: 132px; top: 8px; color: var(--accent-text)">?</span><span class="ns-wp__n" style="left: 38px; top: 72px">17</span><span class="ns-wp__n" style="left: 198px; top: 72px">35</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="g-sec" id="custom">
+    <header><h2 class="ns-h2">Customize tiles and settings</h2><span class="g-note">Gems buy looks only. A tile she can't afford says how many more, never "locked".</span></header>
+    <div class="ns-tiles">
+      <button class="ns-tile is-current" aria-pressed="true"><span class="ns-tile__art"><span class="ns-avatar" aria-hidden="true">S</span></span><span class="ns-tile__name">Square badge</span><span class="ns-tile__meta"><!--kit:icon-check--> Using</span></button>
+      <button class="ns-tile" aria-pressed="false"><span class="ns-tile__art"><!--kit:avatar-emblem-comet--></span><span class="ns-tile__name">Comet</span><span class="ns-tile__meta">Yours</span></button>
+      <button class="ns-tile"><span class="ns-tile__art"><!--kit:avatar-emblem-mountain--></span><span class="ns-tile__name">Mountain</span><span class="ns-tile__meta"><!--kit:gem--> 30</span></button>
+      <button class="ns-tile" disabled><span class="ns-tile__art"><!--kit:avatar-emblem-compass--></span><span class="ns-tile__name">Compass</span><span class="ns-tile__meta"><!--kit:gem--> 60 · 14 more to go</span></button>
+    </div>
+    <div class="g-row">
+      <div class="g-state"><small>Segmented control</small><div class="ns-seg-control" role="group" aria-label="Session length"><button aria-pressed="false">10 min</button><button aria-pressed="true">15 min</button><button aria-pressed="false">20 min</button></div></div>
+      <div class="g-state"><small>Theme</small><div class="ns-seg-control" role="group" aria-label="Theme"><button aria-pressed="true">Light</button><button aria-pressed="false">Dark</button><button aria-pressed="false">Match device</button></div></div>
+    </div>
+  </section>
+
+  <section class="g-sec" id="grownup">
+    <header><h2 class="ns-h2">Grown-up components</h2><span class="g-note">Grown-up view only. Numbers are fine here; no child-facing text.</span></header>
+    <div>
+      <div class="ns-skillrow"><b>Sharing equally</b><span class="ns-level"><i class="on"></i><i class="on"></i><i></i><span>Pictures</span></span><div class="ns-est" role="img" aria-label="Estimate 62 percent; move up at 90, down below 40"><i style="width: 62%"></i><b style="left: 40%"></b><b style="left: 90%"></b></div><span>62%</span></div>
+      <div class="ns-skillrow"><b>× 2, 5, 10</b><span class="ns-level"><i class="on"></i><i class="on"></i><i class="on"></i><span>Numbers</span></span><div class="ns-est" role="img" aria-label="Estimate 93 percent"><i style="width: 93%"></i><b style="left: 40%"></b><b style="left: 90%"></b></div><span>93%</span></div>
+    </div>
+    <div class="g-row">
+      <dl class="ns-pattern" style="flex: 1 1 360px">
+        <div style="display: flex; justify-content: space-between; gap: 12px"><span class="ns-h3">Used subtraction on a division question</span><span class="ns-pattern__count">Seen 4 times</span></div>
+        <dt>What she sees</dt><dd>That answer comes from taking away. Dividing means sharing into equal groups.</dd>
+        <dt>Try at home</dt><dd>Deal real objects (cards, coins, crackers) into equal piles and say it out loud: "12 shared into 3 piles is 4 each."</dd>
+      </dl>
+      <div class="g-state"><small>Times chart (counts as a hint)</small>
+        <table class="ns-times" aria-label="Times chart, 7 times 4 highlighted"><tr><th>×</th><th>1</th><th>2</th><th>3</th><th class="hl">4</th><th>5</th></tr><tr><th>6</th><td>6</td><td>12</td><td>18</td><td class="hl">24</td><td>30</td></tr><tr class="hl"><th class="hl">7</th><td class="hl">7</td><td class="hl">14</td><td class="hl">21</td><td class="hit">28</td><td class="hl">35</td></tr><tr><th>8</th><td>8</td><td>16</td><td>24</td><td class="hl">32</td><td>40</td></tr></table>
+      </div>
+    </div>
+    <div class="g-state" style="width: 100%"><small>Check-up trend by strand (correct out of 4, last four check-ups)</small>
+      <div class="ns-trend" style="width: 100%; max-width: 640px">
+        <span>Number sense</span><svg viewBox="0 0 200 36" aria-hidden="true"><polyline points="10,26 70,18 130,18 190,10" style="fill:none;stroke:var(--sky);stroke-width:2.5"/><circle cx="190" cy="10" r="4" style="fill:var(--sky)"/></svg><span>3 of 4 · +1</span>
+        <span>Add and subtract</span><svg viewBox="0 0 200 36" aria-hidden="true"><polyline points="10,18 70,18 130,10 190,10" style="fill:none;stroke:var(--sky);stroke-width:2.5"/><circle cx="190" cy="10" r="4" style="fill:var(--sky)"/></svg><span>3 of 4 · +0</span>
+        <span>Divide</span><svg viewBox="0 0 200 36" aria-hidden="true"><polyline points="10,34 70,26 130,26 190,18" style="fill:none;stroke:var(--sky);stroke-width:2.5"/><circle cx="190" cy="18" r="4" style="fill:var(--sky)"/></svg><span>2 of 4 · +1</span>
+      </div>
+    </div>
+  </section>
+</div>
+</body>
+</html>

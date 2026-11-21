@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Number Sky · Home (reference)</title>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../components.css">
+<style>
+  .wrap { max-width: 1184px; margin: 0 auto; padding: 24px clamp(16px, 4vw, 48px); display: flex; flex-direction: column; gap: 24px; }
+  .head { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; }
+  .head .who { flex: 1 1 180px; }
+  .body { display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start; }
+  .side { flex: 1 1 300px; max-width: 360px; display: flex; flex-direction: column; gap: 16px; }
+  .map { flex: 999 1 560px; min-width: 0; }
+  .key { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 12px; font-size: 15px; color: var(--ink-soft); }
+  .key span { display: flex; align-items: center; gap: 8px; }
+  .key svg { width: 22px; height: 22px; }
+  .theme-switch { position: fixed; right: 12px; bottom: 12px; }
+  @media (max-width: 719px) {
+    .wrap { padding-top: 16px; gap: 14px; }
+    .side { max-width: none; }
+    .side .ns-card--quiet.key-card { display: none; }
+    .map.ns-card { border: 0; padding: 0; background: none; }
+    .head .ns-btn { display: none; }
+    .foot { display: flex !important; }
+    .map .ns-station__label { background: var(--bg); }
+  }
+</style>
+</head>
+<body class="ns ns-page" data-theme="light">
+<div class="wrap">
+  <header class="head">
+    <button class="ns-avatar" aria-label="Your badge and style">S</button>
+    <div class="who"><div class="ns-h2" style="font-size: 26px">Sam</div><div class="ns-small">7 of 14 stars lit</div></div>
+    <span class="ns-gems" aria-label="46 gems"><!--kit:gem--> 46</span>
+    <button class="ns-btn">Customize</button>
+    <button class="ns-btn">Grown-ups (hold)</button>
+  </header>
+
+  <div class="body">
+    <div class="side">
+      <section class="ns-card" style="padding: 22px; display: flex; flex-direction: column; gap: 12px">
+        <span class="ns-eyebrow">Next stop</span>
+        <h1 class="ns-h1">Sharing equally</h1>
+        <span class="ns-level" style="align-self: flex-start"><i class="on"></i><i class="on"></i><i></i><span>Pictures level</span></span>
+        <p style="color: var(--ink-soft); font-size: 17px">Dividing means sharing into equal groups.</p>
+        <button class="ns-btn ns-btn--primary">Start today's practice <!--kit:icon-arrow-right--></button>
+      </section>
+      <section class="ns-card ns-card--quiet" style="display: flex; flex-direction: column; gap: 10px">
+        <div style="display: flex; justify-content: space-between; align-items: baseline"><h2 class="ns-h2" style="font-size: 19px">This week</h2><b>2 of 4 days</b></div>
+        <div class="ns-week" role="img" aria-label="2 of 4 practice days this week"><i class="on"><!--kit:icon-check--></i><i class="on"><!--kit:icon-check--></i><i></i><i></i></div>
+        <p class="ns-small">Any 4 days count.</p>
+      </section>
+      <section class="ns-card ns-card--quiet key-card" aria-label="Key">
+        <div class="key">
+          <span><!--kit:station-lit-->Lit</span>
+          <span><!--kit:station-pending-->Almost lit</span>
+          <span><!--kit:station-open-->Open</span>
+          <span><!--kit:station-locked-->Not yet open</span>
+        </div>
+      </section>
+    </div>
+
+    <section class="map ns-card" aria-label="Your star lines">
+      <div style="display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 4px 12px; margin-bottom: 12px">
+        <h2 class="ns-h2">Your star lines</h2><span class="ns-small">Click a stop to see what it is.</span>
+      </div>
+
+      <div class="ns-line">
+        <div class="ns-line__head"><span class="ns-badge">Number sense</span><span class="ns-line__from">Start here</span></div>
+        <div class="ns-line__track">
+          <span class="ns-seg" style="--i: 0"></span><span class="ns-seg" style="--i: 1"></span><span class="ns-seg" style="--i: 2"></span>
+          <button class="ns-station" style="--i: 0" aria-label="Seeing amounts, lit"><span><!--kit:station-lit--></span><span class="ns-station__label">Seeing amounts</span></button>
+          <button class="ns-station" style="--i: 1" aria-label="Number line, lit"><span><!--kit:station-lit--></span><span class="ns-station__label">Number line</span></button>
+          <button class="ns-station" style="--i: 2" aria-label="Tens and ones, lit"><span><!--kit:station-lit--></span><span class="ns-station__label">Tens and ones</span></button>
+          <button class="ns-station" style="--i: 3" aria-label="Making 10, lit"><span><!--kit:station-lit--></span><span class="ns-station__label">Making 10</span></button>
+        </div>
+      </div>
+
+      <div class="ns-line">
+        <div class="ns-line__head"><span class="ns-badge">Add &amp; subtract</span><span class="ns-line__from">After Number sense</span></div>
+        <div class="ns-line__track">
+          <span class="ns-seg" style="--i: 0"></span>
+          <button class="ns-station" style="--i: 0" aria-label="Adding, lit"><span><!--kit:station-lit--></span><span class="ns-station__label">Adding</span></button>
+          <button class="ns-station" style="--i: 1" aria-label="Taking away, lit"><span><!--kit:station-lit--></span><span class="ns-station__label">Taking away</span></button>
+        </div>
+      </div>
+
+      <div class="ns-line">
+        <div class="ns-line__head"><span class="ns-badge">Multiply</span><span class="ns-line__from">After Adding</span></div>
+        <div class="ns-line__track">
+          <span class="ns-seg" style="--i: 0"></span><span class="ns-seg ns-seg--off" style="--i: 1"></span><span class="ns-seg ns-seg--off" style="--i: 2"></span>
+          <button class="ns-station" style="--i: 0" aria-label="Equal groups, lit"><span><!--kit:station-lit--></span><span class="ns-station__label">Equal groups</span></button>
+          <button class="ns-station" style="--i: 1" aria-label="× 2, 5, 10, almost lit, check next time"><span><!--kit:station-pending--></span><span class="ns-station__label">× 2, 5, 10</span></button>
+          <button class="ns-station" style="--i: 2" aria-label="× 3 and 4, open"><span><!--kit:station-open--></span><span class="ns-station__label">× 3 and 4</span></button>
+          <button class="ns-station ns-station--locked" style="--i: 3" aria-label="× 6 to 9, not open yet"><span><!--kit:station-locked--></span><span class="ns-station__label">× 6 to 9</span></button>
+        </div>
+      </div>
+
+      <div class="ns-line">
+        <div class="ns-line__head"><span class="ns-badge">Divide</span><span class="ns-line__from">After Equal groups and Taking away</span></div>
+        <div class="ns-line__track">
+          <span class="ns-seg ns-seg--off" style="--i: 0"></span>
+          <button class="ns-station" style="--i: 0" aria-label="Sharing equally, practising now"><span><!--kit:station-now--><span class="ns-tag">Now</span></span><span class="ns-station__label">Sharing equally</span></button>
+          <button class="ns-station ns-station--locked" style="--i: 1" aria-label="Division facts, not open yet"><span><!--kit:station-locked--></span><span class="ns-station__label">Division facts</span></button>
+        </div>
+      </div>
+
+      <div class="ns-line">
+        <div class="ns-line__head"><span class="ns-badge">Problem solving</span><span class="ns-line__from">After Sharing equally</span></div>
+        <div class="ns-line__track">
+          <span class="ns-seg ns-seg--off" style="--i: 0"></span>
+          <button class="ns-station ns-station--locked" style="--i: 0" aria-label="Which operation?, not open yet"><span><!--kit:station-locked--></span><span class="ns-station__label">Which operation?</span></button>
+          <button class="ns-station ns-station--locked" style="--i: 1" aria-label="Fractions, not open yet"><span><!--kit:station-locked--></span><span class="ns-station__label">Fractions</span></button>
+        </div>
+      </div>
+    </section>
+  </div>
+  <footer class="foot" style="display: none; gap: 10px"><button class="ns-btn" style="flex: 1">Customize</button><button class="ns-btn" style="flex: 1">Grown-ups (hold)</button></footer>
+</div>
+<button class="ns-btn theme-switch" onclick="document.body.dataset.theme = document.body.dataset.theme === 'dark' ? 'light' : 'dark'">Light / dark</button>
+</body>
+</html>
