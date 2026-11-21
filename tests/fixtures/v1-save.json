@@ -1,0 +1,585 @@
+{
+ "v": 1,
+ "profiles": {
+  "pmwpo2lcp817": {
+   "id": "pmwpo2lcp817",
+   "name": "Robin",
+   "avatar": "🐙",
+   "created": 1795220731033,
+   "placementDone": true,
+   "skills": {
+    "quantity": {
+     "stage": 0,
+     "best": 0,
+     "mastered": false,
+     "pL": [
+      0.13411824812607903,
+      0.2,
+      0.1
+     ],
+     "att": [
+      6,
+      0,
+      0
+     ],
+     "cor": [
+      0,
+      0,
+      0
+     ],
+     "recent": [
+      [],
+      [],
+      []
+     ],
+     "visit": [
+      0,
+      0,
+      0
+     ],
+     "lastSeen": 1795220732361,
+     "masteredAt": 0
+    },
+    "numberline": {
+     "stage": 0,
+     "best": 0,
+     "mastered": false,
+     "pL": [
+      0.3,
+      0.2,
+      0.1
+     ],
+     "att": [
+      0,
+      0,
+      0
+     ],
+     "cor": [
+      0,
+      0,
+      0
+     ],
+     "recent": [
+      [],
+      [],
+      []
+     ],
+     "visit": [
+      0,
+      0,
+      0
+     ],
+     "lastSeen": 0,
+     "masteredAt": 0
+    },
+    "placevalue": {
+     "stage": 0,
+     "best": 0,
+     "mastered": false,
+     "pL": [
+      0.3,
+      0.2,
+      0.1
+     ],
+     "att": [
+      0,
+      0,
+      0
+     ],
+     "cor": [
+      0,
+      0,
+      0
+     ],
+     "recent": [
+      [],
+      [],
+      []
+     ],
+     "visit": [
+      0,
+      0,
+      0
+     ],
+     "lastSeen": 0,
+     "masteredAt": 0
+    },
+    "makes10": {
+     "stage": 0,
+     "best": 0,
+     "mastered": false,
+     "pL": [
+      0.3,
+      0.2,
+      0.1
+     ],
+     "att": [
+      0,
+      0,
+      0
+     ],
+     "cor": [
+      0,
+      0,
+      0
+     ],
+     "recent": [
+      [],
+      [],
+      []
+     ],
+     "visit": [
+      0,
+      0,
+      0
+     ],
+     "lastSeen": 0,
+     "masteredAt": 0
+    },
+    "addition": {
+     "stage": 0,
+     "best": 0,
+     "mastered": false,
+     "pL": [
+      0.3,
+      0.2,
+      0.1
+     ],
+     "att": [
+      0,
+      0,
+      0
+     ],
+     "cor": [
+      0,
+      0,
+      0
+     ],
+     "recent": [
+      [],
+      [],
+      []
+     ],
+     "visit": [
+      0,
+      0,
+      0
+     ],
+     "lastSeen": 0,
+     "masteredAt": 0
+    },
+    "subtraction": {
+     "stage": 0,
+     "best": 0,
+     "mastered": false,
+     "pL": [
+      0.3,
+      0.2,
+      0.1
+     ],
+     "att": [
+      0,
+      0,
+      0
+     ],
+     "cor": [
+      0,
+      0,
+      0
+     ],
+     "recent": [
+      [],
+      [],
+      []
+     ],
+     "visit": [
+      0,
+      0,
+      0
+     ],
+     "lastSeen": 0,
+     "masteredAt": 0
+    },
+    "multmeaning": {
+     "stage": 0,
+     "best": 0,
+     "mastered": false,
+     "pL": [
+      0.3,
+      0.2,
+      0.1
+     ],
+     "att": [
+      0,
+      0,
+      0
+     ],
+     "cor": [
+      0,
+      0,
+      0
+     ],
+     "recent": [
+      [],
+      [],
+      []
+     ],
+     "visit": [
+      0,
+      0,
+      0
+     ],
+     "lastSeen": 0,
+     "masteredAt": 0
+    },
+    "multeasy": {
+     "stage": 0,
+     "best": 0,
+     "mastered": false,
+     "pL": [
+      0.3,
+      0.2,
+      0.1
+     ],
+     "att": [
+      0,
+      0,
+      0
+     ],
+     "cor": [
+      0,
+      0,
+      0
+     ],
+     "recent": [
+      [],
+      [],
+      []
+     ],
+     "visit": [
+      0,
+      0,
+      0
+     ],
+     "lastSeen": 0,
+     "masteredAt": 0
+    },
+    "multmid": {
+     "stage": 0,
+     "best": 0,
+     "mastered": false,
+     "pL": [
+      0.3,
+      0.2,
+      0.1
+     ],
+     "att": [
+      0,
+      0,
+      0
+     ],
+     "cor": [
+      0,
+      0,
+      0
+     ],
+     "recent": [
+      [],
+      [],
+      []
+     ],
+     "visit": [
+      0,
+      0,
+      0
+     ],
+     "lastSeen": 0,
+     "masteredAt": 0
+    },
+    "multhard": {
+     "stage": 0,
+     "best": 0,
+     "mastered": false,
+     "pL": [
+      0.3,
+      0.2,
+      0.1
+     ],
+     "att": [
+      0,
+      0,
+      0
+     ],
+     "cor": [
+      0,
+      0,
+      0
+     ],
+     "recent": [
+      [],
+      [],
+      []
+     ],
+     "visit": [
+      0,
+      0,
+      0
+     ],
+     "lastSeen": 0,
+     "masteredAt": 0
+    },
+    "divmeaning": {
+     "stage": 0,
+     "best": 0,
+     "mastered": false,
+     "pL": [
+      0.3,
+      0.2,
+      0.1
+     ],
+     "att": [
+      0,
+      0,
+      0
+     ],
+     "cor": [
+      0,
+      0,
+      0
+     ],
+     "recent": [
+      [],
+      [],
+      []
+     ],
+     "visit": [
+      0,
+      0,
+      0
+     ],
+     "lastSeen": 0,
+     "masteredAt": 0
+    },
+    "divfacts": {
+     "stage": 0,
+     "best": 0,
+     "mastered": false,
+     "pL": [
+      0.3,
+      0.2,
+      0.1
+     ],
+     "att": [
+      0,
+      0,
+      0
+     ],
+     "cor": [
+      0,
+      0,
+      0
+     ],
+     "recent": [
+      [],
+      [],
+      []
+     ],
+     "visit": [
+      0,
+      0,
+      0
+     ],
+     "lastSeen": 0,
+     "masteredAt": 0
+    },
+    "whichop": {
+     "stage": 0,
+     "best": 0,
+     "mastered": false,
+     "pL": [
+      0.3,
+      0.2,
+      0.1
+     ],
+     "att": [
+      0,
+      0,
+      0
+     ],
+     "cor": [
+      0,
+      0,
+      0
+     ],
+     "recent": [
+      [],
+      [],
+      []
+     ],
+     "visit": [
+      0,
+      0,
+      0
+     ],
+     "lastSeen": 0,
+     "masteredAt": 0
+    },
+    "fractions": {
+     "stage": 0,
+     "best": 0,
+     "mastered": false,
+     "pL": [
+      0.3,
+      0.2,
+      0.1
+     ],
+     "att": [
+      0,
+      0,
+      0
+     ],
+     "cor": [
+      0,
+      0,
+      0
+     ],
+     "recent": [
+      [],
+      [],
+      []
+     ],
+     "visit": [
+      0,
+      0,
+      0
+     ],
+     "lastSeen": 0,
+     "masteredAt": 0
+    }
+   },
+   "focus": "quantity",
+   "mis": {
+    "place-face": {
+     "count": 1,
+     "last": 1795220731645
+    }
+   },
+   "gems": 19,
+   "owned": {
+    "avatars": [
+     "🐙"
+    ],
+    "themes": [
+     "marigold"
+    ]
+   },
+   "theme": "marigold",
+   "days": [
+    "2026-11-21"
+   ],
+   "sessions": [
+    {
+     "d": 1795220731763,
+     "n": 3,
+     "c": 0,
+     "min": 1,
+     "m": "placement"
+    }
+   ],
+   "log": [
+    {
+     "t": 1795220731130,
+     "s": "multmeaning",
+     "g": 2,
+     "ok": false,
+     "p": 1,
+     "m": null
+    },
+    {
+     "t": 1795220731645,
+     "s": "placevalue",
+     "g": 2,
+     "ok": false,
+     "p": 1,
+     "m": "place-face"
+    },
+    {
+     "t": 1795220731729,
+     "s": "quantity",
+     "g": 2,
+     "ok": false,
+     "p": 1,
+     "m": null
+    },
+    {
+     "t": 1795220731952,
+     "s": "quantity",
+     "g": 0,
+     "ok": false,
+     "h": 0,
+     "m": null,
+     "r": 0,
+     "u": 1
+    },
+    {
+     "t": 1795220732045,
+     "s": "quantity",
+     "g": 0,
+     "ok": false,
+     "h": 0,
+     "m": null,
+     "r": 0,
+     "u": 1
+    },
+    {
+     "t": 1795220732129,
+     "s": "quantity",
+     "g": 0,
+     "ok": false,
+     "h": 0,
+     "m": null,
+     "r": 0,
+     "u": 1
+    },
+    {
+     "t": 1795220732212,
+     "s": "quantity",
+     "g": 0,
+     "ok": false,
+     "h": 0,
+     "m": null,
+     "r": 0,
+     "u": 1
+    },
+    {
+     "t": 1795220732295,
+     "s": "quantity",
+     "g": 0,
+     "ok": false,
+     "h": 0,
+     "m": null,
+     "r": 0,
+     "u": 1
+    },
+    {
+     "t": 1795220732361,
+     "s": "quantity",
+     "g": 0,
+     "ok": false,
+     "h": 0,
+     "m": null,
+     "r": 0,
+     "u": 1
+    }
+   ],
+   "settings": {
+    "sessionLen": 10,
+    "sound": true,
+    "autoRead": false,
+    "chart": true
+   }
+  }
+ },
+ "current": "pmwpo2lcp817",
+ "updated": 1795220732395
+}

@@ -1,0 +1,1307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Number Sky</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&display=swap">
+<style>
+:root{
+  /* Number Sky: math practice as a star chart. Every skill is a star; mastering it lights the star.
+     Layout: one centred column (max 760px). Practice = one large question card, answers under it, feedback card below. */
+  --bg:#EEF1F9;
+  --surface:#FFFFFF;
+  --surface-2:#E3E8F5;
+  --ink:#19203F;
+  --ink-soft:#4D5679;
+  --line:#C9D0E6;
+  --sky:#3A55C4;
+  --accent:#E59A0B;
+  --accent-ink:#2E1D00;
+  --accent-soft:#FBEBC5;
+  --good:#167F63;
+  --good-soft:#D5F0E6;
+  --warm:#B8532E;
+  --warm-soft:#FAE2D7;
+  --blk:#86A0F4;
+  --blk-line:#2F4AB0;
+  --shadow:0 1px 2px rgba(25,32,63,.06),0 6px 20px rgba(25,32,63,.07);
+  --font-display:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;
+  --font-body:"Atkinson Hyperlegible",Verdana,"Segoe UI",system-ui,sans-serif;
+  --r:18px;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0D1330;--surface:#171F47;--surface-2:#212B5B;--ink:#EEF0FA;--ink-soft:#AAB2D6;--line:#2E3A73;--sky:#93A6FF;
+    --accent:#F7B932;--accent-ink:#2A1B00;--accent-soft:#3B3218;
+    --good:#52D3A6;--good-soft:#163E35;--warm:#FF9C7B;--warm-soft:#46271F;
+    --blk:#5671DE;--blk-line:#C3CEFF;--shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0D1330;--surface:#171F47;--surface-2:#212B5B;--ink:#EEF0FA;--ink-soft:#AAB2D6;--line:#2E3A73;--sky:#93A6FF;
+  --accent:#F7B932;--accent-ink:#2A1B00;--accent-soft:#3B3218;
+  --good:#52D3A6;--good-soft:#163E35;--warm:#FF9C7B;--warm-soft:#46271F;
+  --blk:#5671DE;--blk-line:#C3CEFF;--shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:18px;line-height:1.5;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
+button,input,textarea{font:inherit;color:inherit}
+.wrap{max-width:760px;margin:0 auto;padding:16px 16px 56px;display:flex;flex-direction:column;gap:16px}
+h1,h2,h3{font-family:var(--font-display);line-height:1.12;margin:0;text-wrap:balance}
+h1{font-size:clamp(1.85rem,6vw,2.5rem);font-weight:800;letter-spacing:-.015em}
+h2{font-size:1.3rem;font-weight:800}
+h3{font-size:1.08rem;font-weight:600}
+p{margin:0}
+ul{margin:0;padding:0;list-style:none}
+.card{background:var(--surface);border-radius:var(--r);box-shadow:var(--shadow);padding:20px;display:flex;flex-direction:column;gap:14px}
+.muted{color:var(--ink-soft)}
+.small{font-size:.88rem}
+.center{text-align:center}
+.eyebrow{font-family:var(--font-display);font-weight:600;font-size:.85rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft)}
+:focus-visible{outline:3px solid var(--sky);outline-offset:3px}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:56px;padding:0 22px;border-radius:16px;border:0;background:var(--accent);color:var(--accent-ink);font-weight:700;font-size:1.1rem;cursor:pointer;box-shadow:0 3px 0 rgba(0,0,0,.2);transition:transform .08s ease,box-shadow .08s ease;text-align:center;line-height:1.2}
+.btn:active:not(:disabled){transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,.2)}
+.btn.big{width:100%;min-height:62px;font-size:1.2rem}
+.btn.secondary{background:var(--surface);color:var(--ink);border:2px solid var(--line);box-shadow:none}
+.btn.ghost{background:transparent;color:var(--ink-soft);border:2px dashed var(--line);box-shadow:none;min-height:48px;font-size:1rem;padding:0 16px}
+.btn:disabled{opacity:.45;cursor:default}
+.btn svg{width:22px;height:22px}
+.iconbtn{width:48px;height:48px;border-radius:14px;border:2px solid var(--line);background:var(--surface);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;flex:none;padding:0}
+.iconbtn:disabled{opacity:.4;cursor:default}
+.iconbtn svg{width:24px;height:24px}
+.ic{fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.row{display:flex;gap:12px;flex-wrap:wrap}
+.row>.btn{flex:1 1 200px}
+
+/* top bar */
+.top{display:flex;align-items:center;gap:12px}
+.avatar{width:52px;height:52px;border-radius:50%;background:var(--surface);box-shadow:var(--shadow);display:inline-flex;align-items:center;justify-content:center;font-size:30px;flex:none;line-height:1}
+.hello{flex:1;min-width:0}
+.hello .hi{font-family:var(--font-display);font-weight:800;font-size:1.35rem;line-height:1.1;overflow-wrap:anywhere}
+.hello .sub{color:var(--ink-soft);font-size:.95rem}
+.gems{display:inline-flex;align-items:center;gap:6px;background:var(--surface);border-radius:999px;padding:6px 14px 6px 10px;box-shadow:var(--shadow);font-weight:700;font-size:1.1rem}
+.gem{width:22px;height:22px;flex:none}
+.gem .g1{fill:var(--accent)}
+.gem .g2{fill:none;stroke:var(--accent-ink);stroke-opacity:.4;stroke-width:1.3}
+
+/* hero */
+.hero{position:relative;overflow:hidden;padding:24px 20px 20px}
+.hero>*{position:relative}
+.hero-sky{position:absolute!important;inset:0;pointer-events:none;opacity:.9;
+  background:
+    radial-gradient(circle at 86% 18%,var(--accent) 0 2.5px,transparent 3.5px),
+    radial-gradient(circle at 74% 34%,var(--accent) 0 1.5px,transparent 2.5px),
+    radial-gradient(circle at 93% 46%,var(--sky) 0 1.5px,transparent 2.5px),
+    radial-gradient(circle at 64% 12%,var(--sky) 0 1.2px,transparent 2.2px),
+    radial-gradient(circle at 80% 62%,var(--accent) 0 1.2px,transparent 2.2px),
+    radial-gradient(120% 90% at 100% 0%,var(--accent-soft),transparent 55%)}
+.hero h1{font-size:clamp(2rem,7vw,2.8rem)}
+.hero-note{color:var(--ink-soft);max-width:44ch}
+.stage{display:inline-flex;align-items:center;gap:6px;font-weight:700;font-size:.95rem;background:var(--surface-2);border-radius:999px;padding:4px 12px 4px 10px;align-self:flex-start}
+.stage i{width:10px;height:10px;border-radius:50%;border:2px solid var(--accent);display:inline-block}
+.stage i.on{background:var(--accent)}
+.week{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.week .wl{color:var(--ink-soft);font-size:.9rem;margin-right:4px}
+.week .wd{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:.75rem;color:var(--ink-soft)}
+.week .wd i{width:16px;height:16px;border-radius:50%;border:2px solid var(--line);display:block}
+.week .wd.on i{background:var(--good);border-color:var(--good)}
+.week .wd.today{color:var(--ink);font-weight:700}
+
+/* star chart */
+.sec-head{display:flex;flex-direction:column;gap:2px}
+.chart{display:flex;flex-direction:column;gap:14px}
+.const{background:var(--surface);border-radius:var(--r);padding:14px 14px 10px;box-shadow:var(--shadow)}
+.const h3{font-size:.9rem;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:6px}
+.stars{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:6px}
+.star{position:relative;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 4px 8px;border-radius:14px;border:0;background:transparent;cursor:pointer;text-align:center}
+.star:hover{background:var(--surface-2)}
+.star .st{width:48px;height:48px;overflow:visible}
+.star .sp{stroke-linejoin:round}
+.star.lit .sp{fill:var(--accent);stroke:var(--accent);stroke-width:2}
+.star.lit .glow{fill:var(--accent-soft)}
+.star.now .sp{fill:var(--accent-soft);stroke:var(--accent);stroke-width:2.6}
+.star.open .sp{fill:none;stroke:var(--accent);stroke-width:2.2}
+.star.locked .sp{fill:var(--surface-2);stroke:var(--line);stroke-width:1.6}
+.star.locked .sname{color:var(--ink-soft)}
+.sname{font-size:.88rem;font-weight:700;line-height:1.2}
+.pips{display:flex;gap:4px}
+.pips i{width:7px;height:7px;border-radius:50%;background:var(--surface-2);border:1.5px solid var(--line)}
+.pips i.on{background:var(--accent);border-color:var(--accent)}
+.nowtag{position:absolute;top:4px;right:8px;font-size:.68rem;font-weight:700;background:var(--accent);color:var(--accent-ink);border-radius:999px;padding:1px 7px}
+.star.now .st{animation:pulse 2.4s ease-in-out infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+.home-nav{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.hold{position:relative;overflow:hidden;-webkit-touch-callout:none;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+.holdbar{position:absolute;left:0;bottom:0;height:5px;width:0;background:var(--accent)}
+.hold.holding .holdbar{width:100%;transition:width 1.2s linear}
+
+/* practice */
+.ptop{display:flex;align-items:center;gap:12px}
+.prog{flex:1;display:flex;gap:4px}
+.prog i{flex:1;height:10px;border-radius:999px;background:var(--surface-2)}
+.prog i.done{background:var(--accent)}
+.prog i.cur{background:var(--accent-soft);box-shadow:inset 0 0 0 2px var(--accent)}
+.prog-text{flex:1;font-weight:700;color:var(--ink-soft)}
+.meta{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.chip{display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:2px solid var(--line);border-radius:999px;padding:3px 12px;font-weight:700;font-size:.9rem;white-space:nowrap}
+.chip.rev{border-style:dashed}
+.chip.good{background:var(--good-soft);border-color:var(--good);color:var(--ink)}
+.chip.acc{background:var(--accent-soft);border-color:var(--accent);color:var(--ink)}
+.qcard{gap:18px}
+.qhead{display:flex;gap:12px;align-items:flex-start}
+.prompt{flex:1;font-size:clamp(1.2rem,4.4vw,1.5rem);line-height:1.45}
+.prompt.sm{font-size:clamp(1.1rem,4vw,1.3rem)}
+.prompt b{font-weight:700;color:var(--ink)}
+.eq{display:block;text-align:center;font-size:clamp(2rem,9vw,2.8rem);font-weight:700;letter-spacing:.02em;padding:6px 0;line-height:1.2}
+.blank{display:inline-block;min-width:1.4em;border-bottom:4px solid var(--accent);color:var(--ink-soft);text-align:center}
+.frac{display:inline-flex;flex-direction:column;align-items:center;line-height:1;vertical-align:middle;font-weight:700;margin:0 .1em}
+.frac>span:first-child{border-bottom:3px solid currentColor;padding:0 .2em .08em}
+.frac>span:last-child{padding-top:.1em}
+.visual{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:12px;overflow-x:auto;padding:4px 0}
+.visual svg{max-width:100%;height:auto}
+.cap{width:100%;text-align:center;font-weight:700;color:var(--ink-soft);font-size:.95rem}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px}
+.opt{min-height:72px;border-radius:16px;border:2px solid var(--line);background:var(--surface);font-size:1.7rem;font-weight:700;cursor:pointer;padding:10px 12px;display:flex;align-items:center;justify-content:center;gap:10px;line-height:1.25}
+.opt.mid{font-size:1.3rem}
+.opt.txt{font-size:1.05rem;justify-content:flex-start;text-align:left}
+.opt:hover:not(:disabled){border-color:var(--accent)}
+.opt:disabled{cursor:default}
+.opt.right{background:var(--good-soft);border-color:var(--good)}
+.opt.wrong{background:var(--warm-soft);border-color:var(--warm)}
+.opt.sel{border-color:var(--sky)}
+.opt .opi{flex:none}
+.helpers{display:flex;gap:10px;flex-wrap:wrap}
+.hint{background:var(--accent-soft);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.padshow{min-height:64px;border-radius:16px;border:2px solid var(--line);background:var(--surface-2);font-size:2rem;font-weight:700;display:flex;align-items:center;justify-content:center;max-width:360px;width:100%;margin:0 auto}
+.padshow .ph{font-size:1rem;font-weight:400;color:var(--ink-soft)}
+.padshow.right{background:var(--good-soft);border-color:var(--good)}
+.padshow.wrong{background:var(--warm-soft);border-color:var(--warm)}
+.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:360px;width:100%;margin:0 auto}
+.key{min-height:64px;border-radius:14px;border:2px solid var(--line);background:var(--surface);font-size:1.7rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.key.ok{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-size:1.15rem}
+.key svg{width:28px;height:28px}
+.key:disabled{opacity:.45;cursor:default}
+
+/* feedback */
+.fb{border:3px solid var(--line)}
+.fb.good{border-color:var(--good);background:var(--good-soft)}
+.fb.warm{border-color:var(--warm);background:var(--warm-soft)}
+.fb .visual{background:var(--surface);border-radius:14px;padding:12px}
+.buddy{display:flex;align-items:center;gap:12px}
+.bubble{background:var(--surface);border-radius:16px;padding:10px 16px;font-weight:700;font-size:1.2rem;position:relative}
+.fb-gems{display:inline-flex;align-items:center;gap:6px;font-weight:700}
+.ans{font-size:1.15rem}
+
+/* visuals */
+.tfwrap{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+.tf{width:240px;max-width:100%;height:auto}
+.tf-frame{fill:var(--surface-2);stroke:var(--ink-soft);stroke-width:2}
+.tf-cell{fill:var(--surface);stroke:var(--line);stroke-width:1.5}
+.tf-on{fill:var(--accent)}
+.tf-pre{fill:var(--sky)}
+.tf-tap{cursor:pointer}
+.tf-tap:hover .tf-cell{stroke:var(--accent);stroke-width:2.5}
+.blocks{display:flex;gap:14px;align-items:flex-end;flex-wrap:wrap;justify-content:center;min-height:40px}
+.bg{display:flex;gap:4px;align-items:flex-end;flex-wrap:wrap}
+.bg.ones{display:grid;grid-template-columns:repeat(5,12px);gap:4px}
+.flat{width:84px;height:84px}
+.rod{width:12px;height:84px}
+.cube{width:12px;height:12px}
+.b-fill{fill:var(--blk)}
+.b-line{fill:none;stroke:var(--blk-line);stroke-width:1;vector-effect:non-scaling-stroke;opacity:.5}
+.b-edge{fill:none;stroke:var(--blk-line);stroke-width:1.6;vector-effect:non-scaling-stroke}
+.sum{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap;justify-content:center}
+.sum .and{font-weight:700;color:var(--ink-soft);align-self:center}
+.plates{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
+.pgrp{display:flex;flex-direction:column;align-items:center;gap:4px}
+.plate{min-width:88px;min-height:88px;max-width:128px;padding:10px;border-radius:50%;background:var(--surface-2);border:2px solid var(--line);display:flex;flex-wrap:wrap;gap:2px;align-items:center;justify-content:center;align-content:center}
+.plate.box{border-radius:14px}
+.plate.tap{cursor:pointer;border-style:dashed;border-color:var(--accent)}
+.plate.tap:disabled{cursor:default;border-style:solid;border-color:var(--line)}
+.plabel{font-size:.8rem;color:var(--ink-soft);font-weight:700}
+.it{font-size:22px;line-height:1.1}
+.items{display:grid;grid-template-columns:repeat(5,40px);gap:6px;justify-content:center}
+.it-c{width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-size:26px;border-radius:10px;position:relative;line-height:1;border:0;background:transparent;padding:0}
+.items.tap .it-c{background:var(--surface-2);cursor:pointer}
+.items.tap .it-c:disabled{cursor:default}
+.it-c.x{opacity:.4}
+.it-c.x::after{content:"";position:absolute;left:4px;right:4px;top:50%;height:4px;margin-top:-2px;background:var(--warm);border-radius:2px;transform:rotate(-38deg)}
+.items.new .it-c{background:var(--accent-soft)}
+.story{display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:center}
+.story-then{font-weight:700;color:var(--ink-soft)}
+.arr{max-width:100%;height:auto}
+.arr .d0{fill:var(--sky)}
+.arr .d1{fill:var(--accent)}
+.arr .d2{fill:var(--good)}
+.arr .d-off{fill:none;stroke:var(--ink-soft);stroke-width:1.5;stroke-dasharray:3 3}
+.rows{display:flex;flex-direction:column;gap:6px;align-items:center}
+.rows .row{display:flex;align-items:center;gap:10px;flex-wrap:nowrap}
+.rows .dots{display:flex;gap:5px}
+.rows .dots i{width:18px;height:18px;border-radius:50%;background:var(--sky);display:block}
+.rows .sk{font-weight:700;min-width:2.5em;color:var(--ink-soft)}
+.nl{width:100%;max-width:560px;height:auto}
+.nl-tap{cursor:pointer}
+.nl-axis{stroke:var(--ink);stroke-width:3}
+.nl-tick{stroke:var(--ink);stroke-width:2}
+.nl-tick.big{stroke-width:3}
+.nl-lab{fill:var(--ink);font-size:22px;text-anchor:middle;font-family:var(--font-body);font-weight:700}
+.nl-jump{fill:none;stroke:var(--accent);stroke-width:3}
+.nl-jlab{fill:var(--ink);font-size:17px;text-anchor:middle;font-family:var(--font-body);font-weight:700}
+.nl-arrow{fill:var(--warm)}
+.nl-marker{fill:var(--accent);stroke:var(--surface);stroke-width:3}
+.fb .nl-marker{stroke:var(--surface)}
+.fbar,.fb-svg{}
+.fbsvg{width:320px;max-width:100%;height:auto}
+.fb-part{fill:var(--surface);stroke:var(--ink-soft);stroke-width:2}
+.fb-part.on{fill:var(--accent)}
+.fb-part.tap{cursor:pointer}
+.fcsvg{width:150px;height:150px}
+.bm{width:100%;max-width:420px;display:flex;flex-direction:column;gap:6px}
+.bm-whole{background:var(--sky);color:#fff;border-radius:10px;padding:10px;text-align:center;font-weight:700;font-size:1.3rem}
+.bm-parts{display:flex;gap:6px}
+.bm-part{background:var(--accent-soft);border:2px solid var(--accent);border-radius:10px;padding:10px 4px;text-align:center;font-weight:700;font-size:1.3rem;min-width:44px}
+.bm-part.unk{background:var(--surface);border-style:dashed}
+.tri{width:220px;height:auto}
+.tri-edge{fill:var(--surface-2);stroke:var(--line);stroke-width:3;stroke-linejoin:round}
+.tri-node{fill:var(--surface);stroke:var(--sky);stroke-width:3}
+.tri-node.top{stroke:var(--accent)}
+.tri-t{font-size:26px;font-weight:700;text-anchor:middle;fill:var(--ink);font-family:var(--font-body)}
+.tri-op{font-size:22px;text-anchor:middle;fill:var(--ink-soft);font-family:var(--font-body);font-weight:700}
+.pv{border-collapse:collapse;font-size:1.1rem}
+.pv th{font-size:.85rem;color:var(--ink-soft);padding:4px 14px;border-bottom:2px solid var(--line)}
+.pv td{font-size:2rem;font-weight:700;text-align:center;padding:4px 14px}
+.pv td.hi{background:var(--accent-soft);border-radius:10px}
+.opi{width:96px;height:44px}
+.opi circle{fill:var(--sky)}
+.opi .b{fill:var(--accent)}
+.opi .ln{stroke:var(--ink-soft);stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.opi rect{fill:none;stroke:var(--ink-soft);stroke-width:2}
+
+/* build widgets */
+.build{display:flex;flex-direction:column;gap:14px;align-items:stretch}
+.build>.visual,.build>.tfwrap,.build>.blocks,.build>.plates,.build>.rows,.build>.items{align-self:center}
+.brow{display:flex;gap:10px;justify-content:center;align-items:center;flex-wrap:wrap}
+.steppers{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+.stepper{display:flex;align-items:center;gap:8px;background:var(--surface-2);border-radius:16px;padding:6px 8px}
+.sl{font-weight:700;padding:0 6px;font-size:.95rem}
+.sbtn{width:48px;height:48px;border-radius:12px;border:2px solid var(--line);background:var(--surface);font-size:1.6rem;font-weight:700;cursor:pointer;line-height:1}
+.sbtn:disabled{opacity:.4;cursor:default}
+.sv{min-width:1.6em;text-align:center;font-size:1.5rem;font-weight:700}
+.nudge{background:var(--warm-soft);border-radius:12px;padding:10px 14px;font-weight:700}
+.pospill{align-self:center;background:var(--surface-2);border-radius:999px;padding:4px 16px}
+.jlog{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.pool{background:var(--surface-2);border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:8px;align-items:center}
+.pool .items{grid-template-columns:repeat(auto-fill,40px);width:100%}
+.follow{border-top:2px dashed var(--line);padding-top:14px;display:flex;flex-direction:column;gap:12px}
+
+/* modal + toast */
+#layer{position:relative;z-index:40}
+.scrim{position:fixed;inset:0;background:rgba(10,14,35,.55);display:flex;align-items:center;justify-content:center;padding:16px;z-index:40}
+.modal{max-width:460px;width:100%;max-height:calc(100% - 32px);overflow:auto}
+.modal .big-star{width:96px;height:96px;align-self:center}
+.modal .big-star .sp{fill:var(--accent);stroke:var(--accent);stroke-width:2}
+.modal .big-star .glow{fill:var(--accent-soft)}
+.modal h2{font-size:1.7rem;text-align:center}
+.modal .mbody{text-align:center;font-size:1.1rem}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:12px 20px;border-radius:14px;font-weight:700;z-index:45;box-shadow:var(--shadow);max-width:calc(100% - 32px)}
+.chartgrid{border-collapse:collapse;margin:0 auto;font-size:.95rem}
+.chartgrid td,.chartgrid th{width:30px;height:30px;text-align:center;padding:0;border:1px solid var(--line)}
+.chartgrid th{background:var(--surface-2);font-weight:700}
+.chartgrid td{cursor:pointer}
+.chartgrid td.hl{background:var(--accent-soft)}
+.chartgrid td.hx{background:var(--accent);color:var(--accent-ink);font-weight:700}
+.chartwrap{overflow-x:auto}
+
+/* forms */
+.form{display:flex;flex-direction:column;gap:14px}
+.form label,.form legend{font-weight:700}
+.form input,.form textarea,textarea.code{width:100%;border-radius:14px;border:2px solid var(--line);background:var(--surface);padding:12px 14px;font-size:1.15rem}
+textarea.code{font-size:.8rem;font-family:ui-monospace,Menlo,monospace;min-height:90px}
+fieldset{border:0;padding:0;margin:0;display:flex;flex-direction:column;gap:8px}
+.avs{display:flex;gap:10px;flex-wrap:wrap}
+.av{width:64px;height:64px;border-radius:50%;border:3px solid var(--line);background:var(--surface);font-size:34px;cursor:pointer;line-height:1;padding:0}
+.av.on{border-color:var(--accent);background:var(--accent-soft)}
+.brand{display:flex;align-items:center;gap:8px;font-family:var(--font-display);font-weight:800;font-size:1.2rem}
+.brand svg{width:36px;height:36px}
+.brand .sp{fill:var(--accent);stroke:var(--accent)}
+.brand .glow{fill:var(--accent-soft)}
+
+/* shop */
+.shopgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px}
+.item{border:2px solid var(--line);border-radius:16px;background:var(--surface);padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;font-weight:700}
+.item.using{border-color:var(--accent);background:var(--accent-soft)}
+.item .emo{font-size:40px;line-height:1}
+.item .sw{width:44px;height:44px;border-radius:50%}
+.item .price{display:inline-flex;align-items:center;gap:4px;font-size:.95rem}
+.item .price .gem{width:18px;height:18px}
+
+/* summary */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.stats div,.glance div{background:var(--surface-2);border-radius:14px;padding:12px;display:flex;flex-direction:column;align-items:center;text-align:center}
+.stats b,.glance b{font-family:var(--font-display);font-size:1.9rem;line-height:1.1}
+.stats span,.glance span{color:var(--ink-soft);font-size:.9rem}
+.wins{display:flex;flex-direction:column;gap:8px}
+.wins li{display:flex;gap:10px;align-items:center;font-weight:700}
+.wins svg{width:28px;height:28px;flex:none}
+.wins .sp{fill:var(--accent);stroke:var(--accent)}
+
+/* grown-ups */
+.glance{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.skl{display:flex;flex-direction:column;gap:14px}
+.sr{display:flex;flex-direction:column;gap:6px;padding-bottom:14px;border-bottom:1px solid var(--line)}
+.sr:last-child{border-bottom:0;padding-bottom:0}
+.sr-top{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
+.bar{height:8px;border-radius:999px;background:var(--surface-2);overflow:hidden}
+.bar span{display:block;height:100%;background:var(--accent);border-radius:999px}
+.sr-meta{font-size:.9rem}
+.mis{display:flex;flex-direction:column;gap:14px}
+.mis li{background:var(--surface-2);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:4px}
+.mis-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.try{font-weight:700}
+.set{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:6px 0}
+.set-l{font-weight:700}
+.seg{display:inline-flex;border:2px solid var(--line);border-radius:12px;overflow:hidden}
+.seg button{border:0;background:var(--surface);padding:8px 14px;font-weight:700;cursor:pointer;min-height:44px}
+.seg button+button{border-left:2px solid var(--line)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.how{display:flex;flex-direction:column;gap:8px;padding-left:1.1em!important;list-style:disc!important}
+.sess{display:flex;flex-direction:column;gap:6px}
+.sess li{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid var(--line);padding:6px 0;flex-wrap:wrap}
+.learners{display:flex;flex-direction:column;gap:8px}
+.learners li{display:flex;align-items:center;gap:10px}
+.learners .lname{flex:1;font-weight:700}
+.boot{min-height:60vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px}
+.boot svg{width:64px;height:64px}
+.boot .sp{fill:var(--accent);stroke:var(--accent)}
+.boot .glow{fill:var(--accent-soft)}
+
+#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:60;display:none}
+
+@media (max-width:420px){
+  .card{padding:16px}
+  .opts{grid-template-columns:1fr 1fr}
+  .opts.one{grid-template-columns:1fr}
+  .stats b,.glance b{font-size:1.5rem}
+}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+}
+</style>
+</head>
+<body>
+<main class="wrap" id="app" aria-live="off"></main>
+<div id="layer"></div>
+<canvas id="fx" aria-hidden="true"></canvas>
+
+<script id="engine">
+// ================= ENGINE: content, question generators, learning model (no DOM) =================
+const ri=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+const NAMES=['Maya','Leo','Ava','Sam','Noor','Eli','Zoe','Kai','Priya','Owen','Lucia','Ben'];
+const ITEMS=[{one:'cookie',many:'cookies',e:'🍪'},{one:'apple',many:'apples',e:'🍎'},{one:'star',many:'stars',e:'⭐'},{one:'shell',many:'shells',e:'🐚'},{one:'strawberry',many:'strawberries',e:'🍓'},{one:'marble',many:'marbles',e:'🔵'},{one:'heart',many:'hearts',e:'💜'},{one:'leaf',many:'leaves',e:'🍀'}];
+const STAGES=['Hands-on','Pictures','Numbers'];
+const STAGE_WITH=['hands-on','pictures','just numbers'];
+
+const SKILLS=[
+ {id:'quantity',name:'Seeing amounts',group:'Number sense',pre:[],about:'Recognising amounts in ten-frames and comparing two-digit numbers.',kid:'Spot how many without counting one by one, and compare numbers.'},
+ {id:'numberline',name:'Number line',group:'Number sense',pre:['quantity'],about:'Placing and reading numbers on a number line; 1 more/less and 10 more/less.',kid:'Find numbers on a number line.'},
+ {id:'placevalue',name:'Tens and ones',group:'Number sense',pre:['quantity'],about:'Place value: building numbers from hundreds, tens and ones.',kid:'Build numbers out of hundreds, tens and ones.'},
+ {id:'makes10',name:'Making 10',group:'Number sense',pre:['quantity'],about:'Number bonds to 10, 20 and 100.',kid:'Find the numbers that make 10, 20 and 100.'},
+ {id:'addition',name:'Adding',group:'Add & subtract',pre:['numberline','placevalue','makes10'],about:'Addition as combining, using number-line jumps and tens and ones.',kid:'Put groups together and find the total.'},
+ {id:'subtraction',name:'Taking away',group:'Add & subtract',pre:['addition'],about:'Subtraction as taking away and finding a missing part, including regrouping.',kid:'Take away and find what is left.'},
+ {id:'multmeaning',name:'Equal groups',group:'Multiply',pre:['addition'],about:'What multiplication means: equal groups and arrays.',kid:'Multiplying means equal groups. Learn to see them.'},
+ {id:'multeasy',name:'× 2, 5, 10',group:'Multiply',pre:['multmeaning'],about:'Facts for 2, 5 and 10 using doubling, half of ten and adding a zero.',kid:'Times 2, 5 and 10 with shortcuts.'},
+ {id:'multmid',name:'× 3 and 4',group:'Multiply',pre:['multeasy'],about:'Facts for 3 and 4, built from ×2.',kid:'Times 3 and 4, built from times 2.'},
+ {id:'multhard',name:'× 6 to 9',group:'Multiply',pre:['multmid'],about:'Facts for 6 to 9, built from ×5 and ×10.',kid:'Times 6 to 9, built from times 5 and 10.'},
+ {id:'divmeaning',name:'Sharing equally',group:'Divide',pre:['multmeaning','subtraction'],about:'What division means: sharing into equal groups (and how it differs from taking away).',kid:'Dividing means sharing into equal groups.'},
+ {id:'divfacts',name:'Division facts',group:'Divide',pre:['divmeaning','multeasy'],about:'Division as the reverse of multiplication (fact families).',kid:'Use times facts to divide.'},
+ {id:'whichop',name:'Which operation?',group:'Problem solving',pre:['divmeaning','subtraction'],about:'Reading a word problem and choosing +, −, × or ÷ from what is happening in the story.',kid:'Read a story problem and pick +, −, × or ÷.'},
+ {id:'fractions',name:'Fractions',group:'Problem solving',pre:['divmeaning'],about:'Fractions as equal parts of a whole, unit fractions, and a fraction of a number.',kid:'Equal parts of a whole.'},
+];
+const SK=Object.fromEntries(SKILLS.map(s=>[s.id,s]));
+const GROUPS=['Number sense','Add & subtract','Multiply','Divide','Problem solving'];
+const LADDER=['quantity','numberline','placevalue','makes10','addition','subtraction','multmeaning','multeasy','divmeaning','multmid','whichop','divfacts','fractions','multhard'];
+
+const MIS={
+ 'op-sub-for-div':{kid:'That answer comes from taking away. Dividing means sharing into equal groups.',parent:'Used subtraction on a division question',act:'Deal real objects (cards, coins, crackers) into equal piles and say it out loud: "12 shared into 3 piles is 4 each."'},
+ 'op-add-for-div':{kid:'That answer adds the numbers. Dividing splits a number into equal groups.',parent:'Added on a division question',act:'Share objects into equal piles, then count one pile.'},
+ 'op-mult-for-div':{kid:'That answer multiplies. Dividing goes the other way: it splits into equal groups.',parent:'Multiplied on a division question',act:'Use a fact triangle (12 at the top, 3 and 4 at the bottom). Cover one number and ask what is missing.'},
+ 'op-add-for-mult':{kid:'That answer adds the two numbers. Multiplying means equal groups: 3 × 4 is 3 groups of 4.',parent:'Added instead of multiplying',act:'Make equal groups with objects, like 3 cups with 4 beans in each, and count them.'},
+ 'op-add-for-sub':{kid:'That answer adds. Taking away makes the number smaller.',parent:'Added on a subtraction question',act:'Act out take-away stories with objects she can physically remove.'},
+ 'op-sub-for-add':{kid:'That answer takes away. Adding puts groups together, so the total gets bigger.',parent:'Subtracted on an addition question',act:'Push two piles of objects together and count all of them.'},
+ 'sub-smaller-from-larger':{kid:'Careful: in each column, take the bottom number away from the top one. If the top is smaller, break a ten into 10 ones first.',parent:'Took the smaller digit from the larger one in each column (regrouping error)',act:'Use bundled straws or base-ten blocks and physically trade one ten for ten ones.'},
+ 'regroup':{kid:'That answer is 10 away. Check whether a ten needs to move.',parent:'Off by exactly ten (carrying or borrowing slip)',act:'Add and subtract with base-ten blocks, making a new ten whenever there are 10 ones.'},
+ 'place-swap':{kid:'The digits are swapped. The first digit tells you the tens.',parent:'Reversed the digits (for example 47 and 74)',act:'Build numbers with blocks, or $10 bills and $1 coins, and say them as "4 tens and 7 ones".'},
+ 'place-face':{kid:'Look at where the digit sits. A 4 in the tens place is worth 40.',parent:'Gave the digit instead of its place value',act:'Use a hundreds | tens | ones chart, or money: $100, $10 and $1.'},
+ 'tens-ones-mix':{kid:'Check which digit changes: 1 more or less changes the ones, and 10 more or less changes the tens.',parent:'Mixed up 1 more/less with 10 more/less',act:'Use a hundred chart: 1 more is one step right, 10 more is one row down.'},
+ 'off-by-one':{kid:'So close! That is one away. Count again slowly and touch each one.',parent:'Off by one (counting slip)',act:'Count objects by touching and moving each one; group them in fives and tens.'},
+ 'fact-neighbor':{kid:'Close: that is one group too many or too few. Build it from a fact you know.',parent:'Gave a neighbouring times-table answer',act:'Practise one strategy at a time, for example ×9 is ×10 minus one group.'},
+ 'skip-count':{kid:'Count the groups again. Each group adds the same amount.',parent:'Skip-counting slip',act:'Skip-count out loud while pointing at each group.'},
+ 'make10-same':{kid:'That repeats the number you started with. Count the empty spaces instead.',parent:'Repeated the given number instead of finding the missing part',act:'Use an egg carton or ten-frame: how many empty spots are left?'},
+ 'numberline-scale':{kid:'Check what each tick counts by. Here each tick might be worth 10.',parent:'Misread the scale on a number line',act:'Tape a number line on the floor and walk it, counting by ones and then by tens.'},
+ 'frac-denominator':{kid:'More pieces means smaller pieces. 1/8 is smaller than 1/4.',parent:'Thought a bigger bottom number means a bigger fraction',act:'Fold paper strips into halves, quarters and eighths and compare the pieces.'},
+ 'frac-flip':{kid:'The bottom number is how many equal parts. The top number is how many are shaded.',parent:'Swapped the top and bottom numbers of a fraction',act:'Shade parts of paper strips and name them: "3 out of 4 parts".'},
+ 'frac-part-part':{kid:'The bottom number counts all the parts, shaded and not shaded.',parent:'Compared shaded parts to unshaded parts instead of to the whole',act:'Always count the whole first, then the shaded parts.'},
+ 'frac-unshaded':{kid:'That counts the parts that are not shaded. Count the shaded ones.',parent:'Counted the unshaded parts',act:'Point to and count only the coloured parts.'},
+ 'story-op':{kid:'Picture the story. Are things joined, taken away, put in equal groups, or shared?',parent:'Chose the wrong operation in a word problem',act:'Act out word problems with objects before writing any numbers.'},
+};
+
+// ---------- small helpers ----------
+function Q(o){return Object.assign({visual:null,hint:null,explain:{text:''},say:null},o);}
+function fr(k,n){return `<span class="frac" aria-label="${k} out of ${n}"><span>${k}</span><span>${n}</span></span>`;}
+function eq(left,right){return `<span class="eq">${left} = ${right===undefined?'<span class="blank">?</span>':right}</span>`;}
+function skip(step,count){const a=[];for(let i=1;i<=count;i++)a.push(step*i);return a.join(', ');}
+function plural(n,one,many){return n===1?one:(many||one+'s');}
+function numOpts(correct,ds=[],{min=0,n=4}={}){
+  const out=[{value:correct,label:String(correct),mis:null}],seen=new Set([correct]);
+  for(const d of ds){if(!d)continue;const v=d.v;if(!Number.isInteger(v)||v<min||seen.has(v))continue;seen.add(v);out.push({value:v,label:String(v),mis:d.mis||null});if(out.length>=n)break;}
+  let step=1;while(out.length<3&&step<60){for(const v of [correct+step,correct-step]){if(out.length<3&&v>=min&&!seen.has(v)){seen.add(v);out.push({value:v,label:String(v),mis:step===1?'off-by-one':null});}}step++;}
+  return {options:shuffle(out),answer:correct};
+}
+function pm(pairs,ans){const m={};for(const [v,mis] of pairs){if(Number.isInteger(v)&&v>=0&&v!==ans&&!(v in m))m[v]=mis;}return m;}
+function jumpList(a,b,useTens,dir=1){const js=[];let p=a;const t=useTens?Math.floor(b/10):0,o=useTens?b%10:b;for(let i=0;i<t;i++){js.push({from:p,to:p+10*dir,label:(dir>0?'+':'−')+'10'});p+=10*dir;}for(let i=0;i<o;i++){js.push({from:p,to:p+dir,label:(dir>0?'+':'−')+'1'});p+=dir;}return js;}
+function tensLabels(lo,hi){const l=[];for(let v=lo;v<=hi;v+=10)l.push(v);return l;}
+function rangeFor(a,b){const lo=Math.floor(Math.min(a,b)/10)*10;let hi=Math.ceil(Math.max(a,b)/10)*10;if(hi===lo)hi+=10;return [lo,hi];}
+
+// ---------- visuals (return HTML/SVG strings) ----------
+function vTF(cells,tapBase=null){
+  const cs=40,g=5,w=5*cs+6*g,h=2*cs+3*g;
+  let s=`<svg class="tf" viewBox="0 0 ${w} ${h}" aria-hidden="true"><rect x="1.5" y="1.5" width="${w-3}" height="${h-3}" rx="10" class="tf-frame"/>`;
+  for(let i=0;i<10;i++){const r=Math.floor(i/5),c=i%5,x=g+c*(cs+g),y=g+r*(cs+g),st=cells[i];const tap=tapBase!==null&&st!==2;
+    s+=`<g${tap?` data-act="cell" data-i="${tapBase+i}" class="tf-tap"`:''}><rect x="${x}" y="${y}" width="${cs}" height="${cs}" rx="7" class="tf-cell"/>`;
+    if(st)s+=`<circle cx="${x+cs/2}" cy="${y+cs/2}" r="13" class="${st===2?'tf-pre':'tf-on'}"/>`;
+    s+='</g>';}
+  return s+'</svg>';
+}
+function vFrames(n,frames=null,preset=0){
+  frames=frames||Math.max(1,Math.ceil(n/10));
+  let out=`<div class="tfwrap" role="img" aria-label="${n} dots in ten-frames">`;
+  for(let f=0;f<frames;f++){const cells=[];for(let i=0;i<10;i++){const idx=f*10+i;cells.push(idx<preset?2:(idx<n?1:0));}out+=vTF(cells);}
+  return out+'</div>';
+}
+const FLAT=(()=>{let d='';for(let i=1;i<10;i++)d+=`M${i*10} 0V100M0 ${i*10}H100`;return `<svg class="flat" viewBox="0 0 100 100" aria-hidden="true"><rect width="100" height="100" class="b-fill"/><path d="${d}" class="b-line"/><rect width="100" height="100" class="b-edge"/></svg>`;})();
+const ROD=(()=>{let d='';for(let i=1;i<10;i++)d+=`M0 ${i*10}H10`;return `<svg class="rod" viewBox="0 0 10 100" aria-hidden="true"><rect width="10" height="100" class="b-fill"/><path d="${d}" class="b-line"/><rect width="10" height="100" class="b-edge"/></svg>`;})();
+const CUBE=`<svg class="cube" viewBox="0 0 10 10" aria-hidden="true"><rect width="10" height="10" class="b-fill"/><rect width="10" height="10" class="b-edge"/></svg>`;
+function vBlocks(h,t,o){
+  const parts=[];if(h)parts.push(`${h} ${plural(h,'hundred')}`);parts.push(`${t} ${plural(t,'ten')}`);parts.push(`${o} ${plural(o,'one')}`);
+  let s=`<div class="blocks" role="img" aria-label="${parts.join(', ')}">`;
+  if(h)s+=`<div class="bg">${FLAT.repeat(h)}</div>`;
+  if(t)s+=`<div class="bg">${ROD.repeat(t)}</div>`;
+  if(o)s+=`<div class="bg ones">${CUBE.repeat(o)}</div>`;
+  if(!h&&!t&&!o)s+=`<p class="muted">No blocks yet</p>`;
+  return s+'</div>';
+}
+function vSum(a,b){return `<div class="sum">${vBlocks(Math.floor(a/100),Math.floor(a/10)%10,a%10)}<span class="and">and</span>${vBlocks(Math.floor(b/100),Math.floor(b/10)%10,b%10)}</div>`;}
+function vPlates(groups,each,e,{label=null,box=false}={}){
+  let s=`<div class="plates" role="img" aria-label="${groups} groups with ${each} in each">`;
+  for(let g=0;g<groups;g++)s+=`<div class="pgrp"><div class="plate${box?' box':''}">${`<span class="it">${e}</span>`.repeat(each)}</div>${label?`<div class="plabel">${label} ${g+1}</div>`:''}</div>`;
+  return s+'</div>';
+}
+function vItems(n,e,crossed=0,cls=''){
+  let s=`<div class="items ${cls}" role="img" aria-label="${n} items${crossed?`, ${crossed} taken away`:''}">`;
+  for(let i=0;i<n;i++)s+=`<span class="it-c${i>=n-crossed?' x':''}">${e}</span>`;
+  return s+'</div>';
+}
+function vArray(rows,cols,{parts=null,removed=0}={}){
+  const sp=24,r=8.5,pad=6,w=cols*sp+pad*2,h=rows*sp+pad*2;const rc=[];
+  if(parts){let i=0;parts.forEach((c,pi)=>{for(let k=0;k<c;k++)rc[i++]=pi;});}
+  let s=`<svg class="arr" viewBox="0 0 ${w} ${h}" style="width:${Math.min(Math.round(w*1.25),340)}px" role="img" aria-label="${rows} rows of ${cols}${removed?`, last ${removed} row crossed out`:''}">`;
+  for(let y=0;y<rows;y++){const off=y>=rows-removed;for(let x=0;x<cols;x++)s+=`<circle cx="${pad+sp/2+x*sp}" cy="${pad+sp/2+y*sp}" r="${r}" class="${off?'d-off':'d'+((rc[y]||0)%3)}"/>`;}
+  return s+'</svg>';
+}
+const NL={W:480,L:24,R:456};
+function vLine({min,max,tick=1,labels=null,arrow=null,marker=null,jumps=[],tap=false}){
+  const {W,L,R}=NL,H=112,y=64,X=v=>L+(v-min)/(max-min)*(R-L);
+  let s=`<svg class="nl${tap?' nl-tap':''}"${tap?' data-act="nltap"':''} viewBox="0 0 ${W} ${H}" role="img" aria-label="number line from ${min} to ${max}${marker!==null?`, dot at ${marker}`:''}">`;
+  s+=`<line x1="${L}" y1="${y}" x2="${R}" y2="${y}" class="nl-axis"/>`;
+  const n=Math.round((max-min)/tick);
+  for(let i=0;i<=n;i++){const v=min+i*tick,lab=labels?labels.includes(v):true,x=X(v).toFixed(1);
+    s+=`<line x1="${x}" y1="${y-(lab?13:8)}" x2="${x}" y2="${y+(lab?13:8)}" class="nl-tick${lab?' big':''}"/>`;
+    if(lab)s+=`<text x="${x}" y="${y+38}" class="nl-lab">${v}</text>`;}
+  const showAll=jumps.length<=6;
+  jumps.forEach(j=>{const x1=X(j.from),x2=X(j.to),mid=(x1+x2)/2,hg=Math.min(36,8+Math.abs(x2-x1)*.3);
+    s+=`<path d="M${x1.toFixed(1)} ${y-3} Q${mid.toFixed(1)} ${(y-3-hg*2).toFixed(1)} ${x2.toFixed(1)} ${y-3}" class="nl-jump"/>`;
+    if(j.label&&(showAll||Math.abs(j.to-j.from)>=10))s+=`<text x="${mid.toFixed(1)}" y="${(y-9-hg).toFixed(1)}" class="nl-jlab">${j.label}</text>`;});
+  if(arrow!==null)s+=`<path d="M${X(arrow).toFixed(1)} ${y-5} l-10 -20 h20 z" class="nl-arrow"/>`;
+  if(marker!==null)s+=`<circle cx="${X(marker).toFixed(1)}" cy="${y}" r="10" class="nl-marker"/>`;
+  return s+'</svg>';
+}
+function vFracBar(n,k,{shaded=null,tap=false}={}){
+  const W=320,H=64,p=3,w=(W-p*2)/n;
+  let s=`<svg class="fbsvg" viewBox="0 0 ${W} ${H}" role="img" aria-label="bar in ${n} equal parts">`;
+  for(let i=0;i<n;i++){const on=shaded?shaded[i]:i<k;s+=`<rect${tap?` data-act="part" data-i="${i}"`:''} x="${(p+i*w).toFixed(1)}" y="${p}" width="${w.toFixed(1)}" height="${H-p*2}" class="fb-part${on?' on':''}${tap?' tap':''}"/>`;}
+  return s+'</svg>';
+}
+function vFracCircle(n,k){
+  const c=60,r=54;let s=`<svg class="fcsvg" viewBox="0 0 120 120" role="img" aria-label="circle in ${n} equal parts, ${k} shaded">`;
+  for(let i=0;i<n;i++){const a0=(-90+i*360/n)*Math.PI/180,a1=(-90+(i+1)*360/n)*Math.PI/180;
+    s+=`<path d="M${c} ${c} L${(c+r*Math.cos(a0)).toFixed(2)} ${(c+r*Math.sin(a0)).toFixed(2)} A${r} ${r} 0 ${360/n>180?1:0} 1 ${(c+r*Math.cos(a1)).toFixed(2)} ${(c+r*Math.sin(a1)).toFixed(2)} Z" class="fb-part${i<k?' on':''}"/>`;}
+  return s+'</svg>';
+}
+function vBarModel(whole,part,other='?'){return `<div class="bm" role="img" aria-label="bar model: whole ${whole}, one part ${part}, other part ${other==='?'?'unknown':other}"><div class="bm-whole">${whole}</div><div class="bm-parts"><div class="bm-part" style="flex:${part}">${part}</div><div class="bm-part${other==='?'?' unk':''}" style="flex:${whole-part}">${other}</div></div></div>`;}
+function vTri(top,l,r,hide){const v=(x,h)=>h?'?':x;return `<svg class="tri" viewBox="0 0 240 200" role="img" aria-label="fact triangle: ${top} at the top, ${l} and ${hide==='r'?'a missing number':r} at the bottom"><path d="M120 40 L44 160 L196 160 Z" class="tri-edge"/><circle cx="120" cy="40" r="32" class="tri-node top"/><text x="120" y="49" class="tri-t">${v(top,hide==='top')}</text><circle cx="44" cy="160" r="32" class="tri-node"/><text x="44" y="169" class="tri-t">${v(l,hide==='l')}</text><circle cx="196" cy="160" r="32" class="tri-node"/><text x="196" y="169" class="tri-t">${v(r,hide==='r')}</text><text x="120" y="132" class="tri-op">× ÷</text></svg>`;}
+function vPlace(digits,hi=-1){const names=digits.length===3?['Hundreds','Tens','Ones']:['Tens','Ones'];return `<table class="pv"><thead><tr>${names.map(n=>`<th scope="col">${n}</th>`).join('')}</tr></thead><tbody><tr>${digits.map((d,i)=>`<td class="${i===hi?'hi':''}">${d}</td>`).join('')}</tr></tbody></table>`;}
+const OPICON={
+ '+':'<svg class="opi" viewBox="0 0 96 44" aria-hidden="true"><circle cx="10" cy="22" r="6"/><circle cx="24" cy="22" r="6"/><circle cx="40" cy="22" r="6" class="b"/><path d="M50 22h14M58 16l6 6-6 6" class="ln"/><circle cx="76" cy="14" r="6"/><circle cx="88" cy="14" r="6"/><circle cx="82" cy="30" r="6" class="b"/></svg>',
+ '−':'<svg class="opi" viewBox="0 0 96 44" aria-hidden="true"><circle cx="12" cy="22" r="6"/><circle cx="28" cy="22" r="6"/><circle cx="44" cy="22" r="6"/><circle cx="60" cy="22" r="6"/><circle cx="76" cy="22" r="6"/><path d="M54 14l12 16M66 14l-12 16M70 14l12 16M82 14l-12 16" class="ln"/></svg>',
+ '×':'<svg class="opi" viewBox="0 0 96 44" aria-hidden="true"><rect x="4" y="6" width="26" height="32" rx="8"/><rect x="35" y="6" width="26" height="32" rx="8"/><rect x="66" y="6" width="26" height="32" rx="8"/><circle cx="12" cy="22" r="4.5"/><circle cx="22" cy="22" r="4.5"/><circle cx="43" cy="22" r="4.5"/><circle cx="53" cy="22" r="4.5"/><circle cx="74" cy="22" r="4.5"/><circle cx="84" cy="22" r="4.5"/></svg>',
+ '÷':'<svg class="opi" viewBox="0 0 96 44" aria-hidden="true"><circle cx="8" cy="15" r="4.5"/><circle cx="18" cy="15" r="4.5"/><circle cx="28" cy="15" r="4.5"/><circle cx="8" cy="29" r="4.5"/><circle cx="18" cy="29" r="4.5"/><circle cx="28" cy="29" r="4.5"/><path d="M37 22h10M42 17l5 5-5 5" class="ln"/><rect x="54" y="4" width="17" height="36" rx="8"/><rect x="76" y="4" width="17" height="36" rx="8"/><circle cx="62.5" cy="12" r="4" class="b"/><circle cx="62.5" cy="22" r="4" class="b"/><circle cx="62.5" cy="32" r="4" class="b"/><circle cx="84.5" cy="12" r="4" class="b"/><circle cx="84.5" cy="22" r="4" class="b"/><circle cx="84.5" cy="32" r="4" class="b"/></svg>',
+};
+const OPWORD={'+':'Putting together','−':'Taking away','×':'Equal groups','÷':'Sharing or splitting into equal groups'};
+const OPDO={'+':'putting together, so add','−':'taking away, so subtract','×':'equal groups, so multiply','÷':'sharing into equal groups, so divide'};
+
+// ---------- multiplication strategies ----------
+const STRAT={
+ 2:{name:'Double it',tip:n=>`Double ${n}: ${n} + ${n}.`,how:n=>`2 × ${n} is double ${n}: ${n} + ${n} = ${2*n}.`,arr:n=>({rows:2,parts:[1,1]})},
+ 5:{name:'Half of 10 groups',tip:n=>`Find 10 × ${n}, then take half.`,how:n=>`10 × ${n} = ${10*n}. Half of that is ${5*n}.`,arr:n=>({rows:5,parts:[5]})},
+ 10:{name:'Add a zero',tip:n=>`Put a zero on the end of ${n}.`,how:n=>`10 × ${n}: put a zero on the end of ${n} to get ${10*n}.`,arr:n=>({rows:10,parts:[10]})},
+ 3:{name:'2 groups + 1 more group',tip:n=>`Find 2 × ${n}, then add one more ${n}.`,how:n=>`2 × ${n} = ${2*n}. One more ${n} makes ${3*n}.`,arr:n=>({rows:3,parts:[2,1]})},
+ 4:{name:'Double, then double again',tip:n=>`Find 2 × ${n}, then double it.`,how:n=>`2 × ${n} = ${2*n}. Double that: ${4*n}.`,arr:n=>({rows:4,parts:[2,2]})},
+ 6:{name:'5 groups + 1 more group',tip:n=>`Find 5 × ${n}, then add one more ${n}.`,how:n=>`5 × ${n} = ${5*n}. One more ${n} makes ${6*n}.`,arr:n=>({rows:6,parts:[5,1]})},
+ 7:{name:'5 groups + 2 more groups',tip:n=>`Find 5 × ${n}, then add 2 × ${n}.`,how:n=>`5 × ${n} = ${5*n} and 2 × ${n} = ${2*n}. Together that's ${7*n}.`,arr:n=>({rows:7,parts:[5,2]})},
+ 8:{name:'Double 4 groups',tip:n=>`Find 4 × ${n}, then double it.`,how:n=>`4 × ${n} = ${4*n}. Double that: ${8*n}.`,arr:n=>({rows:8,parts:[4,4]})},
+ 9:{name:'10 groups − 1 group',tip:n=>`Find 10 × ${n}, then take away one ${n}.`,how:n=>`10 × ${n} = ${10*n}. Take away one ${n}: ${9*n}.`,arr:n=>({rows:10,parts:[9],removed:1})},
+};
+function stratArray(k,n){const p=STRAT[k].arr(n);return vArray(p.rows,n,{parts:p.parts,removed:p.removed||0});}
+function factGen(ks){return [
+ e=>{const k=pick(ks),n=ri(2,e?5:9);return Q({prompt:`Build <b>${k} × ${n}</b>. Make <b>${k}</b> rows with <b>${n}</b> in each row.`,say:`Build ${k} times ${n}. Make ${k} rows with ${n} in each row.`,kind:'build',build:{type:'rows',target:k,each:n},
+   followup:{prompt:`So what is ${k} × ${n}?`,say:`So what is ${k} times ${n}?`,...numOpts(k*n,[{v:k+n,mis:'op-add-for-mult'},{v:k*n-n,mis:'fact-neighbor'},{v:k*n+n,mis:'fact-neighbor'}])},
+   hint:{text:`Add rows until you have ${k}. The numbers at the end count by ${n}s.`},explain:{text:`${k} rows of ${n}: ${skip(n,k)}. So ${k} × ${n} = ${k*n}.`,visual:vArray(k,n)}});},
+ e=>{const k=pick(ks),n=ri(2,e?5:9);return Q({prompt:`What is <b>${k} × ${n}</b>?`,say:`What is ${k} times ${n}?`,kind:'mc',visual:`${stratArray(k,n)}<p class="cap">${STRAT[k].name}</p>`,
+   ...numOpts(k*n,[{v:k*n-n,mis:'fact-neighbor'},{v:k*n+n,mis:'fact-neighbor'},{v:k+n,mis:'op-add-for-mult'}]),hint:{text:STRAT[k].tip(n)},explain:{text:STRAT[k].how(n),visual:stratArray(k,n)},chart:true});},
+ e=>{const k=pick(ks),n=ri(2,e?6:10);const [x,y]=Math.random()<.5?[k,n]:[n,k];return Q({prompt:eq(`${x} × ${y}`),say:`What is ${x} times ${y}?`,kind:'pad',answer:k*n,
+   padMis:pm([[k+n,'op-add-for-mult'],[k*n-n,'fact-neighbor'],[k*n+n,'fact-neighbor'],[k*n-k,'fact-neighbor'],[k*n+k,'fact-neighbor'],[k*n-1,'off-by-one'],[k*n+1,'off-by-one']],k*n),
+   hint:{text:STRAT[k].tip(n)},explain:{text:STRAT[k].how(n),visual:stratArray(k,n)},chart:true});},
+];}
+
+// ---------- word problems ----------
+function story(type,small){
+  const N=pick(NAMES),it=pick(ITEMS);let a,b,ans,op,text;
+  if(type==='join'){a=ri(small?3:14,small?9:48);b=ri(small?2:6,small?6:27);ans=a+b;op='+';text=`${N} has ${a} ${it.many}. ${N} gets ${b} more. How many ${it.many} does ${N} have now?`;}
+  else if(type==='separate'){a=ri(small?7:24,small?14:65);b=ri(2,small?Math.min(6,a-2):a-8);ans=a-b;op='−';text=`${N} had ${a} ${it.many} and gave ${b} away. How many ${it.many} are left?`;}
+  else if(type==='groups'){a=ri(2,small?4:9);b=ri(2,small?4:9);ans=a*b;op='×';text=`There are ${a} bags. Each bag has ${b} ${it.many}. How many ${it.many} are there altogether?`;}
+  else if(type==='share'){b=ri(2,small?3:6);ans=ri(2,small?4:9);a=b*ans;op='÷';text=`${N} shares ${a} ${it.many} equally between ${b} friends. How many ${it.many} does each friend get?`;}
+  else {b=ri(2,small?4:6);ans=ri(2,small?4:8);a=b*ans;op='÷';text=`${a} ${it.many} are packed into boxes, with ${b} in each box. How many boxes are filled?`;}
+  return {type,N,it,a,b,ans,op,text};
+}
+function storyVisual(s){
+  const e=s.it.e;
+  if(s.type==='join')return `<div class="story">${vItems(s.a,e)}<span class="story-then">then ${s.b} more</span>${vItems(s.b,e,0,'new')}</div>`;
+  if(s.type==='separate')return vItems(s.a,e,s.b);
+  if(s.type==='groups')return vPlates(s.a,s.b,e,{label:'Bag',box:true});
+  if(s.type==='share')return vPlates(s.b,s.ans,e,{label:'Friend'});
+  return vPlates(s.ans,s.b,e,{label:'Box',box:true});
+}
+function opMis(correct,chosen){
+  const m={'÷−':'op-sub-for-div','÷+':'op-add-for-div','÷×':'op-mult-for-div','×+':'op-add-for-mult','−+':'op-add-for-sub','+−':'op-sub-for-add'};
+  return m[correct+chosen]||'story-op';
+}
+function storyOps(s){
+  const {a,b}=s;const list=[{value:'+',label:`${a} + ${b}`},{value:'×',label:`${a} × ${b}`}];
+  if(a>b)list.push({value:'−',label:`${a} − ${b}`});
+  if(a%b===0)list.push({value:'÷',label:`${a} ÷ ${b}`});
+  return shuffle(list.map(o=>Object.assign(o,{mis:o.value===s.op?null:opMis(s.op,o.value)})));
+}
+const STORY_TYPES=['join','separate','groups','share','groupsOf','share'];
+
+// ---------- question generators: GEN[skill][stage](easy) ----------
+const GEN={
+quantity:[
+ e=>{const n=e?ri(3,10):ri(11,19);return Q({prompt:`Show <b>${n}</b> on the ten-frame${n>10?'s':''}. Tap the boxes to fill them.`,kind:'build',build:{type:'tenframe',frames:n>10?2:1,preset:0,target:n},
+   hint:{text:n>10?`One full ten-frame is 10. Fill one frame, then add ${n-10} more.`:`Fill the top row first. That's 5.`},
+   explain:{text:n>10?`A full frame is 10. Then ${n-10} more makes ${n}.`:n>5?`The top row is 5, and ${n-5} more makes ${n}.`:`Here is ${n}.`,visual:vFrames(n,n>10?2:1)}});},
+ e=>{const n=e?ri(4,10):ri(11,20),f=n>10?2:1;return Q({prompt:'How many dots are there?',kind:'mc',visual:vFrames(n,f),...numOpts(n,[{v:n-1,mis:'off-by-one'},{v:n+1,mis:'off-by-one'},{v:n+2}]),
+   hint:{text:'A full ten-frame is 10. A full row is 5.'},
+   explain:{text:n>10?`One full frame is 10, and ${n-10} more makes ${n}.`:n===10?'The frame is full, so it is 10.':`There ${10-n===1?'is':'are'} ${10-n} empty ${plural(10-n,'box','boxes')}, and 10 − ${10-n} = ${n}.`,visual:vFrames(n,f)}});},
+ e=>{let t,o;do{t=ri(e?1:2,e?4:9);o=ri(1,9);}while(t===o);const x=10*t+o,y=10*o+t;let z;do{z=ri(e?12:21,e?49:98);}while(z===x||z===y||z%10===Math.floor(z/10)||z%10===0);
+   const max=Math.max(x,y,z),partner=max===x?y:max===y?x:-1;
+   return Q({prompt:'Which number is the biggest?',kind:'mc',options:shuffle([x,y,z].map(v=>({value:v,label:String(v),mis:v===partner?'place-swap':null}))),answer:max,
+     hint:{text:'Look at the first digit. It tells you how many tens.'},explain:{text:`Compare the tens digits first. If they're the same, compare the ones. ${max} is the biggest.`,visual:vBlocks(0,Math.floor(max/10),max%10)}});},
+],
+numberline:[
+ e=>{const max=e?10:20;let t;do{t=ri(1,max-1);}while(t%5===0);const labels=e?[0,5,10]:[0,5,10,15,20],base=Math.floor(t/5)*5;
+   return Q({prompt:`Tap the line to put the dot on <b>${t}</b>.`,kind:'build',build:{type:'nlplace',min:0,max,labels,target:t},
+     hint:{text:`Find ${base} first, then count ${t-base} small ${plural(t-base,'tick')} to the right.`},explain:{text:`${t} is ${t-base} ${plural(t-base,'tick')} after ${base}.`,visual:vLine({min:0,max,labels,marker:t})}});},
+ e=>{if(e){let v;do{v=ri(1,19);}while(v===10);return Q({prompt:'What number is the arrow pointing to?',kind:'mc',visual:vLine({min:0,max:20,labels:[0,10,20],arrow:v}),...numOpts(v,[{v:v-1,mis:'off-by-one'},{v:v+1,mis:'off-by-one'},{v:v+2}]),
+     hint:{text:'Each small tick counts by 1. Start at the nearest labelled number.'},explain:{text:`Each tick is 1. The arrow is at ${v}.`,visual:vLine({min:0,max:20,labels:[0,5,10,15,20],arrow:v})}});}
+   let v;do{v=ri(1,9)*10;}while(v===50);return Q({prompt:'What number is the arrow pointing to?',kind:'mc',visual:vLine({min:0,max:100,tick:10,labels:[0,50,100],arrow:v}),...numOpts(v,[{v:v/10,mis:'numberline-scale'},{v:v+10,mis:'numberline-scale'},{v:v-10,mis:'numberline-scale'}]),
+     hint:{text:'There are 10 jumps from 0 to 100, so each tick counts by 10.'},explain:{text:`Each tick counts by 10. The arrow is at ${v}.`,visual:vLine({min:0,max:100,tick:10,labels:tensLabels(0,100),arrow:v})}});},
+ e=>{const kind=pick(e?['1more','1less']:['10more','10less']);let a,ans,ds,txt;
+   if(kind==='1more'){a=Math.random()<.5?ri(1,9)*10-1:ri(11,88);ans=a+1;ds=[{v:a-1},{v:a+10,mis:'tens-ones-mix'},{v:a+2,mis:'off-by-one'}];txt=`What is 1 more than <b>${a}</b>?`;}
+   else if(kind==='1less'){a=Math.random()<.5?ri(2,9)*10:ri(12,89);ans=a-1;ds=[{v:a+1},{v:a-10,mis:'tens-ones-mix'},{v:a-2,mis:'off-by-one'}];txt=`What is 1 less than <b>${a}</b>?`;}
+   else if(kind==='10more'){a=ri(11,89);ans=a+10;ds=[{v:a+1,mis:'tens-ones-mix'},{v:a-10},{v:a+20}];txt=`What is 10 more than <b>${a}</b>?`;}
+   else{a=ri(21,99);ans=a-10;ds=[{v:a-1,mis:'tens-ones-mix'},{v:a+10},{v:a-20}];txt=`What is 10 less than <b>${a}</b>?`;}
+   const step=kind.startsWith('10')?10:1,sign=kind.includes('more')?'+':'−',[lo,hi]=rangeFor(a,ans);
+   return Q({prompt:txt,kind:'mc',...numOpts(ans,ds),hint:{text:step===10?'10 more or less changes the tens digit by one. The ones digit stays the same.':'1 more or less changes the ones digit. Watch out when you cross a ten.'},
+     explain:{text:`${a} ${sign} ${step} = ${ans}.`,visual:vLine({min:lo,max:hi,labels:tensLabels(lo,hi),jumps:[{from:a,to:ans,label:sign+step}],marker:ans})}});},
+],
+placevalue:[
+ e=>{const target=e?ri(11,49):ri(101,299),H=Math.floor(target/100),T=Math.floor(target/10)%10,O=target%10;
+   return Q({prompt:`Build <b>${target}</b> with blocks.`,kind:'build',build:{type:'blocks',target,hundreds:target>=100},
+     hint:{text:target>=100?`In ${target}, the first digit is the hundreds, the middle digit is the tens and the last digit is the ones.`:`In ${target}, the first digit is the tens and the last digit is the ones.`},
+     explain:{text:`${target} is ${H?`${H} ${plural(H,'hundred')}, `:''}${T} ${plural(T,'ten')} and ${O} ${plural(O,'one')}.`,visual:vBlocks(H,T,O)}});},
+ e=>{const h=e?0:ri(1,2);let t,o;do{t=ri(1,9);o=ri(1,9);}while(t===o);const v=h*100+t*10+o,sw=h*100+o*10+t;
+   return Q({prompt:'What number do these blocks show?',kind:'mc',visual:vBlocks(h,t,o),...numOpts(v,[{v:sw,mis:'place-swap'},{v:h+t+o,mis:'place-face'},{v:v+10}]),
+     hint:{text:h?'Each big square is 100. Each rod is 10. Each small cube is 1.':'Count the rods by tens: 10, 20, 30… Then add the small cubes.'},
+     explain:{text:`${h?`${h} ${plural(h,'hundred')}, `:''}${t} tens and ${o} ones make ${v}.`,visual:vPlace(String(v).split('').map(Number))}});},
+ e=>{if(Math.random()<.5){let d;do{d=e?[ri(1,9),ri(1,9)]:[ri(1,9),ri(1,9),ri(1,9)];}while(new Set(d).size<d.length);
+     const num=Number(d.join('')),pos=e?0:ri(0,1),pv=10**(d.length-1-pos),dg=d[pos],ans=dg*pv,pname=['hundreds','tens','ones'][3-d.length+pos];
+     return Q({prompt:`What is the <b>${dg}</b> worth in <b>${num}</b>?`,kind:'mc',...numOpts(ans,[dg,dg*10,dg*100].filter(x=>x!==ans).map(v=>({v,mis:'place-face'}))),
+       hint:{text:'Check which place the digit is in: hundreds, tens or ones.',visual:vPlace(d)},explain:{text:`The ${dg} is in the ${pname} place, so it is worth ${ans}.`,visual:vPlace(d,pos)}});}
+   const t=ri(e?1:2,9),o=ri(0,9),v=10*t+o;
+   return Q({prompt:`<b>${t}</b> tens and <b>${o}</b> ones make what number?`,kind:'mc',...numOpts(v,[{v:10*o+t,mis:'place-swap'},{v:t+o,mis:'place-face'},{v:v+10}]),
+     hint:{text:'Each ten is worth 10. Count them by tens, then add the ones.'},explain:{text:`${t} tens is ${t*10}. Add ${o} ones: ${v}.`,visual:vBlocks(0,t,o)}});},
+],
+makes10:[
+ e=>{const k=ri(2,8);return Q({prompt:`This ten-frame has <b>${k}</b>. Tap the empty boxes to fill it up to 10.`,kind:'build',build:{type:'tenframe',frames:1,preset:k,target:10},
+   followup:{prompt:'How many did you add to make 10?',...numOpts(10-k,[{v:k,mis:'make10-same'},{v:11-k,mis:'off-by-one'},{v:9-k,mis:'off-by-one'}])},
+   hint:{text:'Fill every empty box. Then count only the ones you added.'},explain:{text:`${k} and ${10-k} make 10.`,visual:vFrames(10,1,k)}});},
+ e=>{if(e){const k=ri(2,8);return Q({prompt:'How many more dots would make 10?',kind:'mc',visual:vFrames(k,1),...numOpts(10-k,[{v:k,mis:'make10-same'},{v:11-k,mis:'off-by-one'},{v:9-k,mis:'off-by-one'}]),
+     hint:{text:'Count the empty boxes.'},explain:{text:`There ${10-k===1?'is':'are'} ${10-k} empty ${plural(10-k,'box','boxes')}. ${k} + ${10-k} = 10.`,visual:vFrames(10,1,k)}});}
+   const k=ri(11,18);return Q({prompt:'How many more dots would make 20?',kind:'mc',visual:vFrames(k,2),...numOpts(20-k,[{v:k-10,mis:'make10-same'},{v:21-k,mis:'off-by-one'},{v:19-k,mis:'off-by-one'}]),
+     hint:{text:'Count the empty boxes in both frames.'},explain:{text:`There are ${20-k} empty boxes. ${k} + ${20-k} = 20.`,visual:vFrames(20,2,k)}});},
+ e=>{if(e){const k=ri(1,9);return Q({prompt:`<span class="eq">${k} + <span class="blank">?</span> = 10</span>`,say:`${k} plus what makes 10?`,kind:'pad',answer:10-k,padMis:pm([[k,'make10-same'],[11-k,'off-by-one'],[9-k,'off-by-one']],10-k),
+     hint:{text:'Picture a ten-frame. How many boxes would be empty?',visual:vFrames(k,1)},explain:{text:`${k} + ${10-k} = 10.`,visual:vFrames(10,1,k)}});}
+   if(Math.random()<.5){const t=ri(1,9),ans=100-10*t;return Q({prompt:`<span class="eq">${10*t} + <span class="blank">?</span> = 100</span>`,say:`${10*t} plus what makes 100?`,kind:'pad',answer:ans,padMis:pm([[10-t,'place-face'],[ans+10,'regroup'],[ans-10,'regroup']],ans),
+     hint:{text:`${10*t} is ${t} tens. 100 is 10 tens. How many more tens?`},explain:{text:`${t} tens + ${10-t} tens = 10 tens. So ${10*t} + ${ans} = 100.`,visual:vBlocks(0,t,0)}});}
+   let a;do{a=5*ri(3,19);}while(a%10===0);const ans=100-a;
+   return Q({prompt:`<span class="eq">${a} + <span class="blank">?</span> = 100</span>`,say:`${a} plus what makes 100?`,kind:'pad',answer:ans,padMis:pm([[ans+10,'regroup'],[ans-10,'regroup'],[ans+1,'off-by-one'],[ans-1,'off-by-one']],ans),
+     hint:{text:`First get to the next ten: ${a} + 5 = ${a+5}. Then count the tens to 100.`},explain:{text:`${a} + 5 = ${a+5}, and ${a+5} + ${95-a} = 100. 5 + ${95-a} = ${ans}.`,visual:vLine({min:Math.floor(a/10)*10,max:100,labels:tensLabels(Math.floor(a/10)*10,100),jumps:[{from:a,to:a+5,label:'+5'},{from:a+5,to:100,label:'+'+(95-a)}]})}});},
+],
+addition:[
+ e=>{let a,b;if(e){a=ri(2,9);b=ri(2,8);}else{a=ri(11,59);b=ri(11,29);if(a%10===0)a++;}const target=a+b,[lo,hi]=e?[0,20]:rangeFor(a,target);
+   return Q({prompt:`Start at <b>${a}</b>. Jump forward <b>${b}</b>.`,kind:'build',build:{type:'jumps',start:a,target,tens:!e},
+     hint:{text:e?`Tap +1 ${b} times. Count each jump out loud.`:`${b} is ${Math.floor(b/10)} ${plural(Math.floor(b/10),'ten')} and ${b%10} ${plural(b%10,'one')}. Do the +10 jumps first.`},
+     explain:{text:`${a} + ${b} = ${target}.`,visual:vLine({min:lo,max:hi,labels:e?[0,5,10,15,20]:tensLabels(lo,hi),jumps:jumpList(a,b,!e),marker:target})}});},
+ e=>{let a,b;do{a=ri(11,39);b=ri(11,29);}while(e&&(a%10)+(b%10)>=10);const s=a+b,rg=(a%10)+(b%10)>=10;
+   return Q({prompt:'Put these together. How many altogether?',kind:'mc',visual:vSum(a,b),...numOpts(s,[{v:Math.abs(a-b),mis:'op-sub-for-add'},{v:rg?s-10:s+10,mis:'regroup'},{v:s+1,mis:'off-by-one'}]),
+     hint:{text:'Count all the rods by tens first. Then count the cubes. 10 cubes make another ten.'},
+     explain:{text:`${Math.floor(a/10)+Math.floor(b/10)} tens and ${(a%10)+(b%10)} ones${rg?` (that's one more ten and ${(a%10)+(b%10)-10} ones)`:''} make ${s}.`,visual:vSum(a,b)}});},
+ e=>{let a,b;if(e){a=10*ri(1,7)+ri(0,7);b=ri(1,9-a%10);}else{a=ri(15,69);b=ri(12,29);}const s=a+b,at=Math.floor(a/10),ao=a%10,bt=Math.floor(b/10),bo=b%10;
+   return Q({prompt:eq(`${a} + ${b}`),say:`What is ${a} plus ${b}?`,kind:'pad',answer:s,padMis:pm([[Math.abs(a-b),'op-sub-for-add'],[s-10,'regroup'],[s+10,'regroup'],[s-1,'off-by-one'],[s+1,'off-by-one']],s),
+     hint:{text:'Add the tens, then add the ones.',visual:vSum(a,b)},
+     explain:{text:bt?`Tens: ${at*10} + ${bt*10} = ${(at+bt)*10}. Ones: ${ao} + ${bo} = ${ao+bo}. Together: ${s}.`:`Ones: ${ao} + ${bo} = ${ao+bo}. Add the ${at*10}: ${s}.`,visual:vSum(a,b)}});},
+],
+subtraction:[
+ e=>{const it=pick(ITEMS),n=e?ri(5,10):ri(11,20),k=ri(2,n-2);return Q({prompt:`There are <b>${n}</b> ${it.many}. Tap <b>${k}</b> of them to take them away.`,kind:'build',build:{type:'crossout',n,k,e:it.e},
+   followup:{prompt:`How many ${it.many} are left?`,...numOpts(n-k,[{v:n+k,mis:'op-add-for-sub'},{v:n-k+1,mis:'off-by-one'},{v:n-k-1,mis:'off-by-one'}])},
+   hint:{text:'Tap one at a time and count as you go.'},explain:{text:`${n} take away ${k} leaves ${n-k}. That's ${n} − ${k} = ${n-k}.`,visual:vItems(n,it.e,k)}});},
+ e=>{let a,b;if(e){a=ri(8,20);b=ri(2,a-3);}else{a=ri(30,90);b=ri(11,a-11);}const d=a-b,rg=(a%10)<(b%10);
+   return Q({prompt:`The whole bar is <b>${a}</b>. One part is <b>${b}</b>. What is the other part?`,kind:'mc',visual:vBarModel(a,b),...numOpts(d,[{v:a+b,mis:'op-add-for-sub'},{v:rg?d+10:d-10,mis:'regroup'},{v:d+1,mis:'off-by-one'}]),
+     hint:{text:`The two parts together make ${a}. Take ${b} away from ${a}.`},explain:{text:`${a} − ${b} = ${d}. Check: ${b} + ${d} = ${a}.`,visual:vBarModel(a,b,d)}});},
+ e=>{let a,b;if(e){a=10*ri(2,9)+ri(1,9);b=ri(1,a%10);}else{a=ri(31,99);const at=Math.floor(a/10),ao=a%10;const bt=ri(1,at-1);const bo=(ao<9&&Math.random()<.6)?ri(ao+1,9):ri(0,ao);b=10*bt+bo;}
+   const d=a-b,at=Math.floor(a/10),ao=a%10,bt=Math.floor(b/10),bo=b%10,rg=ao<bo,sfl=Math.abs(at-bt)*10+Math.abs(ao-bo),[lo,hi]=rangeFor(d,a);
+   return Q({prompt:eq(`${a} − ${b}`),say:`What is ${a} minus ${b}?`,kind:'pad',answer:d,padMis:pm([[a+b,'op-add-for-sub'],[sfl,'sub-smaller-from-larger'],[d+10,'regroup'],[d-10,'regroup'],[d+1,'off-by-one'],[d-1,'off-by-one']],d),
+     hint:{text:rg?`You can't take ${bo} from ${ao}. Break one ten into 10 ones first.`:'Take away the tens, then take away the ones.'},
+     explain:{text:rg?`${a} is ${at} tens and ${ao} ones. Break a ten: ${at-1} tens and ${ao+10} ones. ${ao+10} − ${bo} = ${ao+10-bo}. ${at-1} − ${bt} = ${at-1-bt} ${plural(at-1-bt,'ten')}. Answer: ${d}.`:`Ones: ${ao} − ${bo} = ${ao-bo}. Tens: ${at} − ${bt} = ${at-bt}. Answer: ${d}.`,
+       visual:vLine({min:lo,max:hi,labels:tensLabels(lo,hi),jumps:jumpList(a,b,true,-1),marker:d})}});},
+],
+multmeaning:[
+ e=>{const a=ri(2,e?4:5),b=ri(2,e?4:5),it=pick(ITEMS);return Q({prompt:`Make <b>${a}</b> groups with <b>${b}</b> in each group.`,kind:'build',build:{type:'groups',a,b,e:it.e},
+   followup:{prompt:`How many ${it.many} is that altogether?`,...numOpts(a*b,[{v:a+b,mis:'op-add-for-mult'},{v:a*b-b,mis:'skip-count'},{v:a*b+b,mis:'skip-count'}])},
+   hint:{text:'The first buttons set how many groups. The second buttons set how many go in each group.'},explain:{text:`${a} groups of ${b} is ${a} × ${b} = ${a*b}. Count by ${b}s: ${skip(b,a)}.`,visual:vPlates(a,b,it.e)}});},
+ e=>{const it=pick(ITEMS);if(Math.random()<.5){let a,b;do{a=ri(3,e?4:5);b=ri(2,e?4:5);}while(a===b);
+     return Q({prompt:'Which matches the picture?',kind:'mc',visual:vPlates(a,b,it.e),options:shuffle([{value:'m',label:`${a} × ${b}`},{value:'a',label:`${a} + ${b}`,mis:'op-add-for-mult'},{value:'d',label:`${b} + ${b}`,mis:'skip-count'}]),answer:'m',
+       hint:{text:`Count the groups. Then count how many are in one group.`},explain:{text:`There are ${a} groups with ${b} in each: ${a} × ${b}.`,visual:vPlates(a,b,it.e)}});}
+   const a=ri(2,e?4:5),b=ri(2,e?4:5);return Q({prompt:`How many ${it.many} altogether?`,kind:'mc',visual:vPlates(a,b,it.e),...numOpts(a*b,[{v:a+b,mis:'op-add-for-mult'},{v:a*b-b,mis:'skip-count'},{v:a*b+1,mis:'off-by-one'}]),
+     hint:{text:`Count by ${b}s, one group at a time.`},explain:{text:`${a} groups of ${b}: ${skip(b,a)}. That's ${a} × ${b} = ${a*b}.`,visual:vPlates(a,b,it.e)}});},
+ e=>{const a=ri(2,e?5:6),b=ri(2,e?5:6);if(Math.random()<.5){const mx=Math.max(a,b),mn=Math.min(a,b);
+     return Q({prompt:`Which means the same as <b>${a} × ${b}</b>?`,say:`Which means the same as ${a} times ${b}?`,kind:'mc',options:shuffle([{value:'g',label:`${a} groups of ${b}`},{value:'a',label:`${a} and ${b} put together`,mis:'op-add-for-mult'},{value:'s',label:`${mx} take away ${mn}`},{value:'d',label:`${a} shared into ${b} groups`}]),answer:'g',
+       hint:{text:'× means "groups of".'},explain:{text:`${a} × ${b} means ${a} groups of ${b}.`,visual:vPlates(a,b,'●')}});}
+   return Q({prompt:`What is <b>${a}</b> groups of <b>${b}</b>?`,kind:'pad',answer:a*b,padMis:pm([[a+b,'op-add-for-mult'],[a*b-b,'skip-count'],[a*b+b,'skip-count'],[a*b-1,'off-by-one'],[a*b+1,'off-by-one']],a*b),
+     hint:{text:`Count by ${b}s, ${a} times.`},explain:{text:`${a} groups of ${b}: ${skip(b,a)}. So ${a} × ${b} = ${a*b}.`,visual:vPlates(a,b,'●')}});},
+],
+multeasy:factGen([2,5,10]),
+multmid:factGen([3,4]),
+multhard:factGen([6,7,8,9]),
+divmeaning:[
+ e=>{let k,q;do{k=ri(2,e?3:4);q=ri(2,e?4:5);}while(k===2&&q===2);const n=k*q,it=pick(ITEMS);
+   return Q({prompt:`Share <b>${n}</b> ${it.many} equally onto <b>${k}</b> plates. Tap a plate to put one ${it.one} on it.`,kind:'build',build:{type:'share',n,k,e:it.e},
+     followup:{prompt:`How many ${it.many} are on each plate?`,...numOpts(q,[{v:n-k,mis:'op-sub-for-div'},{v:n+k,mis:'op-add-for-div'},{v:q+1,mis:'off-by-one'}])},
+     hint:{text:'Go around the plates one at a time, like dealing cards.'},explain:{text:`${n} shared equally onto ${k} plates is ${q} each. That's ${n} ÷ ${k} = ${q}.`,visual:vPlates(k,q,it.e)}});},
+ e=>{let k,q;do{k=ri(2,e?3:4);q=ri(2,e?4:5);}while(k===2&&q===2);const n=k*q,it=pick(ITEMS);
+   if(Math.random()<.6)return Q({prompt:`${n} ${it.many} were shared equally onto ${k} plates. Which number sentence matches?`,kind:'mc',visual:vPlates(k,q,it.e),
+     options:shuffle([{value:'div',label:`${n} ÷ ${k} = ${q}`},{value:'sub',label:`${n} − ${k} = ${n-k}`,mis:'op-sub-for-div'},{value:'add',label:`${n} + ${k} = ${n+k}`,mis:'op-add-for-div'},{value:'mul',label:`${n} × ${k} = ${n*k}`,mis:'op-mult-for-div'}]),answer:'div',
+     hint:{text:'Sharing equally means dividing. Look for ÷.'},explain:{text:`Sharing ${n} onto ${k} plates gives ${q} on each, so ${n} ÷ ${k} = ${q}. The ÷ sign means "shared equally into".`,visual:vPlates(k,q,it.e)}});
+   return Q({prompt:`${n} ${it.many} were shared equally onto ${k} plates. How many are on each plate?`,kind:'mc',visual:vPlates(k,q,it.e),...numOpts(q,[{v:n-k,mis:'op-sub-for-div'},{v:n+k,mis:'op-add-for-div'},{v:q+1,mis:'off-by-one'}]),
+     hint:{text:'Count the items on just one plate.'},explain:{text:`Each plate has ${q}. ${n} ÷ ${k} = ${q}.`,visual:vPlates(k,q,it.e)}});},
+ e=>{let k,q;do{k=ri(2,e?3:5);q=ri(2,e?5:6);}while(k===2&&q===2);const n=k*q;
+   if(Math.random()<.5)return Q({prompt:`What does <b>${n} ÷ ${k}</b> mean?`,say:`What does ${n} divided by ${k} mean?`,kind:'mc',
+     options:shuffle([{value:'s',label:`Share ${n} into ${k} equal groups`},{value:'t',label:`Take ${k} away from ${n}`,mis:'op-sub-for-div'},{value:'p',label:`Put ${n} and ${k} together`,mis:'op-add-for-div'},{value:'g',label:`${n} groups of ${k}`,mis:'op-mult-for-div'}]),answer:'s',
+     hint:{text:'÷ means "shared equally into".'},explain:{text:`${n} ÷ ${k} means share ${n} into ${k} equal groups. Each group gets ${q}.`,visual:vPlates(k,q,'●')}});
+   return Q({prompt:eq(`${n} ÷ ${k}`),say:`What is ${n} divided by ${k}?`,kind:'mc',...numOpts(q,[{v:n-k,mis:'op-sub-for-div'},{v:n+k,mis:'op-add-for-div'},{v:n*k,mis:'op-mult-for-div'}]),
+     hint:{text:`Picture ${n} things shared onto ${k} plates.`},explain:{text:`Share ${n} into ${k} equal groups: each gets ${q}. So ${n} ÷ ${k} = ${q}.`,visual:vPlates(k,q,'●')}});},
+],
+divfacts:[
+ e=>{const k=ri(2,e?3:5),q=ri(2,e?4:6),n=k*q,it=pick(ITEMS);return Q({prompt:`Put <b>${n}</b> ${it.many} into groups of <b>${k}</b>. Tap "Make a group" until none are left.`,kind:'build',build:{type:'makegroups',n,k,e:it.e},
+   followup:{prompt:'How many groups did you make?',...numOpts(q,[{v:n-k,mis:'op-sub-for-div'},{v:n+k,mis:'op-add-for-div'},{v:q+1,mis:'off-by-one'}])},
+   hint:{text:'Each tap takes away one group. Keep going until there are none left.'},explain:{text:`Each group took away ${k}. You did that ${q} times, so ${n} ÷ ${k} = ${q}.`,visual:vPlates(q,k,it.e,{box:true})}});},
+ e=>{const k=ri(2,e?5:9),q=ri(2,e?5:9),n=k*q;return Q({prompt:`<b>${k} × ${q} = ${n}</b>. So what is <b>${n} ÷ ${k}</b>?`,say:`${k} times ${q} is ${n}. So what is ${n} divided by ${k}?`,kind:'mc',visual:vTri(n,k,q,'r'),
+   ...numOpts(q,[{v:n-k,mis:'op-sub-for-div'},{v:n*k,mis:'op-mult-for-div'},{v:q+1,mis:'fact-neighbor'}]),
+   hint:{text:`Division undoes multiplication. ${k} times what makes ${n}?`},explain:{text:`${k} × ${q} = ${n}, so ${n} ÷ ${k} = ${q}. They're in the same fact family.`,visual:vTri(n,k,q,null)}});},
+ e=>{const k=ri(2,e?5:10),q=ri(2,e?5:10),n=k*q;return Q({prompt:eq(`${n} ÷ ${k}`),say:`What is ${n} divided by ${k}?`,kind:'pad',answer:q,padMis:pm([[n-k,'op-sub-for-div'],[n+k,'op-add-for-div'],[n*k,'op-mult-for-div'],[q-1,'fact-neighbor'],[q+1,'fact-neighbor']],q),
+   hint:{text:`Think: ${k} times what makes ${n}?`},explain:{text:`${k} × ${q} = ${n}, so ${n} ÷ ${k} = ${q}.`,visual:vTri(n,k,q,null)},chart:true});},
+],
+whichop:[
+ e=>{const s=story(pick(STORY_TYPES),true);return Q({prompt:s.text,kind:'mc',lead:'What is happening in this story?',
+   options:shuffle(['+','−','×','÷'].map(op=>({value:op,label:`${OPICON[op]}<span>${OPWORD[op]}</span>`,mis:op===s.op?null:opMis(s.op,op)}))),answer:s.op,
+   hint:{text:'Picture it happening. Do things get joined, taken away, put in equal groups, or shared out?'},explain:{text:`This story is about ${OPDO[s.op]}: ${s.a} ${s.op} ${s.b} = ${s.ans}.`,visual:storyVisual(s)}});},
+ e=>{const s=story(pick(STORY_TYPES),true);return Q({prompt:s.text,kind:'mc',lead:'Which number sentence matches the story?',visual:storyVisual(s),options:storyOps(s),answer:s.op,
+   hint:{text:'Look at the picture. What is happening to the things?'},explain:{text:`This story is about ${OPDO[s.op]}: ${s.a} ${s.op} ${s.b} = ${s.ans}.`,visual:storyVisual(s)}});},
+ e=>{const s=story(pick(STORY_TYPES),e);return Q({prompt:s.text,kind:'mc',lead:'Which number sentence solves it?',options:storyOps(s),answer:s.op,
+   hint:{text:'Picture the story first. Are things joined, taken away, put in equal groups, or shared?'},explain:{text:`This story is about ${OPDO[s.op]}: ${s.a} ${s.op} ${s.b} = ${s.ans}.`,visual:OPICON[s.op]}});},
+],
+fractions:[
+ e=>{const n=pick(e?[2,3,4]:[2,3,4,5,6,8]),k=ri(1,n-1);return Q({prompt:`Shade ${fr(k,n)} of the bar.`,say:`Shade ${k} out of ${n} parts of the bar.`,kind:'build',build:{type:'shade',n,k},
+   hint:{text:`The bottom number, ${n}, is how many equal parts. Shade ${k} of them.`},explain:{text:`${k}/${n} means ${k} out of ${n} equal parts.`,visual:vFracBar(n,k)}});},
+ e=>{const n=pick(e?[2,3,4]:[2,3,4,5,6,8]),k=ri(1,n-1),vis=Math.random()<.5?vFracBar(n,k):vFracCircle(n,k);const seen=new Set([`${k}/${n}`]);
+   const opts=[{value:`${k}/${n}`,label:fr(k,n)}];
+   [[n,k,'frac-flip'],[k,n-k,'frac-part-part'],[n-k,n,'frac-unshaded']].forEach(([a,b,m])=>{const key=`${a}/${b}`;if(!seen.has(key)){seen.add(key);opts.push({value:key,label:fr(a,b),mis:m});}});
+   if(opts.length<3){const key=`${k}/${n+1}`;opts.push({value:key,label:fr(k,n+1)});}
+   return Q({prompt:'What fraction is shaded?',kind:'mc',visual:vis,options:shuffle(opts),answer:`${k}/${n}`,
+     hint:{text:'Count all the equal parts for the bottom number. Count the shaded parts for the top number.'},explain:{text:`There are ${n} equal parts and ${k} ${k===1?'is':'are'} shaded, so it's ${k}/${n}.`,visual:vis}});},
+ e=>{if(Math.random()<.5){let a,b;do{a=pick([2,3,4,5,6,8]);b=pick([2,3,4,5,6,8]);}while(a>=b);const first=Math.random()<.5;
+     return Q({prompt:`Which is bigger: ${first?fr(1,a):fr(1,b)} or ${first?fr(1,b):fr(1,a)}?`,say:`Which is bigger: 1 out of ${first?a:b}, or 1 out of ${first?b:a}?`,kind:'mc',
+       options:[...shuffle([{value:'a',label:fr(1,a)},{value:'b',label:fr(1,b),mis:'frac-denominator'}]),{value:'same',label:'They are the same'}],answer:'a',
+       hint:{text:'Picture the same bar cut into more pieces. Are the pieces bigger or smaller?'},explain:{text:`${fr(1,a)} is bigger. Cutting into ${b} pieces makes smaller pieces than cutting into ${a}.`,visual:vFracBar(a,1)+vFracBar(b,1)}});}
+   const k=pick(e?[2,3,4]:[2,3,4,5]),q=ri(2,e?5:8),n=k*q;
+   return Q({prompt:`What is ${fr(1,k)} of <b>${n}</b>?`,say:`What is 1 out of ${k} of ${n}?`,kind:'pad',answer:q,padMis:pm([[n-k,'op-sub-for-div'],[n*k,'op-mult-for-div'],[n+k,'op-add-for-div'],[q+1,'off-by-one'],[q-1,'off-by-one']],q),
+     hint:{text:`${fr(1,k)} of ${n} means share ${n} into ${k} equal parts and take one part.`},explain:{text:`${n} ÷ ${k} = ${q}, so ${fr(1,k)} of ${n} is ${q}.`,visual:vPlates(k,q,'●')}});},
+],
+};
+function makeQuestion(skill,stage,easy){const q=GEN[skill][stage](easy);q.skill=skill;q.stage=stage;return q;}
+
+// ---------- learning model (Bayesian Knowledge Tracing per skill and level) ----------
+const BKT={T:0.12,S:0.1};
+function newSkillState(){return {stage:0,best:0,mastered:false,pL:[0.3,0.2,0.1],att:[0,0,0],cor:[0,0,0],recent:[[],[],[]],visit:[0,0,0],lastSeen:0,masteredAt:0};}
+function newProfile(name,avatar){const skills={};SKILLS.forEach(s=>skills[s.id]=newSkillState());
+  return {id:'p'+Date.now().toString(36)+Math.floor(Math.random()*1000),name,avatar,created:Date.now(),placementDone:false,skills,focus:null,mis:{},gems:10,
+    owned:{avatars:[avatar],themes:['marigold']},theme:'marigold',days:[],sessions:[],log:[],settings:{sessionLen:10,sound:true,autoRead:false,chart:true}};}
+function bkt(p,ok,G){const S=BKT.S;const post=ok?p*(1-S)/(p*(1-S)+(1-p)*G):p*S/(p*S+(1-p)*(1-G));return Math.min(0.995,Math.max(0.01,post+(1-post)*BKT.T));}
+function guessFor(q){if(q.kind==='mc')return 1/q.options.length;if(q.kind==='pad')return 0.03;return 0.05;}
+function frontier(p){return SKILLS.filter(s=>!p.skills[s.id].mastered&&s.pre.every(id=>p.skills[id].mastered));}
+function pickFocus(p){const fr=frontier(p);if(p.focus&&fr.some(s=>s.id===p.focus))return p.focus;fr.sort((a,b)=>LADDER.indexOf(a.id)-LADDER.indexOf(b.id));p.focus=fr[0]?fr[0].id:null;return p.focus;}
+function nextItem(p,sess){
+  const mastered=SKILLS.filter(s=>p.skills[s.id].mastered),f=pickFocus(p);
+  if(mastered.length&&(!f||sess.i%4===3)){mastered.sort((a,b)=>p.skills[a.id].lastSeen-p.skills[b.id].lastSeen);return {skill:mastered[0].id,stage:Math.random()<.7?2:1,review:true};}
+  if(!f)return null;
+  return {skill:f,stage:p.skills[f].stage,review:false};
+}
+function noteMis(p,mis){if(!mis)return;const m=p.mis[mis]||{count:0,last:0};m.count++;m.last=Date.now();p.mis[mis]=m;}
+function record(p,skill,stage,ok,{hinted=false,mis=null,G=0.25,review=false,unsure=false}={}){
+  const sk=p.skills[skill],ev=[],clean=ok&&!hinted;
+  sk.pL[stage]=(ok&&hinted)?Math.min(0.995,sk.pL[stage]+(1-sk.pL[stage])*BKT.T*0.5):bkt(sk.pL[stage],ok,G);
+  sk.att[stage]++;if(ok)sk.cor[stage]++;
+  sk.recent[stage].push(clean?1:0);if(sk.recent[stage].length>5)sk.recent[stage].shift();
+  sk.visit[stage]++;sk.lastSeen=Date.now();noteMis(p,mis);
+  p.log.push({t:Date.now(),s:skill,g:stage,ok,h:hinted?1:0,m:mis,r:review?1:0,u:unsure?1:0});if(p.log.length>400)p.log.splice(0,p.log.length-400);
+  if(review){if(sk.mastered&&sk.pL[stage]<0.4){sk.mastered=false;sk.stage=stage;sk.visit=[0,0,0];sk.recent=[[],[],[]];p.focus=skill;ev.push({type:'refresh',skill});}return ev;}
+  const rec=sk.recent[stage],last3ok=rec.length>=3&&rec.slice(-3).every(x=>x===1);
+  if(sk.pL[stage]>=0.9&&last3ok){
+    if(stage<2){const back=(sk.best||0)>stage;sk.stage=stage+1;sk.best=Math.max(sk.best||0,sk.stage);sk.visit[sk.stage]=0;sk.recent[sk.stage]=[];ev.push({type:back?'back':'up',skill,stage:sk.stage});}
+    else{sk.mastered=true;sk.masteredAt=Date.now();if(p.focus===skill)p.focus=null;ev.push({type:'mastered',skill});}
+    return ev;
+  }
+  const last3=rec.slice(-3),wrong=last3.filter(x=>x===0).length;
+  if(sk.visit[stage]>=3&&last3.length>=3&&wrong>=2&&sk.pL[stage]<0.4){
+    if(stage>0){sk.stage=stage-1;sk.visit[sk.stage]=0;sk.recent[sk.stage]=[];sk.recent[stage]=[];ev.push({type:'down',skill,stage:sk.stage});}
+    else{const pre=SK[skill].pre;
+      if(pre.length){const w=pre.slice().sort((a,b)=>p.skills[a].pL[2]-p.skills[b].pL[2])[0],ws=p.skills[w];
+        ws.mastered=false;ws.stage=1;ws.pL[1]=Math.min(ws.pL[1],0.6);ws.pL[2]=Math.min(ws.pL[2],0.5);ws.visit=[0,0,0];ws.recent=[[],[],[]];
+        sk.visit[0]=0;sk.recent[0]=[];p.focus=w;ev.push({type:'prereq',skill,to:w});}
+      else{sk.visit[0]=0;sk.recent[0]=[];}}
+  }
+  return ev;
+}
+// placement: binary search along the ladder, two number-level questions per probe
+function placementInit(){return {lo:0,hi:LADDER.length-1,mid:null,asked:0,firstOk:null,tested:{}};}
+function placementNext(P){if(P.lo>P.hi||P.asked>=12)return null;if(P.mid===null)P.mid=Math.floor((P.lo+P.hi)/2);return {skill:LADDER[P.mid],stage:2};}
+function placementRecord(P,ok){P.asked++;const id=LADDER[P.mid];
+  if(P.firstOk===null){if(ok){P.firstOk=true;return;}P.tested[id]='fail';P.hi=P.mid-1;P.mid=null;P.firstOk=null;return;}
+  if(ok){P.tested[id]='pass';P.lo=P.mid+1;}else{P.tested[id]='fail';P.hi=P.mid-1;}P.mid=null;P.firstOk=null;}
+function placementApply(p,P){const start=P.lo;
+  LADDER.forEach((id,i)=>{const s=newSkillState();if(i<start){s.mastered=true;s.stage=2;s.best=2;s.pL=[0.95,0.92,P.tested[id]==='pass'?0.92:0.88];s.masteredAt=Date.now();}p.skills[id]=s;});
+  p.placementDone=true;p.focus=null;pickFocus(p);return start;}
+</script>
+
+<script>
+// ================= APP: storage, screens, interaction =================
+const LS_KEY='numbersky.v1';
+const THEMES={
+ marigold:{name:'Marigold',price:0,light:['#E59A0B','#2E1D00','#FBEBC5'],dark:['#F7B932','#2A1B00','#3B3218']},
+ ocean:{name:'Ocean',price:30,light:['#0B86A8','#FFFFFF','#D3EFF7'],dark:['#45C6EC','#04222C','#173843']},
+ berry:{name:'Berry',price:30,light:['#C13A7E','#FFFFFF','#F7DCEA'],dark:['#FF73B7','#33081E','#43213A']},
+ lime:{name:'Lime',price:40,light:['#4F850E','#FFFFFF','#E2F0CC'],dark:['#A6E04B','#1A2A03','#2C3A1E']},
+ coral:{name:'Coral',price:40,light:['#CC5030','#FFFFFF','#F9E0D7'],dark:['#FF8F6B','#3A1206','#45281F']},
+ lavender:{name:'Lavender',price:50,light:['#7256D4','#FFFFFF','#E6E0FA'],dark:['#B3A0FF','#1E1442','#2E2A55']},
+};
+const AVATARS=[['🦊',0],['🐢',0],['🐙',0],['🦉',20],['🐼',25],['🐝',25],['🐳',30],['🦖',35],['🤖',40],['🐉',50],['🦄',50],['🪐',60]];
+const OK_LINES=["That's it!","Nice thinking.","Yes, spot on.","You worked it out.","Exactly right.","Great job."];
+const ICON={
+ close:'<svg viewBox="0 0 24 24" aria-hidden="true"><path class="ic" d="M6 6l12 12M18 6L6 18"/></svg>',
+ speak:'<svg viewBox="0 0 24 24" aria-hidden="true"><path class="ic" d="M4 9v6h4l5 4V5L8 9H4z"/><path class="ic" d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg>',
+ bulb:'<svg viewBox="0 0 24 24" aria-hidden="true"><path class="ic" d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/></svg>',
+ back:'<svg viewBox="0 0 24 24" aria-hidden="true"><path class="ic" d="M9 6h11v12H9l-6-6z"/><path class="ic" d="M12 10l4 4M16 10l-4 4"/></svg>',
+ left:'<svg viewBox="0 0 24 24" aria-hidden="true"><path class="ic" d="M15 5l-7 7 7 7"/></svg>',
+ right:'<svg viewBox="0 0 24 24" aria-hidden="true"><path class="ic" d="M9 5l7 7-7 7"/></svg>',
+ up:'<svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="22" style="fill:var(--accent-soft)"/><path d="M24 34V14M15 23l9-9 9 9" style="fill:none;stroke:var(--accent);stroke-width:4.5;stroke-linecap:round;stroke-linejoin:round"/></svg>',
+ shift:'<svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="22" style="fill:var(--surface-2)"/><path d="M14 20h18l-5-5M34 28H16l5 5" style="fill:none;stroke:var(--sky);stroke-width:4;stroke-linecap:round;stroke-linejoin:round"/></svg>',
+};
+const GEM='<svg class="gem" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12l4 6-10 12L2 9z" class="g1"/><path d="M2 9h20M9 3l3 6 3-6M12 9v12" class="g2"/></svg>';
+function starPath(cx,cy,R,r){let d='';for(let i=0;i<10;i++){const a=-Math.PI/2+i*Math.PI/5,rad=i%2?r:R;d+=(i?'L':'M')+(cx+rad*Math.cos(a)).toFixed(1)+' '+(cy+rad*Math.sin(a)).toFixed(1);}return d+'Z';}
+const STAR_D=starPath(24,25,20,8.5);
+function starSVG(state,cls='st'){return `<svg class="${cls}" viewBox="0 0 48 48" aria-hidden="true">${state==='lit'?'<circle cx="24" cy="25" r="22" class="glow"/>':''}<path d="${STAR_D}" class="sp"/></svg>`;}
+
+let APP=loadLocal()||{v:1,profiles:{},current:null,updated:0};
+let prof=null,S=null,Cur=null;
+const UI={screen:'boot',modal:null,toast:null,tmp:{}};
+const Sync={mode:'local',ref:null,writing:false,dirty:false,timer:null};
+const $app=document.getElementById('app'),$layer=document.getElementById('layer');
+
+// ---------- storage ----------
+function loadLocal(){try{const s=localStorage.getItem(LS_KEY);return s?JSON.parse(s):null;}catch(e){return null;}}
+function save(){APP.updated=Date.now();try{localStorage.setItem(LS_KEY,JSON.stringify(APP));}catch(e){}
+  if(Sync.ref){Sync.dirty=true;clearTimeout(Sync.timer);Sync.timer=setTimeout(flush,1200);}}
+async function flush(){if(!Sync.ref||Sync.writing||!Sync.dirty)return;Sync.writing=true;Sync.dirty=false;
+  try{await Sync.ref.set(JSON.parse(JSON.stringify(APP)));Sync.mode='account';}
+  catch(e){const c=e&&e.code;if(c==='unavailable'){Sync.dirty=true;setTimeout(flush,1500+Math.random()*1500);}else if(c==='resource_exhausted'){Sync.dirty=true;setTimeout(flush,5000);}else{Sync.ref=null;Sync.mode='local';}}
+  Sync.writing=false;if(Sync.dirty&&Sync.ref&&!Sync.writing)clearTimeout(Sync.timer),Sync.timer=setTimeout(flush,1200);}
+async function connect(onReady){
+  try{
+    if(!window.claude||!window.claude.use)return;
+    const [db,user]=await Promise.all([window.claude.use('db'),window.claude.use('user')]);
+    if(!db||!user)return;const uid=await user.id();if(!uid)return;
+    const ref=db.doc('data/users/'+uid+'/numbersky');
+    const snap=await Promise.race([ref.get(),new Promise((_,rej)=>setTimeout(()=>rej({code:'timeout'}),10000))]);
+    Sync.ref=ref;Sync.mode='account';
+    if(snap.exists){const remote=JSON.parse(JSON.stringify(snap.data()));
+      if((remote.updated||0)>(APP.updated||0)&&remote.profiles){if(UI.screen!=='practice'){APP=remote;try{localStorage.setItem(LS_KEY,JSON.stringify(APP));}catch(e){}if(onReady.done)routeHome();}}
+      else if((APP.updated||0)>(remote.updated||0)){Sync.dirty=true;flush();}}
+    else if(Object.keys(APP.profiles).length){Sync.dirty=true;flush();}
+  }catch(e){}
+}
+
+// ---------- theme ----------
+function isDark(){const t=document.documentElement.getAttribute('data-theme');if(t==='dark')return true;if(t==='light')return false;try{return matchMedia('(prefers-color-scheme: dark)').matches;}catch(e){return false;}}
+function applyAccent(){const th=THEMES[(prof&&prof.theme)||'marigold']||THEMES.marigold;const [a,ai,s]=isDark()?th.dark:th.light;const st=document.documentElement.style;st.setProperty('--accent',a);st.setProperty('--accent-ink',ai);st.setProperty('--accent-soft',s);}
+new MutationObserver(applyAccent).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',applyAccent);}catch(e){}
+
+// ---------- sound, speech, effects ----------
+let AC=null;
+const SND={ok:[[660,.16,0],[880,.24,.11]],soft:[[392,.22,0]],up:[[523,.14,0],[659,.14,.1],[784,.14,.2],[1047,.32,.3]]};
+function tone(seq){if(!prof||!prof.settings.sound)return;try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();const t0=AC.currentTime+.01;
+  seq.forEach(([f,d,at])=>{const o=AC.createOscillator(),g=AC.createGain();o.type='sine';o.frequency.value=f;g.gain.setValueAtTime(0.0001,t0+at);g.gain.exponentialRampToValueAtTime(0.16,t0+at+0.02);g.gain.exponentialRampToValueAtTime(0.0001,t0+at+d);o.connect(g);g.connect(AC.destination);o.start(t0+at);o.stop(t0+at+d+0.05);});}catch(e){}}
+let TTS=null;
+async function initTTS(){try{if(window.claude&&window.claude.use){TTS=await window.claude.use('tts');if(UI.screen==='practice')render();}}catch(e){TTS=null;}}
+function canSpeak(){return !!TTS||('speechSynthesis' in window);}
+function strip(h){return String(h).replace(/<span class="frac"[^>]*><span>(\d+)<\/span><span>(\d+)<\/span><\/span>/g,'$1 out of $2').replace(/<[^>]+>/g,' ').replace(/×/g,' times ').replace(/÷/g,' divided by ').replace(/−/g,' minus ').replace(/=\s*\?/g,' equals what?').replace(/\s+/g,' ').trim();}
+async function speak(text){text=String(text).slice(0,1900);
+  if(TTS){try{await TTS.speak(text,{rate:0.9});return;}catch(e){if(e&&e.code==='not_granted'){TTS=null;}else return;}}
+  try{if('speechSynthesis' in window){speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.rate=0.9;speechSynthesis.speak(u);}}catch(e){}}
+function sayFor(q){return (q.lead?q.lead+' ':'')+(q.say||strip(q.prompt));}
+function reduced(){try{return matchMedia('(prefers-reduced-motion: reduce)').matches;}catch(e){return false;}}
+function confetti(){if(reduced())return;const c=document.getElementById('fx'),ctx=c.getContext('2d'),dpr=window.devicePixelRatio||1;const W=c.width=innerWidth*dpr,H=c.height=innerHeight*dpr;c.style.display='block';
+  const cs=getComputedStyle(document.documentElement),cols=['--accent','--sky','--good','--warm'].map(v=>cs.getPropertyValue(v).trim()||'#E59A0B');
+  const P=Array.from({length:110},()=>({x:W/2+(Math.random()-.5)*W*.35,y:H*.38,vx:(Math.random()-.5)*15*dpr,vy:(-Math.random()*15-4)*dpr,r:(4+Math.random()*5)*dpr,c:pick(cols),a:Math.random()*6,s:Math.random()<.5}));
+  const t0=performance.now();(function f(t){ctx.clearRect(0,0,W,H);P.forEach(p=>{p.vy+=.45*dpr;p.x+=p.vx;p.y+=p.vy;p.a+=.15;ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.a);ctx.fillStyle=p.c;if(p.s)ctx.fillRect(-p.r,-p.r/2,p.r*2,p.r);else{ctx.beginPath();ctx.arc(0,0,p.r*.7,0,7);ctx.fill();}ctx.restore();});
+    if(t-t0<1800)requestAnimationFrame(f);else{ctx.clearRect(0,0,W,H);c.style.display='none';}})(t0);}
+function toast(text){UI.toast=text;renderLayer();clearTimeout(toast.t);toast.t=setTimeout(()=>{UI.toast=null;renderLayer();},2400);}
+
+// ---------- helpers ----------
+function dayKey(d){const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),dd=String(d.getDate()).padStart(2,'0');return `${y}-${m}-${dd}`;}
+function markDay(p){const k=dayKey(new Date());if(!p.days.includes(k)){p.days.push(k);if(p.days.length>180)p.days.shift();}}
+function rel(ts){if(!ts)return 'never';const d=Math.floor((new Date(dayKey(new Date())).getTime()-new Date(dayKey(new Date(ts))).getTime())/864e5);return d<=0?'today':d===1?'yesterday':`${d} days ago`;}
+function migrate(p){if(!p)return;SKILLS.forEach(s=>{if(!p.skills[s.id])p.skills[s.id]=newSkillState();const k=p.skills[s.id];if(typeof k.best!=='number')k.best=k.mastered?2:k.stage;});p.settings=Object.assign({sessionLen:10,sound:true,autoRead:false,chart:true},p.settings||{});
+  p.mis=p.mis||{};p.log=p.log||[];p.sessions=p.sessions||[];p.days=p.days||[];p.owned=p.owned||{avatars:[p.avatar],themes:['marigold']};p.theme=p.theme||'marigold';if(typeof p.gems!=='number')p.gems=0;}
+function setProf(){prof=APP.current&&APP.profiles[APP.current]?APP.profiles[APP.current]:null;migrate(prof);}
+function routeHome(){setProf();UI.modal=null;if(!prof)UI.screen=Object.keys(APP.profiles).length?'profiles':'welcome';else if(!prof.placementDone)UI.screen='placeIntro';else UI.screen='home';render();window.scrollTo(0,0);}
+function gemPill(){return `<span class="gems" aria-label="${prof.gems} gems">${GEM}<b>${prof.gems}</b></span>`;}
+function stageChip(st){return `<span class="stage" aria-label="Level: ${STAGES[st]}">${[0,1,2].map(i=>`<i class="${i<=st?'on':''}"></i>`).join('')}${STAGES[st]}</span>`;}
+function weekDots(){const out=[];const t=new Date();let n=0;for(let i=6;i>=0;i--){const d=new Date(t.getFullYear(),t.getMonth(),t.getDate()-i),k=dayKey(d),on=prof.days.includes(k);if(on)n++;out.push(`<span class="wd${on?' on':''}${i===0?' today':''}"><i></i>${'SMTWTFS'[d.getDay()]}</span>`);}
+  return `<div class="week" aria-label="Practised ${n} of the last 7 days"><span class="wl">This week</span>${out.join('')}</div>`;}
+function speakBtn(act='speak'){return canSpeak()?`<button class="iconbtn" data-act="${act}" aria-label="Read it to me">${ICON.speak}</button>`:'';}
+function optClass(o){const t=String(o.label).replace(/<[^>]+>/g,'').trim();return /[a-z]{3,}/i.test(t)?' txt':t.length>6?' mid':'';}
+function optBtn(o,i,act,chosen,answer){const fbk=Cur.phase==='feedback';let cls='opt'+optClass(o);
+  if(fbk){if(S.mode!=='placement'){if(String(o.value)===String(answer))cls+=' right';else if(i===chosen)cls+=' wrong';}else if(i===chosen)cls+=' sel';}
+  return `<button class="${cls}" data-act="${act}" data-i="${i}"${fbk?' disabled':''}>${o.label}</button>`;}
+
+// ---------- render ----------
+function focusKey(){const a=document.activeElement;if(!a||a===document.body||!a.dataset)return null;if(a.id)return '#'+a.id;if(!a.dataset.act)return null;
+  return `[data-act="${a.dataset.act}"]`+(a.dataset.i!=null?`[data-i="${a.dataset.i}"]`:'')+(a.dataset.d!=null?`[data-d="${a.dataset.d}"]`:'')+(a.dataset.k!=null?`[data-k="${a.dataset.k}"][data-v="${a.dataset.v}"]`:'');}
+function render(){applyAccent();const fk=focusKey();let h='';
+  switch(UI.screen){case 'boot':h=vBoot();break;case 'welcome':h=vWelcome();break;case 'profiles':h=vProfiles();break;case 'placeIntro':h=vPlaceIntro();break;
+    case 'practice':h=vPractice();break;case 'placed':h=vPlaced();break;case 'summary':h=vSummary();break;case 'shop':h=vShop();break;case 'grown':h=vGrown();break;default:h=vHome();}
+  $app.innerHTML=h;renderLayer();
+  if(fk&&!UI.modal){try{const el=document.querySelector(fk);if(el&&!el.disabled)el.focus({preventScroll:true});}catch(e){}}}
+function renderLayer(){$layer.innerHTML=vModal()+(UI.toast?`<div class="toast" role="status">${esc(UI.toast)}</div>`:'');
+  if(UI.modal){const b=$layer.querySelector('.modal [data-focus]')||$layer.querySelector('.modal button');if(b)b.focus({preventScroll:true});}}
+
+function vBoot(){return `<div class="boot">${starSVG('lit')}<p class="muted">Loading your stars…</p></div>`;}
+
+function vWelcome(){const av=UI.tmp.av||'🦊';return `
+<section class="card">
+  <div class="brand">${starSVG('lit')}<span>Number Sky</span></div>
+  <h1>Light up a star for every math skill you master.</h1>
+  <p class="muted">Short practice with no timers. The app finds the right level and changes as you learn.</p>
+  <form id="newp" class="form" autocomplete="off">
+    <label for="pname">What's your name?</label>
+    <input id="pname" name="pname" maxlength="20" required value="${esc(UI.tmp.name||'')}">
+    <fieldset><legend>Pick a buddy</legend>
+      <div class="avs">${AVATARS.filter(a=>a[1]===0).map(([a])=>`<button type="button" class="av${a===av?' on':''}" data-act="pickAv" data-d="${a}" aria-pressed="${a===av}" aria-label="Buddy ${a}">${a}</button>`).join('')}</div>
+      <p class="muted small">You can unlock more buddies with gems.</p>
+    </fieldset>
+    <button class="btn big" type="submit">Let's go</button>
+    ${UI.tmp.adding?'<button type="button" class="btn secondary" data-act="back">Cancel</button>':''}
+  </form>
+</section>`;}
+
+function vProfiles(){return `<section class="card"><div class="brand">${starSVG('lit')}<span>Number Sky</span></div><h1>Who's practising?</h1>
+<ul class="learners">${Object.values(APP.profiles).map(p=>`<li><span class="avatar">${p.avatar}</span><span class="lname">${esc(p.name)}</span><button class="btn secondary" data-act="switchTo" data-d="${p.id}">Start</button></li>`).join('')}</ul>
+<button class="btn ghost" data-act="addLearner">Add a learner</button></section>`;}
+
+function vPlaceIntro(){return `<section class="card">
+<header class="top"><span class="avatar">${prof.avatar}</span><div class="hello"><div class="hi">Hi, ${esc(prof.name)}</div></div></header>
+<h1>First, a quick warm-up</h1>
+<p>About 8 questions to find your starting point. There's no timer and no score.</p>
+<p>If you don't know one, tap <b>I'm not sure</b>. That helps too.</p>
+<button class="btn big" data-act="beginPlace">Start the warm-up</button>
+<button class="btn secondary" data-act="skipPlace">Skip and start from the very beginning</button>
+</section>`;}
+
+function vPlaced(){const f=prof.focus,lit=SKILLS.filter(s=>prof.skills[s.id].mastered);return `<section class="card">
+<p class="eyebrow">Warm-up done</p><h1>${f?`You're starting with ${esc(SK[f].name)}`:'Every star is already lit'}</h1>
+${lit.length?`<p>${lit.length} ${plural(lit.length,'star is','stars are')} already lit because you showed you know ${lit.length===1?'it':'them'}. They'll come back now and then to keep them bright.</p>`:'<p>We\'ll start at the beginning and move quickly through anything that feels easy.</p>'}
+<p class="muted">Each skill has three levels: hands-on, pictures, then just numbers.</p>
+<button class="btn big" data-act="home">See my star chart</button></section>`;}
+
+function vHome(){const p=prof,f=pickFocus(p),st=f?p.skills[f].stage:0,lit=SKILLS.filter(s=>p.skills[s.id].mastered).length;return `
+<header class="top"><span class="avatar" aria-hidden="true">${p.avatar}</span><div class="hello"><div class="hi">Hi, ${esc(p.name)}</div><div class="sub">${lit} of ${SKILLS.length} stars lit</div></div>${gemPill()}</header>
+<section class="card hero">
+  <div class="hero-sky" aria-hidden="true"></div>
+  <p class="eyebrow">Today's practice</p>
+  <h1>${f?esc(SK[f].name):'Keep your stars bright'}</h1>
+  ${f?stageChip(st):''}
+  <p class="hero-note">${f?SK[f].kid:'You have lit every star. Practice now reviews them so they stay strong.'}</p>
+  <button class="btn big" data-act="start">Start · ${p.settings.sessionLen} questions</button>
+  ${weekDots()}
+</section>
+<section class="chart" aria-labelledby="chartH"><div class="sec-head"><h2 id="chartH">Your star chart</h2><p class="muted small">Tap a star to see what it is. Dots show the levels you've finished.</p></div>${starChart()}</section>
+<nav class="home-nav" aria-label="More"><button class="btn secondary" data-act="shop">${GEM} Shop</button><button class="btn secondary hold" data-hold="1" aria-label="Grown-ups. Press and hold to open.">Grown-ups (hold)<span class="holdbar"></span></button></nav>`;}
+const STATE_LABEL={lit:'mastered',now:'practising now',open:'ready to start',locked:'locked'};
+function starState(id){const st=prof.skills[id];if(st.mastered)return 'lit';if(id===prof.focus)return 'now';return frontier(prof).some(s=>s.id===id)?'open':'locked';}
+function starChart(){return GROUPS.map(g=>`<div class="const"><h3>${g}</h3><div class="stars">${SKILLS.filter(s=>s.group===g).map(s=>{const st=prof.skills[s.id],state=starState(s.id),pips=st.mastered?3:(state==='locked'?0:st.stage);
+  return `<button class="star ${state}" data-act="star" data-d="${s.id}" aria-label="${esc(s.name)}: ${STATE_LABEL[state]}">${starSVG(state)}<span class="sname">${esc(s.name)}</span><span class="pips" aria-hidden="true">${[0,1,2].map(i=>`<i class="${i<pips?'on':''}"></i>`).join('')}</span>${state==='now'?'<span class="nowtag">Now</span>':''}</button>`;}).join('')}</div></div>`).join('');}
+
+function vPractice(){const q=Cur.q,sk=SK[q.skill],fbk=Cur.phase==='feedback',pl=S.mode==='placement';
+  const prog=pl?`<div class="prog-text">Warm-up · question ${Math.min(S.P.asked+(fbk?0:1),12)}</div>`:`<div class="prog" role="progressbar" aria-label="Progress" aria-valuemin="0" aria-valuemax="${S.n}" aria-valuenow="${S.i}">${Array.from({length:S.n},(_,i)=>`<i class="${i<S.i?'done':(i===S.i&&!fbk?'cur':'')}"></i>`).join('')}</div>`;
+  const meta=pl?'<span class="chip">Warm-up</span>':`<span class="chip">${esc(sk.name)}</span>${stageChip(q.stage)}${q.review?'<span class="chip rev">Review</span>':''}`;
+  let input='';if(q.kind==='mc')input=`<div class="opts">${q.options.map((o,i)=>optBtn(o,i,'opt',Cur.chosen,q.answer)).join('')}</div>`;else if(q.kind==='pad')input=vPad();else input=vBuild();
+  const helpers=fbk?'':`<div class="helpers">${!pl&&q.hint&&!Cur.hintShown?`<button class="btn ghost" data-act="hint">${ICON.bulb} Hint</button>`:''}${!pl&&q.chart&&prof.settings.chart?'<button class="btn ghost" data-act="chart">Times chart</button>':''}<button class="btn ghost" data-act="unsure">I'm not sure</button></div>`;
+  const hint=Cur.hintShown&&q.hint?`<div class="hint" role="note"><b>Hint</b><p>${q.hint.text}</p>${q.hint.visual?`<div class="visual">${q.hint.visual}</div>`:''}</div>`:'';
+  return `
+<div class="ptop"><button class="iconbtn" data-act="quit" aria-label="Stop practice">${ICON.close}</button>${prog}${gemPill()}</div>
+<div class="meta">${meta}</div>
+<section class="card qcard" aria-label="Question">
+  <div class="qhead"><div class="prompt">${q.lead?`<p class="muted" style="font-size:.8em;margin-bottom:6px">${q.lead}</p>`:''}${q.prompt}</div>${speakBtn()}</div>
+  ${q.visual?`<div class="visual">${q.visual}</div>`:''}
+  ${input}${hint}${helpers}
+</section>
+${fbk?vFeedback():''}`;}
+
+function vPad(){const fbk=Cur.phase==='feedback',keys=['1','2','3','4','5','6','7','8','9','del','0','ok'];
+  const cls=fbk&&S.mode!=='placement'?(Cur.ok?' right':' wrong'):'';
+  return `<div class="padshow${cls}" aria-live="polite" aria-label="Your answer">${Cur.entry?esc(Cur.entry):'<span class="ph">Tap the numbers</span>'}</div>
+<div class="pad">${keys.map(k=>`<button class="key${k==='ok'?' ok':''}" data-act="key" data-d="${k}"${fbk||(k==='ok'&&!Cur.entry)?' disabled':''} aria-label="${k==='del'?'Delete':k==='ok'?'Check':k}">${k==='del'?ICON.back:k==='ok'?'Check':k}</button>`).join('')}</div>`;}
+
+function initBuild(bd){switch(bd.type){
+  case 'tenframe':{const cells=Array(bd.frames*10).fill(0);for(let i=0;i<bd.preset;i++)cells[i]=2;return {cells};}
+  case 'blocks':return {h:0,t:0,o:0};
+  case 'nlplace':return {m:null};
+  case 'jumps':{const lo=Math.floor(bd.start/10)*10;return {pos:bd.start,hist:[],lo,hi:Math.max(lo+20,Math.ceil((bd.target+1)/10)*10)};}
+  case 'crossout':return {x:Array(bd.n).fill(false)};
+  case 'groups':return {a:1,b:1};
+  case 'rows':return {r:0};
+  case 'share':return {plates:Array(bd.k).fill(0),hist:[]};
+  case 'makegroups':return {g:0};
+  case 'shade':return {s:Array(bd.n).fill(false)};}
+  return {};}
+function buildRight(bd,b){switch(bd.type){
+  case 'tenframe':return b.cells.filter(Boolean).length===bd.target;
+  case 'blocks':return b.h*100+b.t*10+b.o===bd.target;
+  case 'nlplace':return b.m===bd.target;
+  case 'jumps':return b.pos===bd.target;
+  case 'crossout':return b.x.filter(Boolean).length===bd.k;
+  case 'groups':return b.a===bd.a&&b.b===bd.b;
+  case 'rows':return b.r===bd.target;
+  case 'share':{const sum=b.plates.reduce((a,c)=>a+c,0);return sum===bd.n&&b.plates.every(c=>c===b.plates[0]);}
+  case 'makegroups':return b.g*bd.k===bd.n;
+  case 'shade':return b.s.filter(Boolean).length===bd.k;}
+  return false;}
+function buildNudge(bd,b){switch(bd.type){
+  case 'tenframe':return `Not quite. Count your dots again. You need ${bd.target} in all.`;
+  case 'blocks':return 'Not quite. Check the tens and the ones again.';
+  case 'nlplace':return b.m===null?'Tap the line to place the dot first.':'Not quite. Find the nearest labelled number, then count the ticks.';
+  case 'jumps':return b.pos<bd.target?'Not there yet. How many have you jumped so far?':'You went past it. Tap Undo and try again.';
+  case 'crossout':return `You need to take away exactly ${bd.k}. Count the crossed-out ones.`;
+  case 'groups':return `Check both numbers: ${bd.a} groups, with ${bd.b} in each group.`;
+  case 'rows':return `You need ${bd.target} rows. Count the rows again.`;
+  case 'share':return 'The plates aren\'t equal yet. Tap Undo to move some back, then share again.';
+  case 'shade':return `Shade exactly ${bd.k} parts.`;}
+  return 'Not quite. Try again.';}
+const NEEDS_CHECK=['tenframe','blocks','nlplace','crossout','groups','rows','shade'];
+function vBuild(){const q=Cur.q,bd=q.build,b=Cur.b,done=!!b.done||Cur.phase!=='answer',D=done?' disabled':'';let h='';
+  switch(bd.type){
+    case 'tenframe':h+='<div class="tfwrap">';for(let f=0;f<bd.frames;f++)h+=vTF(b.cells.slice(f*10,f*10+10),done?null:f*10);h+='</div>';break;
+    case 'blocks':{h+=vBlocks(b.h,b.t,b.o);const places=[...(bd.hundreds?[['h','Hundreds','hundred',3]]:[]),['t','Tens','ten',9],['o','Ones','one',9]];
+      h+=`<div class="steppers">${places.map(([k,l,one,mx])=>`<div class="stepper"><span class="sl">${l}</span><button class="sbtn" data-act="blk" data-d="${k}-" aria-label="Take away one ${one}"${done||b[k]<=0?' disabled':''}>−</button><span class="sv" aria-label="${b[k]} ${plural(b[k],one)}">${b[k]}</span><button class="sbtn" data-act="blk" data-d="${k}+" aria-label="Add one ${one}"${done||b[k]>=mx?' disabled':''}>+</button></div>`).join('')}</div>`;break;}
+    case 'nlplace':h+=`<div class="visual">${vLine({min:bd.min,max:bd.max,labels:bd.labels,marker:b.m,tap:!done})}</div><div class="brow"><button class="iconbtn" data-act="nlnudge" data-d="-1" aria-label="Move the dot left"${D}>${ICON.left}</button><span class="muted">${b.m===null?'Tap the line':'Arrows move the dot'}</span><button class="iconbtn" data-act="nlnudge" data-d="1" aria-label="Move the dot right"${D}>${ICON.right}</button></div>`;break;
+    case 'jumps':{const lab=bd.tens?tensLabels(b.lo,b.hi):[0,5,10,15,20].filter(v=>v>=b.lo&&v<=b.hi);
+      h+=`<div class="pospill">You're on <b>${b.pos}</b></div><div class="visual">${vLine({min:b.lo,max:b.hi,labels:lab,marker:b.pos,jumps:b.hist.map(([f,t])=>({from:f,to:t,label:'+'+(t-f)}))})}</div>
+<div class="jlog" aria-label="Jumps so far">${b.hist.length?b.hist.map(([f,t])=>`<span class="chip">+${t-f}</span>`).join(''):'<span class="muted">No jumps yet</span>'}</div>
+<div class="brow">${bd.tens?`<button class="btn secondary" data-act="jump" data-d="10"${done||b.pos+10>b.hi?' disabled':''}>+10</button>`:''}<button class="btn secondary" data-act="jump" data-d="1"${done||b.pos+1>b.hi?' disabled':''}>+1</button><button class="btn ghost" data-act="jundo"${done||!b.hist.length?' disabled':''}>Undo</button></div>
+${done?'':'<button class="btn big" data-act="jdone">I\'m there</button>'}`;break;}
+    case 'crossout':h+=`<div class="items tap">${b.x.map((x,i)=>`<button class="it-c${x?' x':''}" data-act="cross" data-i="${i}" aria-pressed="${x}" aria-label="${i+1}${x?', taken away':''}"${D}>${bd.e}</button>`).join('')}</div><p class="muted center">Taken away: ${b.x.filter(Boolean).length}</p>`;break;
+    case 'groups':h+=vPlates(b.a,b.b,bd.e)+`<div class="steppers">${[['a','Groups'],['b','In each group']].map(([k,l])=>`<div class="stepper"><span class="sl">${l}</span><button class="sbtn" data-act="grp" data-d="${k}-" aria-label="${l}: fewer"${done||b[k]<=1?' disabled':''}>−</button><span class="sv">${b[k]}</span><button class="sbtn" data-act="grp" data-d="${k}+" aria-label="${l}: more"${done||b[k]>=6?' disabled':''}>+</button></div>`).join('')}</div>`;break;
+    case 'rows':h+=`<div class="rows" role="img" aria-label="${b.r} rows of ${bd.each}">${b.r?Array.from({length:b.r},(_,i)=>`<div class="row"><span class="dots">${'<i></i>'.repeat(bd.each)}</span><span class="sk">${(i+1)*bd.each}</span></div>`).join(''):'<p class="muted">No rows yet</p>'}</div>
+<div class="brow"><button class="btn secondary" data-act="row" data-d="+"${done||b.r>=10?' disabled':''}>+ Add a row of ${bd.each}</button><button class="btn ghost" data-act="row" data-d="-"${done||b.r<=0?' disabled':''}>Remove a row</button></div>`;break;
+    case 'share':{const left=bd.n-b.plates.reduce((a,c)=>a+c,0);
+      h+=`<div class="pool"><div>Left to share: <b>${left}</b></div><div class="items">${`<span class="it-c">${bd.e}</span>`.repeat(left)||'<span class="muted">All shared</span>'}</div></div>
+<div class="plates">${b.plates.map((c,i)=>`<div class="pgrp"><button class="plate tap" data-act="plate" data-i="${i}" aria-label="Plate ${i+1}, has ${c}"${done||left===0?' disabled':''}>${`<span class="it">${bd.e}</span>`.repeat(c)}</button><div class="plabel">Plate ${i+1}</div></div>`).join('')}</div>
+<div class="brow"><button class="btn ghost" data-act="sundo"${done||!b.hist.length?' disabled':''}>Undo</button></div>`;break;}
+    case 'makegroups':{const left=bd.n-b.g*bd.k;
+      h+=`<div class="pool"><div>Left: <b>${left}</b></div><div class="items">${`<span class="it-c">${bd.e}</span>`.repeat(left)||'<span class="muted">None left</span>'}</div></div>
+<button class="btn big" data-act="mkgrp"${done||left<bd.k?' disabled':''}>Make a group of ${bd.k}</button>${b.g?vPlates(b.g,bd.k,bd.e,{box:true,label:'Group'}):''}`;break;}
+    case 'shade':h+=`<div class="visual">${vFracBar(bd.n,0,{shaded:b.s,tap:!done})}</div><p class="muted center">Shaded: ${b.s.filter(Boolean).length}</p>`;break;
+  }
+  if(!done&&NEEDS_CHECK.includes(bd.type))h+='<button class="btn big" data-act="bcheck">Check</button>';
+  if(b.msg&&!done)h+=`<p class="nudge" role="status">${b.msg}</p>`;
+  if(b.done&&q.followup)h+=`<div class="follow"><div class="qhead"><p class="prompt sm">${q.followup.prompt}</p>${speakBtn('fspeak')}</div><div class="opts">${q.followup.options.map((o,i)=>optBtn(o,i,'fopt',Cur.fchosen,q.followup.answer)).join('')}</div></div>`;
+  return `<div class="build">${h}</div>`;}
+
+function answerText(){const q=Cur.q;const find=(opts,ans)=>{const o=opts.find(o=>String(o.value)===String(ans));return o?o.label.replace(/<svg[\s\S]*?<\/svg>/g,''):'';};
+  if(q.kind==='mc')return find(q.options,q.answer);if(q.kind==='pad')return String(q.answer);if(q.followup&&Cur.b&&Cur.b.done)return find(q.followup.options,q.followup.answer);return '';}
+function vFeedback(){const q=Cur.q;
+  if(S.mode==='placement')return `<section class="card fb${Cur.ok?' good':''}" id="fb"><div class="buddy"><span class="avatar">${prof.avatar}</span><div class="bubble" role="status">${Cur.ok?"That's right.":'Thanks. That helps find your starting point.'}</div></div><button class="btn big" data-act="next">Next</button></section>`;
+  if(Cur.ok)return `<section class="card fb good" id="fb"><div class="buddy"><span class="avatar">${prof.avatar}</span><div class="bubble" role="status">${pick(OK_LINES)}${Cur.hinted?' (with a hint)':''}</div></div><div class="fb-gems">+${Cur.gain} ${GEM}</div><button class="btn big" data-act="next">Next</button></section>`;
+  const mt=Cur.mis&&MIS[Cur.mis]?MIS[Cur.mis].kid:null,at=answerText();
+  return `<section class="card fb warm" id="fb"><h2 role="status">${Cur.unsure?'Good call asking. Here\'s how to see it.':'Not quite. Let\'s look at it another way.'}</h2>${mt?`<p><b>${mt}</b></p>`:''}<p>${q.explain.text}</p>${q.explain.visual?`<div class="visual">${q.explain.visual}</div>`:''}${at?`<p class="ans">The answer is <b>${at}</b>.</p>`:''}<div class="fb-gems">+${Cur.gain} ${GEM} for trying</div><button class="btn big" data-act="next">Got it, next</button></section>`;}
+
+function vSummary(){const ev=S.events,wins=[];ev.forEach(e=>{if(e.type==='mastered')wins.push(`<li>${starSVG('lit')}Lit a star: ${esc(SK[e.skill].name)}</li>`);else if(e.type==='up')wins.push(`<li>${ICON.up}${esc(SK[e.skill].name)}: up to ${STAGE_WITH[e.stage]}</li>`);});
+  const ups=ev.filter(e=>e.type==='up'||e.type==='mastered').length;
+  return `<section class="card"><p class="eyebrow">${S.early?'Stopped for now':'Practice done'}</p><h1>Nice work, ${esc(prof.name)}.</h1>
+<div class="stats"><div><b>${S.answered}</b><span>${plural(S.answered,'question')}</span></div><div><b>+${S.gems}</b><span>gems</span></div><div><b>${ups}</b><span>${plural(ups,'level-up')}</span></div></div>
+${wins.length?`<ul class="wins">${wins.join('')}</ul>`:'<p class="muted">Every answer moves you closer to the next level.</p>'}
+${weekDots()}
+<div class="row"><button class="btn big" data-act="more">5 more questions</button><button class="btn secondary" data-act="home">Back to my stars</button></div></section>`;}
+
+function vShop(){return `<header class="top"><button class="iconbtn" data-act="home" aria-label="Back">${ICON.left}</button><div class="hello"><div class="hi">Shop</div><div class="sub">Spend gems on buddies and colours</div></div>${gemPill()}</header>
+<section class="card"><h2>Buddies</h2><div class="shopgrid">${AVATARS.map(([a,p])=>{const own=prof.owned.avatars.includes(a)||p===0,use=prof.avatar===a;return `<button class="item${use?' using':''}" data-act="buyAv" data-d="${a}" aria-label="Buddy ${a}${use?', in use':own?', owned':`, costs ${p} gems`}"><span class="emo">${a}</span><span class="price">${use?'Using':own?'Use':`${GEM}${p}`}</span></button>`;}).join('')}</div></section>
+<section class="card"><h2>Colours</h2><div class="shopgrid">${Object.entries(THEMES).map(([k,t])=>{const own=prof.owned.themes.includes(k)||t.price===0,use=prof.theme===k,c=isDark()?t.dark[0]:t.light[0];return `<button class="item${use?' using':''}" data-act="buyTheme" data-d="${k}" aria-label="${t.name}${use?', in use':own?', owned':`, costs ${t.price} gems`}"><span class="sw" style="background:${c}"></span>${t.name}<span class="price">${use?'Using':own?'Use':`${GEM}${t.price}`}</span></button>`;}).join('')}</div></section>
+<p class="muted small center">You earn gems for every answer, level-up and finished practice.</p>`;}
+
+function skillRow(s){const st=prof.skills[s.id],isF=frontier(prof).some(x=>x.id===s.id);let chip,pct,lab;
+  if(st.mastered){chip='<span class="chip good">Mastered</span>';pct=Math.round(st.pL[2]*100);lab=`Confidence ${pct}%`;}
+  else if(isF){chip=`<span class="chip acc">${STAGES[st.stage]} level</span>`;pct=Math.round(st.pL[st.stage]*100);lab=`${pct}% estimated at this level`;}
+  else{chip='<span class="chip">Locked</span>';pct=0;lab=`Unlocks after ${s.pre.map(id=>SK[id].name).join(' and ')}`;}
+  const att=st.att.reduce((a,b)=>a+b,0),cor=st.cor.reduce((a,b)=>a+b,0);
+  return `<li class="sr"><div class="sr-top"><b>${esc(s.name)}</b>${chip}</div><div class="bar" aria-hidden="true"><span style="width:${pct}%"></span></div><div class="sr-meta">${lab}${att?` · ${att} ${plural(att,'answer')}, ${Math.round(cor/att*100)}% right · last ${rel(st.lastSeen)}`:''}</div><p class="muted small">${s.about}</p></li>`;}
+function seg(k,label,opts){return `<div class="set"><span class="set-l" id="set-${k}">${label}</span><div class="seg" role="group" aria-labelledby="set-${k}">${opts.map(([v,t])=>`<button data-act="set" data-k="${k}" data-v="${v}" aria-pressed="${String(prof.settings[k])===String(v)}">${t}</button>`).join('')}</div></div>`;}
+function vGrown(){const p=prof,wk=Date.now()-7*864e5,rec=p.log.filter(l=>l.t>=wk&&!l.p),acc=rec.length?Math.round(rec.filter(l=>l.ok).length/rec.length*100):null;
+  const wkKey=dayKey(new Date(wk)),days=p.days.filter(d=>d>wkKey).length,lit=SKILLS.filter(s=>p.skills[s.id].mastered).length,f=pickFocus(p);
+  const misList=Object.entries(p.mis).filter(([k])=>MIS[k]).sort((a,b)=>b[1].count-a[1].count).slice(0,6);
+  const sess=p.sessions.slice(-8).reverse();
+  return `
+<header class="top"><button class="iconbtn" data-act="back" aria-label="Back to the star chart">${ICON.left}</button><div class="hello"><div class="hi">Grown-up view</div><div class="sub">${esc(p.name)}</div></div></header>
+<section class="card"><h2>At a glance</h2>
+<div class="glance"><div><b>${lit}/${SKILLS.length}</b><span>skills mastered</span></div><div><b>${rec.length}</b><span>questions in 7 days</span></div><div><b>${acc===null?'–':acc+'%'}</b><span>right in 7 days</span></div><div><b>${days}</b><span>days practised in 7</span></div></div>
+<p>${f?`Working on <b>${esc(SK[f].name)}</b> at the <b>${STAGES[p.skills[f].stage].toLowerCase()}</b> level.`:'All skills mastered. Practice is review only.'}</p></section>
+<section class="card"><h2>Patterns noticed</h2>
+${misList.length?`<ul class="mis">${misList.map(([k,v])=>`<li><div class="mis-top"><b>${MIS[k].parent}</b><span class="chip">${v.count}×</span></div><p class="muted small">Last seen ${rel(v.last)}</p><p><span class="try">Try at home:</span> ${MIS[k].act}</p></li>`).join('')}</ul><p class="muted small">Worth sharing with her teacher or tutor.</p>`:'<p class="muted">Nothing yet. When a wrong answer matches a common pattern, such as subtracting on a division question, it shows up here with an activity to try at home.</p>'}</section>
+<section class="card"><h2>Skills</h2><ul class="skl">${SKILLS.map(skillRow).join('')}</ul></section>
+<section class="card"><h2>Recent sessions</h2>${sess.length?`<ul class="sess">${sess.map(s=>`<li><span>${new Date(s.d).toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'})}${s.m==='placement'?' · warm-up':''}</span><span class="muted">${s.n} ${plural(s.n,'question')}, ${s.c} right, ${s.min} min</span></li>`).join('')}</ul>`:'<p class="muted">No sessions yet.</p>'}</section>
+<section class="card"><h2>Settings</h2>
+${seg('sessionLen','Questions per session',[[5,'5'],[10,'10'],[15,'15']])}
+${seg('sound','Sounds',[[true,'On'],[false,'Off']])}
+${seg('autoRead','Read each question aloud',[[false,'Off'],[true,'On']])}
+${seg('chart','Times-table chart on facts',[[true,'Allowed'],[false,'Hidden']])}
+${canSpeak()?'':'<p class="muted small">Read-aloud isn\'t available in this browser.</p>'}</section>
+<section class="card"><h2>How it decides what comes next</h2><ul class="how">
+<li>Each skill has three levels: <b>hands-on</b> (she builds it), <b>pictures</b> (she reads a picture), and <b>numbers</b> (symbols only).</li>
+<li>After every answer the app updates its estimate of how likely she is to know that skill at that level (Bayesian Knowledge Tracing). Past 90%, with her last three answers right and no hints, she moves up a level.</li>
+<li>If 2 of her last 3 answers are wrong and the estimate drops below 40%, she moves down a level. If she's struggling even hands-on, it goes back to the earlier skill this one depends on.</li>
+<li>Every fourth question reviews a skill she has already mastered. Two misses in review reopen that skill.</li>
+<li>No timers. Hints and "I'm not sure" are always there; they slow progress a little but never cost gems.</li>
+</ul></section>
+<section class="card"><h2>Learners and data</h2>
+<p>${Sync.mode==='account'?'Progress is saved to the Claude account that opened this page, and in this browser.':'Progress is saved in this browser only. Copy a backup code to move it to another device.'}</p>
+<div class="row"><button class="btn secondary" data-act="copyBackup">Copy backup code</button></div>
+${UI.tmp.code?`<label for="codeOut" class="small muted">Backup code (select all and copy)</label><textarea readonly class="code" id="codeOut">${esc(UI.tmp.code)}</textarea>`:''}
+<form id="restoreForm" class="form"><label for="restoreText">Restore from a backup code</label><textarea id="restoreText" class="code" rows="3"></textarea><button class="btn secondary" type="submit">Restore</button></form>
+<h3>Learners</h3><ul class="learners">${Object.values(APP.profiles).map(x=>`<li><span class="avatar">${x.avatar}</span><span class="lname">${esc(x.name)}</span>${x.id===p.id?'<span class="chip">Current</span>':`<button class="btn secondary" data-act="switchTo" data-d="${x.id}">Switch</button>`}</li>`).join('')}</ul>
+<button class="btn secondary" data-act="addLearner">Add a learner</button>
+<div class="row"><button class="btn ghost" data-act="redo">Redo the warm-up</button><button class="btn ghost" data-act="reset">Reset ${esc(p.name)}'s progress</button></div>
+</section>`;}
+
+function vModal(){const m=UI.modal;if(!m)return '';let body='';
+  if(m.type==='event'){const e=m.ev,s=SK[e.skill];let icon,title,text;
+    if(e.type==='mastered'){icon=starSVG('lit','big-star');title='A new star is lit!';text=`You've mastered ${esc(s.name)}.`;}
+    else if(e.type==='up'){icon=ICON.up.replace('<svg','<svg class="big-star"');title='Level up!';text=`You're ready for ${esc(s.name)} with ${STAGE_WITH[e.stage]}.`;}
+    else if(e.type==='down'){icon=ICON.shift.replace('<svg','<svg class="big-star"');title="Let's switch it up";text=`Let's try ${esc(s.name)} with ${STAGE_WITH[e.stage]} for a bit. It makes it easier to see what's going on. You'll move back up soon.`;}
+    else if(e.type==='prereq'){icon=ICON.shift.replace('<svg','<svg class="big-star"');title='Quick warm-up';text=`Let's practise ${esc(SK[e.to].name)} for a bit. It will make ${esc(s.name)} easier.`;}
+    else{icon=ICON.shift.replace('<svg','<svg class="big-star"');title='Quick refresh';text=`Let's brush up on ${esc(s.name)} for a few questions.`;}
+    body=`<section class="card modal" role="dialog" aria-modal="true" aria-labelledby="mt">${icon}<h2 id="mt">${title}</h2><p class="mbody">${text}</p><button class="btn big" data-act="eventOk" data-focus>Keep going</button></section>`;}
+  else if(m.type==='confirm')body=`<section class="card modal" role="dialog" aria-modal="true" aria-labelledby="mt"><h2 id="mt">${m.title}</h2><p class="mbody">${m.text}</p><div class="row"><button class="btn secondary" data-act="closeModal" data-focus>Cancel</button><button class="btn" data-act="${m.act}">${m.yes}</button></div></section>`;
+  else if(m.type==='star'){const s=SK[m.id],st=prof.skills[m.id],state=starState(m.id);
+    const status=state==='lit'?'Mastered. It comes back in review now and then.':state==='now'?`Practising now at the ${STAGES[st.stage].toLowerCase()} level.`:state==='open'?'Ready to start.':`Unlocks after ${s.pre.map(id=>SK[id].name).join(' and ')}.`;
+    body=`<section class="card modal" role="dialog" aria-modal="true" aria-labelledby="mt">${starSVG(state==='lit'?'lit':'now','big-star')}<h2 id="mt">${esc(s.name)}</h2><p class="mbody">${s.kid}</p><p class="mbody muted">${status}</p>${state==='open'?`<button class="btn big" data-act="focusSkill" data-d="${m.id}">Practise this next</button>`:''}<button class="btn secondary" data-act="closeModal" data-focus>Close</button></section>`;}
+  else if(m.type==='chart'){const hi=m.hi||[0,0];let t='<table class="chartgrid"><thead><tr><th scope="col">×</th>';for(let c=1;c<=10;c++)t+=`<th scope="col">${c}</th>`;t+='</tr></thead><tbody>';
+    for(let r=1;r<=10;r++){t+=`<tr><th scope="row">${r}</th>`;for(let c=1;c<=10;c++){const cls=(r===hi[0]&&c===hi[1])?'hx':(r===hi[0]||c===hi[1])?'hl':'';t+=`<td class="${cls}" data-act="chartcell" data-i="${r}" data-d="${c}">${r*c}</td>`;}t+='</tr>';}
+    body=`<section class="card modal" role="dialog" aria-modal="true" aria-labelledby="mt"><h2 id="mt">Times chart</h2><p class="mbody small muted">Tap a number to light up its row and column. Using the chart counts like a hint.</p><div class="chartwrap">${t}</tbody></table></div><button class="btn big" data-act="closeModal" data-focus>Back to the question</button></section>`;}
+  return `<div class="scrim">${body}</div>`;}
+
+// ---------- session flow ----------
+function beginSession(mode,n){S={mode,n:mode==='placement'?12:n,i:0,answered:0,correct:0,gems:0,start:Date.now(),events:[],P:mode==='placement'?placementInit():null,early:false};UI.screen='practice';nextQuestion();}
+function nextQuestion(){let item;
+  if(S.mode==='placement'){item=placementNext(S.P);if(!item)return finishPlacement();}
+  else{if(S.i>=S.n)return finishSession(false);item=nextItem(prof,S);if(!item)return finishSession(false);}
+  const sk=prof.skills[item.skill],easy=S.mode==='placement'?false:(!item.review&&sk.pL[item.stage]<0.5);
+  let q;try{q=makeQuestion(item.skill,item.stage,easy);}catch(err){q=makeQuestion('quantity',1,true);}
+  q.review=!!item.review;
+  Cur={q,phase:'answer',hinted:false,hintShown:false,entry:'',chosen:null,fchosen:null,b:q.kind==='build'?initBuild(q.build):null,buildMiss:false};
+  save();render();window.scrollTo(0,0);if(prof.settings.autoRead)speak(sayFor(q));}
+function submit(ok,mis,o={}){if(!Cur||Cur.phase!=='answer')return;const q=Cur.q,hinted=Cur.hinted;
+  Cur.phase='feedback';Cur.ok=ok;Cur.mis=ok?null:mis;Cur.unsure=!!o.unsure;let gain=1+(ok&&!hinted?1:0);
+  if(S.mode==='placement'){placementRecord(S.P,ok);Cur.events=[];noteMis(prof,Cur.mis);prof.log.push({t:Date.now(),s:q.skill,g:q.stage,ok,p:1,m:Cur.mis});if(prof.log.length>400)prof.log.splice(0,prof.log.length-400);}
+  else{const ev=record(prof,q.skill,q.stage,ok,{hinted,mis:Cur.mis,G:guessFor(q),review:q.review,unsure:Cur.unsure});Cur.events=ev;S.events.push(...ev);ev.forEach(x=>{if(x.type==='up')gain+=5;if(x.type==='back')gain+=2;if(x.type==='mastered')gain+=15;});}
+  Cur.gain=gain;prof.gems+=gain;S.gems+=gain;S.i++;S.answered++;if(ok)S.correct++;markDay(prof);
+  save();render();tone(ok?SND.ok:SND.soft);
+  requestAnimationFrame(()=>{const fb=document.getElementById('fb');if(fb){fb.scrollIntoView({block:'nearest',behavior:reduced()?'auto':'smooth'});const nb=fb.querySelector('[data-act="next"]');if(nb)nb.focus({preventScroll:true});}});}
+const EV_ORDER=['mastered','up','back','prereq','refresh','down'];
+function afterFeedback(){const ev=(Cur.events||[]).slice().sort((a,b)=>EV_ORDER.indexOf(a.type)-EV_ORDER.indexOf(b.type))[0];
+  if(ev&&ev.type==='back'){nextQuestion();toast(`Back up to ${STAGE_WITH[ev.stage]} for ${SK[ev.skill].name}.`);return;}
+  if(ev&&ev.type==='down'){S.downs=S.downs||{};if(S.downs[ev.skill]){nextQuestion();toast(`Trying it with ${STAGE_WITH[ev.stage]} for a bit.`);return;}S.downs[ev.skill]=1;}
+  if(ev){UI.modal={type:'event',ev};render();if(ev.type==='mastered'||ev.type==='up'){tone(SND.up);if(ev.type==='mastered')confetti();}return;}
+  nextQuestion();}
+function finishSession(early){S.early=early;
+  if(S.answered>0){prof.sessions.push({d:Date.now(),n:S.answered,c:S.correct,min:Math.max(1,Math.round((Date.now()-S.start)/60000)),m:S.mode});if(prof.sessions.length>100)prof.sessions.shift();
+    if(!early){prof.gems+=5;S.gems+=5;}}
+  save();Cur=null;UI.screen=S.answered>0?'summary':'home';render();window.scrollTo(0,0);if(UI.screen==='summary'&&!early){tone(SND.up);confetti();}}
+function finishPlacement(){placementApply(prof,S.P);prof.sessions.push({d:Date.now(),n:S.answered,c:S.correct,min:Math.max(1,Math.round((Date.now()-S.start)/60000)),m:'placement'});
+  save();Cur=null;UI.screen='placed';render();window.scrollTo(0,0);tone(SND.up);confetti();}
+function buildCheck(){const q=Cur.q,b=Cur.b;if(Cur.phase!=='answer'||b.done)return;
+  if(buildRight(q.build,b)){b.done=true;b.msg=null;if(!q.followup)return submit(!Cur.buildMiss,null);render();if(prof.settings.autoRead)speak(q.followup.say||strip(q.followup.prompt));return;}
+  Cur.buildMiss=true;b.tries=(b.tries||0)+1;if(b.tries>=2)return submit(false,null);b.msg=buildNudge(q.build,b);render();}
+function padKey(k){if(!Cur||Cur.phase!=='answer')return;
+  if(k==='del')Cur.entry=Cur.entry.slice(0,-1);
+  else if(k==='ok'){if(!Cur.entry)return;const v=parseInt(Cur.entry,10),ok=v===Cur.q.answer;return submit(ok,ok?null:((Cur.q.padMis&&Cur.q.padMis[v])||null));}
+  else if(Cur.entry.length<4)Cur.entry=(Cur.entry==='0'?'':Cur.entry)+k;
+  render();}
+
+// ---------- actions ----------
+const B=()=>Cur&&Cur.phase==='answer'&&Cur.b&&!Cur.b.done;
+const ACT={
+ start(){beginSession('practice',prof.settings.sessionLen);},
+ more(){beginSession('practice',5);},
+ home(){UI.screen='home';UI.modal=null;render();window.scrollTo(0,0);},
+ back(){UI.tmp={};routeHome();},
+ shop(){UI.screen='shop';render();window.scrollTo(0,0);},
+ star(el){UI.modal={type:'star',id:el.dataset.d};renderLayer();},
+ focusSkill(el){prof.focus=el.dataset.d;save();UI.modal=null;render();toast('Next practice: '+SK[el.dataset.d].name);},
+ closeModal(){UI.modal=null;render();},
+ opt(el){if(!Cur||Cur.phase!=='answer')return;const o=Cur.q.options[+el.dataset.i];Cur.chosen=+el.dataset.i;submit(String(o.value)===String(Cur.q.answer),o.mis||null);},
+ fopt(el){if(!Cur||Cur.phase!=='answer')return;const f=Cur.q.followup,o=f.options[+el.dataset.i];Cur.fchosen=+el.dataset.i;const fok=String(o.value)===String(f.answer);submit(fok&&!Cur.buildMiss,fok?null:(o.mis||null));},
+ key(el){padKey(el.dataset.d);},
+ hint(){if(!Cur)return;Cur.hintShown=true;Cur.hinted=true;render();},
+ unsure(){submit(false,null,{unsure:true});},
+ chart(){if(!Cur)return;Cur.hinted=true;UI.modal={type:'chart',hi:null};render();},
+ chartcell(el){UI.modal.hi=[+el.dataset.i,+el.dataset.d];renderLayer();},
+ speak(){if(Cur)speak(sayFor(Cur.q));},
+ fspeak(){if(Cur&&Cur.q.followup)speak(Cur.q.followup.say||strip(Cur.q.followup.prompt));},
+ next(){afterFeedback();},
+ quit(){UI.modal={type:'confirm',title:'Stop for now?',text:S.mode==='placement'?'You can do the warm-up again later.':'Everything you\'ve done so far is saved.',yes:'Stop',act:'doQuit'};renderLayer();},
+ doQuit(){UI.modal=null;if(S.mode==='placement'){Cur=null;routeHome();return;}finishSession(true);},
+ eventOk(){UI.modal=null;nextQuestion();},
+ cell(el){if(!B())return;const i=+el.dataset.i,c=Cur.b.cells;if(c[i]===2)return;c[i]=c[i]?0:1;Cur.b.msg=null;render();},
+ blk(el){if(!B())return;const [k,d]=[el.dataset.d[0],el.dataset.d[1]],mx=k==='h'?3:9,b=Cur.b;b[k]=Math.max(0,Math.min(mx,b[k]+(d==='+'?1:-1)));b.msg=null;render();},
+ nltap(el,e){if(!B())return;const bd=Cur.q.build,r=el.getBoundingClientRect();const xs=(e.clientX-r.left)/r.width*NL.W;let v=Math.round(bd.min+(xs-NL.L)/(NL.R-NL.L)*(bd.max-bd.min));Cur.b.m=Math.max(bd.min,Math.min(bd.max,v));Cur.b.msg=null;render();},
+ nlnudge(el){if(!B())return;const bd=Cur.q.build;const d=+el.dataset.d;let m=Cur.b.m===null?(d>0?bd.min+1:bd.max-1):Cur.b.m+d;Cur.b.m=Math.max(bd.min,Math.min(bd.max,m));Cur.b.msg=null;render();},
+ jump(el){if(!B())return;const b=Cur.b,d=+el.dataset.d;if(b.pos+d>b.hi)return;b.hist.push([b.pos,b.pos+d]);b.pos+=d;b.msg=null;render();},
+ jundo(){if(!B())return;const b=Cur.b,j=b.hist.pop();if(j)b.pos=j[0];b.msg=null;render();},
+ jdone(){buildCheck();},
+ cross(el){if(!B())return;const i=+el.dataset.i;Cur.b.x[i]=!Cur.b.x[i];Cur.b.msg=null;render();},
+ grp(el){if(!B())return;const k=el.dataset.d[0],d=el.dataset.d[1],b=Cur.b;b[k]=Math.max(1,Math.min(6,b[k]+(d==='+'?1:-1)));b.msg=null;render();},
+ row(el){if(!B())return;const b=Cur.b;b.r=Math.max(0,Math.min(10,b.r+(el.dataset.d==='+'?1:-1)));b.msg=null;render();},
+ plate(el){if(!B())return;const bd=Cur.q.build,b=Cur.b,i=+el.dataset.i;const left=bd.n-b.plates.reduce((a,c)=>a+c,0);if(left<=0)return;b.plates[i]++;b.hist.push(i);b.msg=null;
+   if(left-1===0){buildCheck();return;}render();},
+ sundo(){if(!B())return;const b=Cur.b,i=b.hist.pop();if(i!==undefined)b.plates[i]--;b.msg=null;render();},
+ mkgrp(){if(!B())return;const bd=Cur.q.build,b=Cur.b;if(bd.n-b.g*bd.k<bd.k)return;b.g++;if(b.g*bd.k===bd.n){buildCheck();return;}render();},
+ part(el){if(!B())return;const i=+el.dataset.i;Cur.b.s[i]=!Cur.b.s[i];Cur.b.msg=null;render();},
+ bcheck(){buildCheck();},
+ pickAv(el){UI.tmp.av=el.dataset.d;render();},
+ buyAv(el){const a=el.dataset.d,price=(AVATARS.find(x=>x[0]===a)||[a,0])[1];
+   if(prof.owned.avatars.includes(a)||price===0){prof.avatar=a;save();render();return;}
+   if(prof.gems<price){toast(`You need ${price-prof.gems} more gems for that one.`);return;}
+   prof.gems-=price;prof.owned.avatars.push(a);prof.avatar=a;save();render();tone(SND.up);toast('Unlocked!');},
+ buyTheme(el){const k=el.dataset.d,t=THEMES[k];if(!t)return;
+   if(prof.owned.themes.includes(k)||t.price===0){prof.theme=k;save();render();return;}
+   if(prof.gems<t.price){toast(`You need ${t.price-prof.gems} more gems for that one.`);return;}
+   prof.gems-=t.price;prof.owned.themes.push(k);prof.theme=k;save();render();tone(SND.up);toast('Unlocked!');},
+ set(el){const k=el.dataset.k,v=el.dataset.v;prof.settings[k]=v==='true'?true:v==='false'?false:(isNaN(+v)?v:+v);save();render();},
+ copyBackup(){const code=JSON.stringify({numbersky:1,profile:prof});UI.tmp.code=code;render();
+   try{navigator.clipboard.writeText(code).then(()=>toast('Backup code copied.'),()=>toast('Select the code below and copy it.'));}catch(e){toast('Select the code below and copy it.');}},
+ doRestore(){const np=UI.tmp.restore;UI.tmp.restore=null;UI.modal=null;if(!np)return;APP.profiles[np.id]=np;APP.current=np.id;save();toast('Progress restored.');routeHome();},
+ redo(){UI.modal={type:'confirm',title:'Redo the warm-up?',text:`${esc(prof.name)}'s skill levels will be set again from a new warm-up. Gems and buddies stay.`,yes:'Redo warm-up',act:'doRedo'};renderLayer();},
+ doRedo(){UI.modal=null;prof.placementDone=false;save();routeHome();},
+ reset(){UI.modal={type:'confirm',title:'Reset all progress?',text:`This clears ${esc(prof.name)}'s skill levels, patterns and history. Gems and buddies stay. This can't be undone.`,yes:'Reset',act:'doReset'};renderLayer();},
+ doReset(){UI.modal=null;const fresh=newProfile(prof.name,prof.avatar);Object.assign(prof,{skills:fresh.skills,focus:null,mis:{},log:[],sessions:[],days:[],placementDone:false});save();routeHome();},
+ switchTo(el){APP.current=el.dataset.d;save();routeHome();},
+ addLearner(){UI.tmp={adding:true};UI.screen='welcome';render();window.scrollTo(0,0);},
+ beginPlace(){beginSession('placement');},
+ skipPlace(){placementApply(prof,{lo:0,tested:{}});save();UI.screen='home';render();},
+};
+document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if(!el||el.disabled)return;const f=ACT[el.dataset.act];if(f){e.preventDefault();f(el,e);}});
+document.addEventListener('input',e=>{if(e.target.id==='pname')UI.tmp.name=e.target.value;});
+document.addEventListener('submit',e=>{e.preventDefault();
+  if(e.target.id==='newp'){const name=(document.getElementById('pname').value||'').trim();if(!name){document.getElementById('pname').focus();return;}
+    const p=newProfile(name.slice(0,20),UI.tmp.av||'🦊');APP.profiles[p.id]=p;APP.current=p.id;UI.tmp={};save();routeHome();}
+  if(e.target.id==='restoreForm'){const txt=(document.getElementById('restoreText').value||'').trim();let obj=null;try{obj=JSON.parse(txt);}catch(err){}
+    if(!obj||!obj.profile||!obj.profile.skills||!obj.profile.id){toast("That code doesn't look right. Paste the whole backup code.");return;}
+    UI.tmp.restore=obj.profile;UI.modal={type:'confirm',title:`Restore ${esc(obj.profile.name||'this learner')}?`,text:'This replaces the saved progress for that learner on this page.',yes:'Restore',act:'doRestore'};renderLayer();}});
+document.addEventListener('keydown',e=>{
+  if(UI.modal&&e.key==='Escape'){e.preventDefault();if(UI.modal.type==='event')ACT.eventOk();else ACT.closeModal();return;}
+  if(UI.screen==='practice'&&Cur&&Cur.phase==='answer'&&Cur.q.kind==='pad'&&!UI.modal){
+    if(/^[0-9]$/.test(e.key)){e.preventDefault();padKey(e.key);}else if(e.key==='Backspace'){e.preventDefault();padKey('del');}else if(e.key==='Enter'){e.preventDefault();padKey('ok');}}
+  const h=e.target.closest&&e.target.closest('[data-hold]');if(h&&(e.key==='Enter'||e.key===' ')){e.preventDefault();if(!e.repeat)holdStart(h);}});
+document.addEventListener('keyup',e=>{const h=e.target.closest&&e.target.closest('[data-hold]');if(h&&(e.key==='Enter'||e.key===' '))holdEnd(h,true);});
+// press-and-hold gate for the grown-up view
+let holdT=null;
+function holdStart(el){if(holdT)return;el.classList.add('holding');holdT=setTimeout(()=>{holdT=null;el.classList.remove('holding');UI.tmp.code=null;UI.screen='grown';render();window.scrollTo(0,0);},1200);}
+function holdEnd(el,hint){if(holdT){clearTimeout(holdT);holdT=null;if(hint)toast('Keep holding to open the grown-up view.');}if(el)el.classList.remove('holding');}
+document.addEventListener('pointerdown',e=>{const el=e.target.closest('[data-hold]');if(el)holdStart(el);});
+document.addEventListener('pointerup',e=>{const el=e.target.closest&&e.target.closest('[data-hold]');holdEnd(el||document.querySelector('[data-hold]'),!!el);});
+document.addEventListener('pointercancel',()=>holdEnd(document.querySelector('[data-hold]')));
+document.addEventListener('pointerleave',e=>{if(e.target&&e.target.closest&&e.target.closest('[data-hold]'))holdEnd(e.target.closest('[data-hold]'));},true);
+document.addEventListener('contextmenu',e=>{if(e.target.closest&&e.target.closest('[data-hold]'))e.preventDefault();});
+
+// ---------- boot ----------
+function start(){setProf();UI.screen='boot';render();const ready={done:false};const go=()=>{if(ready.done)return;ready.done=true;routeHome();};
+  setTimeout(go,1600);connect(ready).then(go,go);initTTS();}
+const hot=window.claude&&window.claude.hot;
+if(hot&&hot.snapshot)hot.snapshot(()=>({}));
+if(hot&&hot.ready)hot.ready(start);else start();
+</script>
+</body>
+</html>
