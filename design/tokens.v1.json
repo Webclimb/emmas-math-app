@@ -66,6 +66,14 @@
       "blk-line": {
         "value": "#2F4AB0",
         "role": "base-ten block edges"
+      },
+      "on-sky": {
+        "value": "#FFFFFF",
+        "role": "text on the sky-coloured bar-model whole (added in M0 port: v1 literal not captured in the first token export)"
+      },
+      "scrim": {
+        "value": "rgba(10,14,35,.55)",
+        "role": "modal backdrop (added in M0 port: v1 literal not captured in the first token export)"
       }
     },
     "dark": {
@@ -132,6 +140,14 @@
       "blk-line": {
         "value": "#C3CEFF",
         "role": "base-ten block edges"
+      },
+      "on-sky": {
+        "value": "#FFFFFF",
+        "role": "text on the sky-coloured bar-model whole (added in M0 port: v1 literal not captured in the first token export)"
+      },
+      "scrim": {
+        "value": "rgba(10,14,35,.55)",
+        "role": "modal backdrop (added in M0 port: v1 literal not captured in the first token export)"
       }
     }
   },
@@ -240,6 +256,14 @@
       ],
       "use": "all running text, all maths, buttons",
       "features": "tabular-nums"
+    },
+    "mono": {
+      "family": "ui-monospace",
+      "fallback": "Menlo, monospace",
+      "weights": [
+        400
+      ],
+      "use": "backup code box (added in M0 port from v1 CSS)"
     }
   },
   "type": {
@@ -280,7 +304,11 @@
   },
   "elevation": {
     "card": "0 1px 2px rgba(25,32,63,.06), 0 6px 20px rgba(25,32,63,.07)",
-    "buttonPress": "3px solid offset shadow, moves 2px on press"
+    "buttonPress": "3px solid offset shadow, moves 2px on press",
+    "cardDark": "0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.25)",
+    "button": "0 3px 0 rgba(0,0,0,.2)",
+    "buttonPressed": "0 1px 0 rgba(0,0,0,.2)",
+    "$note": "cardDark, button and buttonPressed added in M0 port from v1 CSS"
   },
   "motion": {
     "buttonPress": "80ms ease",

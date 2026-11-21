@@ -35,3 +35,22 @@ source/
 - v1 is live as a private Claude artifact and is unchanged by this package.
 - The spec is a draft. Milestone M0 (port, no behaviour change) can start now; everything else waits for approval.
 - Captures were generated from the v1 source with the real fonts. Emoji in them come from the capture machine and differ by device.
+
+## Development (from milestone M0)
+
+The app now lives in a TypeScript repo that still builds to one self-contained `index.html`. `source/` stays as the v1 reference.
+
+```
+src/engine/    skills, generators, learner model, placement, seeded random (pure TypeScript, no DOM)
+src/storage/   storage interface, device and artifact-account adapters, schema migrations
+src/design/    design tokens -> CSS variables (reads design/tokens.v1.json)
+src/app/       Preact screens, session flow, effects
+tests/         acceptance (Vitest), unit, ui (Playwright, against dist/index.html), fixtures
+```
+
+- `npm install`
+- `npm run dev`: development server
+- `npm run build`: builds `dist/index.html`
+- `npm run accept`: typecheck, Vitest, build, Playwright and a criteria-coverage list
+
+`DRIFT_REPORT.md` records what each milestone changed and what still needs a decision.
