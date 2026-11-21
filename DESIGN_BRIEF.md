@@ -78,7 +78,7 @@ New components for v2: lesson player (watch / together / your turn, with step do
 2. **Component specs** for every component in section 4, with all states (default, pressed, focus, disabled, correct, not yet).
 3. **Maths graphics kit:** construction rules and SVGs for each graphic, named `kit-<graphic>-<variant>.svg`, drawn with `currentColor` or token names, no embedded text that must be translated or read aloud.
 4. **Item and avatar sets** as SVG, with her input.
-5. **Key screens** at 390 px and 820 px, light and dark: home (star map), lesson player, one practice screen per hands-on widget, feedback (correct and not yet), facts set and quick round, word-problem diagram, check-up, session wrap-up, grown-up view, printed report.
+5. **Key screens** at 390 px and 1280 × 800 (changed from 820 px on 2026-11-21, `SPEC.md` D-17), light and dark: home (star map), lesson player, one practice screen per hands-on widget, feedback (correct and not yet), facts set and quick round, word-problem diagram, check-up, session wrap-up, grown-up view, printed report.
 6. **Motion notes:** what moves, for how long, and the reduced-motion alternative. Dealing an item onto a plate and a jump along the number line are worth animating because the movement is the concept.
 
 ## 6. Requirements and constraints
