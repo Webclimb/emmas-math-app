@@ -1,11 +1,13 @@
 // Live app state, shared by views and actions. Mirrors v1's globals (APP, prof, S, Cur, UI).
 import type { ModelEvent, Placement, Profile, Question } from '../engine/types';
+import type { Check } from '../engine/workbook';
 import type { Store } from '../storage/store';
 
 export interface Session {
-  mode: 'practice' | 'placement';
+  /** practice, the first-run warm-up, or the F-22 workbook check. */
+  mode: 'practice' | 'placement' | 'check';
   n: number; i: number; answered: number; correct: number; gems: number; start: number;
-  events: ModelEvent[]; P: Placement | null; early: boolean; downs?: Record<string, number>;
+  events: ModelEvent[]; P: Placement | null; early: boolean; downs?: Record<string, number>; C?: Check;
 }
 
 // Build-widget working state; fields depend on the widget type.
@@ -30,10 +32,19 @@ export type Modal =
   | { type: 'chart'; hi: [number, number] | null };
 
 export interface UIState {
-  screen: 'boot' | 'welcome' | 'profiles' | 'placeIntro' | 'practice' | 'placed' | 'summary' | 'shop' | 'grown' | 'home';
+  screen: 'boot' | 'welcome' | 'profiles' | 'placeIntro' | 'practice' | 'placed' | 'checked' | 'summary' | 'shop' | 'grown' | 'home';
   modal: Modal | null;
   toast: string | null;
-  tmp: { av?: string; name?: string; adding?: boolean; code?: string | null; restore?: Profile | null };
+  tmp: { av?: string; name?: string; adding?: boolean; code?: string | null; restore?: Profile | null; gtab?: string; stab?: string; wb?: WorkbookDraft };
+}
+
+/** The grown-up's workbook step (F-22). Lives in memory only: never saved. */
+export interface WorkbookDraft {
+  step: 'start' | 'reading' | 'confirm';
+  picks: string[];
+  topic?: string;
+  beyond?: string[];
+  err?: string;
 }
 
 export const G = {
@@ -42,6 +53,8 @@ export const G = {
   S: null as Session | null,
   Cur: null as Current | null,
   UI: { screen: 'boot', modal: null, toast: null, tmp: {} } as UIState,
+  /** Whether this view can read workbook photos (null until known). */
+  photos: null as boolean | null,
 };
 
 /** The current learner. Only call where a learner is guaranteed (every screen after welcome). */

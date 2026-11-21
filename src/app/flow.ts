@@ -3,13 +3,15 @@ import { h, render as preactRender } from 'preact';
 import { guessFor, newProfile, noteMis, nextItem, record, LOG_CAP } from '../engine/model';
 import { makeQuestion } from '../engine/generators';
 import { placementApply, placementInit, placementNext, placementRecord } from '../engine/placement';
+import { checkApply, checkInit, checkNext, checkRecord, newWorkbookGoal } from '../engine/workbook';
+import { canReadPhotos, readWorkbookPhoto, READ_ERROR_TEXT, type ReadError } from './workbook';
 import { SK, STAGE_WITH } from '../engine/skills';
 import { NL } from '../engine/visuals';
 import { THEMES } from '../design/tokens';
 import type { Build, Question } from '../engine/types';
 import { backupCode, migrateProfile, parseBackup } from '../storage/schema';
-import { AVATARS, DEFAULT_AVATAR, GEMS, HOLD_MS } from './data';
-import { applyAccent, confetti, reduced, speak, strip, tone, SND } from './effects';
+import { AVATARS, DEFAULT_AVATAR, GEMS, HOLD_MS, TOAST_MS } from './data';
+import { applyAccent, reduced, speak, strip, tone, SND } from './effects';
 import { G, P, app, type BuildState, type Current } from './state';
 import { markDay } from './util';
 import { Layer, Screen } from './views';
@@ -27,6 +29,7 @@ function focusKey(): string | null {
 }
 export function render(): void {
   applyAccent(); const fk = focusKey();
+  $app.dataset.screen = G.UI.screen;
   preactRender(h(Screen, null), $app);
   renderLayer();
   if (fk && !G.UI.modal) { try { const el = document.querySelector(fk) as HTMLButtonElement | null; if (el && !el.disabled) el.focus({ preventScroll: true }); } catch { /* bad selector */ } }
@@ -36,7 +39,7 @@ export function renderLayer(): void {
   if (G.UI.modal) { const b = ($layer.querySelector('.modal [data-focus]') || $layer.querySelector('.modal button')) as HTMLElement | null; if (b) b.focus({ preventScroll: true }); }
 }
 let toastT: ReturnType<typeof setTimeout> | undefined;
-export function toast(text: string): void { G.UI.toast = text; renderLayer(); clearTimeout(toastT); toastT = setTimeout(() => { G.UI.toast = null; renderLayer(); }, 2400); }
+export function toast(text: string): void { G.UI.toast = text; renderLayer(); clearTimeout(toastT); toastT = setTimeout(() => { G.UI.toast = null; renderLayer(); }, TOAST_MS); }
 
 // ---------- profile and routing ----------
 export function save(): void { G.store.save(); }
@@ -97,16 +100,18 @@ function buildNudge(bd: Build, b: BuildState): string {
 export function newCurrent(q: Question): Current {
   return { q, phase: 'answer', hinted: false, hintShown: false, entry: '', chosen: null, fchosen: null, b: q.kind === 'build' ? initBuild(q.build!) : null, buildMiss: false };
 }
-function beginSession(mode: 'practice' | 'placement', n = 0): void {
-  G.S = { mode, n: mode === 'placement' ? 12 : n, i: 0, answered: 0, correct: 0, gems: 0, start: Date.now(), events: [], P: mode === 'placement' ? placementInit() : null, early: false };
+function beginSession(mode: 'practice' | 'placement' | 'check', n = 0): void {
+  G.S = { mode, n: mode === 'placement' ? 12 : n, i: 0, answered: 0, correct: 0, gems: 0, start: Date.now(), events: [], P: mode === 'placement' ? placementInit() : null, early: false,
+    C: mode === 'check' ? checkInit(P().workbook ? P().workbook!.skills : []) : undefined };
   G.UI.screen = 'practice'; nextQuestion();
 }
 function nextQuestion(): void {
   const S = G.S!, prof = P(); let item;
   if (S.mode === 'placement') { item = placementNext(S.P!); if (!item) return finishPlacement(); }
+  else if (S.mode === 'check') { item = checkNext(S.C!); if (!item) return finishCheck(); }
   else { if (S.i >= S.n) return finishSession(false); item = nextItem(prof, S); if (!item) return finishSession(false); }
   const review = 'review' in item ? item.review : false;
-  const sk = prof.skills[item.skill], easy = S.mode === 'placement' ? false : (!review && sk.pL[item.stage] < 0.5);
+  const sk = prof.skills[item.skill], easy = S.mode !== 'practice' ? false : (!review && sk.pL[item.stage] < 0.5);
   let q: Question; try { q = makeQuestion(item.skill, item.stage, easy); } catch { q = makeQuestion('quantity', 1, true); }
   q.review = !!review;
   G.Cur = newCurrent(q);
@@ -116,8 +121,9 @@ function submit(ok: boolean, mis: string | null, o: { unsure?: boolean } = {}): 
   const Cur = G.Cur, S = G.S!, prof = P();
   if (!Cur || Cur.phase !== 'answer') return; const q = Cur.q, hinted = Cur.hinted;
   Cur.phase = 'feedback'; Cur.ok = ok; Cur.mis = ok ? null : mis; Cur.unsure = !!o.unsure; let gain = GEMS.answer + (ok && !hinted ? GEMS.clean : 0);
-  if (S.mode === 'placement') {
-    placementRecord(S.P!, ok); Cur.events = []; noteMis(prof, Cur.mis);
+  if (S.mode !== 'practice') {
+    if (S.mode === 'placement') placementRecord(S.P!, ok); else checkRecord(S.C!, ok);
+    Cur.events = []; noteMis(prof, Cur.mis);
     prof.log.push({ t: Date.now(), s: q.skill, g: q.stage, ok, p: 1, m: Cur.mis }); if (prof.log.length > LOG_CAP) prof.log.splice(0, prof.log.length - LOG_CAP);
   } else {
     const ev = record(prof, q.skill, q.stage, ok, { hinted, mis: Cur.mis, G: guessFor(q), review: q.review, unsure: Cur.unsure });
@@ -125,7 +131,8 @@ function submit(ok: boolean, mis: string | null, o: { unsure?: boolean } = {}): 
     ev.forEach(x => { if (x.type === 'up') gain += GEMS.up; if (x.type === 'back') gain += GEMS.back; if (x.type === 'mastered') gain += GEMS.mastered; });
   }
   Cur.gain = gain; prof.gems += gain; S.gems += gain; S.i++; S.answered++; if (ok) S.correct++; markDay(prof);
-  save(); render(); tone(ok ? SND.ok : SND.soft);
+  // No sound for a wrong answer (design/MOTION.md, F-6.AC-1).
+  save(); render(); if (ok) tone(SND.ok);
   requestAnimationFrame(() => { const fb = document.getElementById('fb'); if (fb) { fb.scrollIntoView({ block: 'nearest', behavior: reduced() ? 'auto' : 'smooth' }); const nb = fb.querySelector('[data-act="next"]') as HTMLElement | null; if (nb) nb.focus({ preventScroll: true }); } });
 }
 const EV_ORDER = ['mastered', 'up', 'back', 'prereq', 'refresh', 'down'];
@@ -133,7 +140,7 @@ function afterFeedback(): void {
   const S = G.S!, ev = (G.Cur!.events || []).slice().sort((a, b) => EV_ORDER.indexOf(a.type) - EV_ORDER.indexOf(b.type))[0];
   if (ev && ev.type === 'back') { nextQuestion(); toast(`Back up to ${STAGE_WITH[ev.stage]} for ${SK[ev.skill].name}.`); return; }
   if (ev && ev.type === 'down') { S.downs = S.downs || {}; if (S.downs[ev.skill]) { nextQuestion(); toast(`Trying it with ${STAGE_WITH[ev.stage]} for a bit.`); return; } S.downs[ev.skill] = 1; }
-  if (ev) { G.UI.modal = { type: 'event', ev }; render(); if (ev.type === 'mastered' || ev.type === 'up') { tone(SND.up); if (ev.type === 'mastered') confetti(); } return; }
+  if (ev) { G.UI.modal = { type: 'event', ev }; render(); if (ev.type === 'mastered' || ev.type === 'up') tone(SND.up); return; }
   nextQuestion();
 }
 function finishSession(early: boolean): void {
@@ -143,13 +150,39 @@ function finishSession(early: boolean): void {
     if (!early) { prof.gems += GEMS.session; S.gems += GEMS.session; }
   }
   save(); G.Cur = null; G.UI.screen = S.answered > 0 ? 'summary' : 'home'; render(); window.scrollTo(0, 0);
-  if (G.UI.screen === 'summary' && !early) { tone(SND.up); confetti(); }
+  if (G.UI.screen === 'summary' && !early) tone(SND.up);
 }
 function finishPlacement(): void {
   const S = G.S!, prof = P();
   placementApply(prof, S.P!); prof.sessions.push({ d: Date.now(), n: S.answered, c: S.correct, min: Math.max(1, Math.round((Date.now() - S.start) / 60000)), m: 'placement' });
-  save(); G.Cur = null; G.UI.screen = 'placed'; render(); window.scrollTo(0, 0); tone(SND.up); confetti();
+  save(); G.Cur = null; G.UI.screen = 'placed'; render(); window.scrollTo(0, 0); tone(SND.up);
 }
+function finishCheck(): void {
+  const S = G.S!, prof = P();
+  checkApply(prof, S.C!);
+  prof.sessions.push({ d: Date.now(), n: S.answered, c: S.correct, min: Math.max(1, Math.round((Date.now() - S.start) / 60000)), m: 'check' }); if (prof.sessions.length > 100) prof.sessions.shift();
+  save(); G.Cur = null; G.UI.screen = 'checked'; render(); window.scrollTo(0, 0); tone(SND.up);
+}
+
+// ---------- workbook (F-22) ----------
+/** Learn whether photos can be read here, then re-render the workbook tab. */
+export function probePhotos(): void {
+  if (G.photos !== null) return;
+  canReadPhotos().then(v => { G.photos = v; if (G.UI.screen === 'grown') render(); }, () => { G.photos = false; });
+}
+async function readPhoto(file: Blob): Promise<void> {
+  G.UI.tmp.wb = { step: 'reading', picks: [] }; render();
+  try {
+    const r = await readWorkbookPhoto(file);
+    G.UI.tmp.wb = { step: 'confirm', picks: r.skills, topic: r.topic, beyond: r.beyond };
+  } catch (e) {
+    const code = ((e as { code?: ReadError })?.code) || 'failed';
+    if (code === 'unavailable' || code === 'not_granted') G.photos = false;
+    G.UI.tmp.wb = { step: 'start', picks: [], err: READ_ERROR_TEXT[code] };
+  }
+  if (G.UI.screen === 'grown') render();
+}
+
 function buildCheck(): void {
   const Cur = G.Cur!, q = Cur.q, b = Cur.b!; if (Cur.phase !== 'answer' || b.done) return;
   if (buildRight(q.build!, b)) { b.done = true; b.msg = null; if (!q.followup) return submit(!Cur.buildMiss, null); render(); if (P().settings.autoRead) speak(q.followup.say || strip(q.followup.prompt)); return; }
@@ -186,8 +219,8 @@ export const ACT: Record<string, (el: El, e?: { clientX: number }) => void> = {
   speak() { if (G.Cur) speak(sayFor(G.Cur.q)); },
   fspeak() { const f = G.Cur && G.Cur.q.followup; if (f) speak(f.say || strip(f.prompt)); },
   next() { afterFeedback(); },
-  quit() { G.UI.modal = { type: 'confirm', title: 'Stop for now?', text: G.S!.mode === 'placement' ? 'You can do the warm-up again later.' : 'Everything you\'ve done so far is saved.', yes: 'Stop', act: 'doQuit' }; renderLayer(); },
-  doQuit() { G.UI.modal = null; if (G.S!.mode === 'placement') { G.Cur = null; routeHome(); return; } finishSession(true); },
+  quit() { const m = G.S!.mode; G.UI.modal = { type: 'confirm', title: 'Stop for now?', text: m === 'placement' ? 'You can do the warm-up again later.' : m === 'check' ? 'You can do the workbook check again later.' : 'Everything you\'ve done so far is saved.', yes: 'Stop', act: 'doQuit' }; renderLayer(); },
+  doQuit() { G.UI.modal = null; if (G.S!.mode !== 'practice') { G.Cur = null; routeHome(); return; } finishSession(true); },
   eventOk() { G.UI.modal = null; nextQuestion(); },
   cell(el) { if (!B()) return; const i = +el.dataset.i!, c = bs().cells!; if (c[i] === 2) return; c[i] = c[i] ? 0 : 1; bs().msg = null; render(); },
   blk(el) { if (!B()) return; const [k, d] = [el.dataset.d![0], el.dataset.d![1]], mx = k === 'h' ? 3 : 9, b = bs(); b[k] = Math.max(0, Math.min(mx, (b[k] as number) + (d === '+' ? 1 : -1))); b.msg = null; render(); },
@@ -213,8 +246,20 @@ export const ACT: Record<string, (el: El, e?: { clientX: number }) => void> = {
   part(el) { if (!B()) return; const i = +el.dataset.i!; bs().s![i] = !bs().s![i]; bs().msg = null; render(); },
   bcheck() { buildCheck(); },
   pickAv(el) { G.UI.tmp.av = el.dataset.d; render(); },
+  stab(el) { G.UI.tmp.stab = el.dataset.d; render(); },
+  gtab(el) { G.UI.tmp.gtab = el.dataset.d; G.UI.tmp.code = null; if (el.dataset.d === 'workbook') probePhotos(); render(); window.scrollTo(0, 0); },
+  wbManual() { G.UI.tmp.wb = { step: 'confirm', picks: [] }; render(); },
+  wbToggle(el) { const wb = G.UI.tmp.wb; if (!wb) return; const id = el.dataset.d!; wb.picks = wb.picks.includes(id) ? wb.picks.filter(x => x !== id) : [...wb.picks, id]; render(); },
+  wbCancel() { G.UI.tmp.wb = undefined; render(); },
+  wbConfirm() {
+    const wb = G.UI.tmp.wb; if (!wb || !wb.picks.length) return;
+    P().workbook = newWorkbookGoal(wb.picks); G.UI.tmp.wb = undefined; save(); render(); toast('Workbook skills saved. The check starts from the home screen.');
+  },
+  wbClear() { G.UI.modal = { type: 'confirm', title: 'Clear the workbook goal?', text: 'Practice goes back to the usual order. Levels she has reached stay.', yes: 'Clear', act: 'doWbClear' }; renderLayer(); },
+  doWbClear() { G.UI.modal = null; P().workbook = null; P().focus = null; save(); render(); },
+  beginCheck() { if (P().workbook) beginSession('check'); },
   buyAv(el) {
-    const prof = P(), a = el.dataset.d!, price = (AVATARS.find(x => x[0] === a) || [a, 0])[1];
+    const prof = P(), a = el.dataset.d!, item = AVATARS.find(x => x.id === a); if (!item) return; const price = item.price;
     if (prof.owned.avatars.includes(a) || price === 0) { prof.avatar = a; save(); render(); return; }
     if (prof.gems < price) { toast(`You need ${price - prof.gems} more gems for that one.`); return; }
     prof.gems -= price; prof.owned.avatars.push(a); prof.avatar = a; save(); render(); tone(SND.up); toast('Unlocked!');
@@ -246,14 +291,19 @@ let holdT: ReturnType<typeof setTimeout> | null = null;
 export const holdTimer = () => holdT;
 function holdStart(el: El) {
   if (holdT) return; el.classList.add('holding');
-  holdT = setTimeout(() => { holdT = null; el.classList.remove('holding'); G.UI.tmp.code = null; G.UI.screen = 'grown'; render(); window.scrollTo(0, 0); }, HOLD_MS);
+  holdT = setTimeout(() => { holdT = null; el.classList.remove('holding'); G.UI.tmp.code = null; G.UI.tmp.gtab = 'progress'; G.UI.screen = 'grown'; render(); window.scrollTo(0, 0); }, HOLD_MS);
 }
 function holdEnd(el: El | null, hint: boolean) { if (holdT) { clearTimeout(holdT); holdT = null; if (hint) toast('Keep holding to open the grown-up view.'); } if (el) el.classList.remove('holding'); }
 const closest = (t: EventTarget | null, sel: string) => (t && (t as Element).closest ? (t as Element).closest(sel) as El | null : null);
 
 export function listen(): void {
   document.addEventListener('click', e => { const el = closest(e.target, '[data-act]') as HTMLButtonElement | null; if (!el || el.disabled) return; const f = ACT[el.dataset.act!]; if (f) { e.preventDefault(); f(el, e); } });
-  document.addEventListener('input', e => { const t = e.target as HTMLInputElement; if (t.id === 'pname') G.UI.tmp.name = t.value; });
+  // The badges on the welcome form show her initial, so they update as she types.
+  document.addEventListener('input', e => { const t = e.target as HTMLInputElement; if (t.id === 'pname') { const was = (G.UI.tmp.name || '').trim()[0]; G.UI.tmp.name = t.value; if (t.value.trim()[0] !== was) render(); } });
+  document.addEventListener('change', e => {
+    const t = e.target as HTMLInputElement;
+    if (t.id === 'wbPhoto' && t.files && t.files[0]) { const f = t.files[0]; t.value = ''; void readPhoto(f); }
+  });
   document.addEventListener('submit', e => {
     e.preventDefault(); const t = e.target as HTMLFormElement;
     if (t.id === 'newp') {

@@ -1,4 +1,6 @@
 // Saved-data shape and migrations (spec F-20.AC-1). A v1 save must load in every later version.
+import { DEFAULT_THEME, THEMES } from '../design/tokens';
+import { DEFAULT_AVATAR, isAvatarId } from '../app/data';
 import { DEFAULT_SETTINGS, newSkillState } from '../engine/model';
 import { SKILLS } from '../engine/skills';
 import type { Profile } from '../engine/types';
@@ -35,7 +37,13 @@ export function migrateProfile(p: Profile | null): void {
   });
   p.settings = Object.assign({ ...DEFAULT_SETTINGS }, p.settings || {});
   p.mis = p.mis || {}; p.log = p.log || []; p.sessions = p.sessions || []; p.days = p.days || [];
-  p.owned = p.owned || { avatars: [p.avatar], themes: ['marigold'] }; p.theme = p.theme || 'marigold';
+  p.owned = p.owned || { avatars: [p.avatar], themes: [DEFAULT_THEME] };
+  // F-15.AC-6: a theme outside the design's set (v1 Marigold, Lime, Coral, Lavender) loads as Cobalt and stays owned.
+  if (!p.theme || !THEMES[p.theme]) p.theme = DEFAULT_THEME;
+  if (!p.owned.themes.includes(DEFAULT_THEME)) p.owned.themes.push(DEFAULT_THEME);
+  // F-19.AC-5: v1 emoji buddies become the default badge. Bought v1 buddies stay listed in owned.avatars.
+  if (!isAvatarId(p.avatar)) p.avatar = DEFAULT_AVATAR;
+  if (!p.owned.avatars.includes(p.avatar)) p.owned.avatars.push(p.avatar);
   if (typeof p.gems !== 'number') p.gems = 0;
 }
 

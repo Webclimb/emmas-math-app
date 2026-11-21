@@ -1,8 +1,8 @@
 # Number Sky: build spec
 
-**Spec version: v2.1-draft (awaiting approval).** v1.0 is the as-built prototype in `source/index.html`, written before this spec existed and described here after the fact. Nothing marked NEW or CHANGE is approved to build until the owner signs off and the blocking open questions in section 9 are answered. Milestone M0 (port, no behaviour change) may start immediately.
+**Spec version: v2.3-draft (awaiting approval).** v1.0 is the as-built prototype in `source/index.html`, written before this spec existed and described here after the fact. Nothing marked NEW or CHANGE is approved to build until the owner signs off and the blocking open questions in section 9 are answered. Milestone M0 (port, no behaviour change) may start immediately.
 
-**Approved so far (owner, 2026-11-21):** milestone M0; F-1.AC-2; the F-6.AC-2 wording; the design-system amendments in v2.1 (D-14 to D-17 below: desktop first with keyboard paths, quick rounds default Off, the four accent themes with a v1 theme migration, adoption of `design/` as the design system). Everything else marked NEW or CHANGE still awaits sign-off.
+**Approved so far (owner, 2026-11-21):** milestone M0; F-1.AC-2; the F-6.AC-2 wording; the design-system amendments in v2.1 (D-14 to D-17 below: desktop first with keyboard paths, quick rounds default Off, the four accent themes with a v1 theme migration, adoption of `design/` as the design system); milestone MD, bringing the design forward (D-18, 2026-11-21); F-22 workbook check and milestone MW (D-19); storage stays on-device plus Claude account, no external backend (D-20). Everything else marked NEW or CHANGE still awaits sign-off.
 
 Status tags on features: **BUILT** (in v1, keep), **CHANGE** (in v1, behaviour changes), **NEW** (not in v1). Evidence references (E#) and decisions (D-#) point to `RESEARCH_REVIEW.md`.
 
@@ -169,6 +169,16 @@ New skills, each with three levels, lessons and error patterns: multi-digit mult
 - F-21.AC-1: Each new skill satisfies F-3, F-4, F-5 and F-6 before it is switched on.
 - F-21.AC-2: Each is mapped to an Ontario 2020 Number-strand expectation in the skill data file.
 
+### F-22 Workbook check — NEW (D-19)
+She is starting mid-year, so a grown-up can aim practice at what her class is doing now. A photo of a workbook page tells the app which skills the page depends on; a short check finds which of those she has; practice then steps back to the weakest one and climbs toward the page.
+- F-22.AC-1: From the grown-up view, a grown-up can take or choose a photo of a workbook page. Claude (the artifact runtime's `sample` capability with images) names the skills in the skill map the page depends on, and lists in words any needed skills the app does not have yet. Where reading photos is unavailable, the grown-up picks the skills from the skill map by hand.
+- F-22.AC-2: Nothing about the learner changes until the grown-up confirms the list; they can add or remove skills first, or cancel.
+- F-22.AC-3: The photo is sent only to the runtime's `sample` call, is never stored, and is dropped after reading. Only the confirmed skill ids and dates are saved; no text from the page is kept. The request to Claude contains the photo and the skill map only, never the learner's nickname or any learner data.
+- F-22.AC-4: The check is taken by the learner from the home screen. It asks up to 2 numbers-level questions per skill (two right passes it; a wrong answer or "I'm not sure" ends that skill's probe and does not pass it), starting with the confirmed skills in teaching order, with no timer, no score, no hints and "I'm not sure" on every question. A skill she does not pass adds its prerequisites to the check, so it steps back toward fundamentals one skill at a time. At most 16 questions.
+- F-22.AC-5: After the check, skills she passed are lit (pending once F-7.AC-6 is built) and skills she did not pass reopen at pictures level. Her focus becomes the earliest unlit skill on the path to the confirmed skills, and normal level moves (F-7) take her back up toward the page.
+- F-22.AC-6: While a workbook goal is active, new practice is chosen from the confirmed skills and their prerequisites, unless she picks another open skill herself (F-15.AC-3). Once every confirmed skill is lit, reviews favour the confirmed skills. The grown-up can clear the goal at any time.
+- F-22.AC-7: Practice questions always come from the app's tested generators (F-5.AC-1). Claude only names skills; it never writes questions, answers or explanations, and the app never solves the workbook page itself.
+
 ## 4. Non-goals (v2)
 
 - Diagnosing dyscalculia or replacing specialist teaching.
@@ -178,13 +188,15 @@ New skills, each with three levels, lessons and error patterns: multi-digit mult
 - Speech recognition of spoken explanations.
 - Geometry, measurement beyond money and time, algebra, data strands.
 - Teacher or class dashboards, accounts, sign-in of its own.
+- An external backend or database such as Supabase (D-20).
+- Solving or marking her actual workbook pages (F-22.AC-7).
 - A full dynamic Bayesian network learner model (the F-7.AC-5 nudges are the v2 approximation).
 - Native mobile apps.
 
 ## 5. Data
 
-- **Inputs:** learner taps and typed answers; settings; an optional pasted backup code.
-- **Stored per learner:** nickname, avatar, theme, settings; per-skill state (level, estimates, attempts, corrects, recent results, last seen, review interval, pending/lit); per-fact state; error-pattern counts; a capped answer log (last 400: time, skill, level, correct, hinted, pattern, response time); sessions (last 100); practice days (last 180); check-up results; gems and owned cosmetics; schema version.
+- **Inputs:** learner taps and typed answers; settings; an optional pasted backup code; an optional workbook photo, read once and not kept (F-22).
+- **Stored per learner:** nickname, avatar, theme, settings; the workbook goal (confirmed skill ids, dates, check results; never the photo or any text from it, F-22.AC-3); per-skill state (level, estimates, attempts, corrects, recent results, last seen, review interval, pending/lit); per-fact state; error-pattern counts; a capped answer log (last 400: time, skill, level, correct, hinted, pattern, response time); sessions (last 100); practice days (last 180); check-up results; gems and owned cosmetics; schema version.
 - **Outputs:** on-screen views; backup code (JSON text); printable report.
 - **Where:** on-device storage by default. When published as a Claude artifact, also that viewer's private account storage at `data/users/<id>/numbersky`.
 - **Retention:** until the grown-up resets or deletes the learner. No server-side copy outside the artifact adapter.
@@ -193,7 +205,7 @@ New skills, each with three levels, lessons and error patterns: multi-digit mult
 ## 6. Integrations
 
 - Google Fonts stylesheet (fonts only).
-- Optional, only when published as a Claude artifact: the artifact runtime's `db`, `user` and `tts` capabilities. Each must degrade to nothing when absent (on-device storage; browser speech synthesis or no read-aloud).
+- Optional, only when published as a Claude artifact: the artifact runtime's `db`, `user`, `tts` and `sample` (with images, F-22) capabilities. Each must degrade to nothing when absent (on-device storage; browser speech synthesis or no read-aloud; picking workbook skills by hand). `sample` is called only when a grown-up chooses a photo, and uses that viewer's own Claude usage.
 - None else. No analytics, no APIs.
 
 ## 7. Constraints
@@ -224,7 +236,7 @@ Blocking items stop the named features only.
 
 | # | Question | Blocks |
 |---|---|---|
-| Q1 | Where will it be hosted: private Claude artifact (account-synced), a static site, or both? | F-20 adapter priority |
+| Q1 | ~~Where will it be hosted?~~ Resolved 2026-11-21: private Claude artifact, account-synced, with on-device storage as fallback; no external backend (D-20). | — |
 | Q2 | ~~Are short optional timed rounds acceptable for her?~~ Resolved 2026-11-21: default Off (D-15); the grown-up can turn them on. | — |
 | Q3 | Which story themes and avatar styles would she choose? Her input should drive the redesign. | F-15.AC-3, design brief |
 | Q4 | Does she also have reading or attention difficulties? This changes the read-aloud default and lesson length, and such learners gained less in trials. | F-19 defaults, F-4.AC-2 |
@@ -250,12 +262,17 @@ Blocking items stop the named features only.
 | 2026-11-21 | D-14: desktop browser first, mouse and keyboard; keyboard entry at numbers level (F-5.AC-6) and a keyboard path for every build widget (F-19.AC-6). | How she will use it; `design/README.md`. |
 | 2026-11-21 | D-15: quick rounds default Off (F-10.AC-6, section 8). | Owner's decision to leave timed rounds out for now (Q2). The quick round keeps F-10.AC-5 and F-16.AC-2: slim bar, no digits, no clock. |
 | 2026-11-21 | D-16: accent themes become Cobalt, Ocean, Berry, Graphite; v1 themes outside the set load as Cobalt (F-15.AC-6, F-20.AC-1). | v1's Lime, Coral and Lavender clashed with correct, not-yet and item colours. |
+| 2026-11-21 | D-19: add F-22 workbook check and milestone MW before M1. Claude only maps a photographed page to skills; the app's tested generators provide every question. | She starts mid-year; practice should aim at what her class is doing now, stepping back to fundamentals first. |
+| 2026-11-21 | D-20: no Supabase or other external backend. Storage stays on-device plus the Claude artifact account adapter (F-20.AC-2). | Owner decision. Avoids a second processor for a child's disability-related data and keeps artifact hosting. |
+| 2026-11-21 | D-18: bring the design forward as milestone MD: restyle and re-lay out every existing screen to `design/` (desktop two-column layouts, kit graphics instead of emoji, F-15.AC-6 themes, F-19.AC-5), before M1. Design parts that belong to unbuilt features (session parts, strip, lessons, week goal, say it, how did that feel) wait for their milestones. | Owner wants to review the desktop design on the real app. |
 | 2026-11-21 | D-17: adopt `design/` (direction B, "Star Lines") as the design system; key-screen sizes 390 px and 1280 × 800. | Delivered against `DESIGN_BRIEF.md` §5. |
 
 ## 11. Change log
 
 - **v1.0** (2026-11-20): as-built prototype: 14 skills, three levels, BKT per skill and level, single-ladder placement, 21 error patterns, star chart, gems and shop, grown-up view, read-aloud, artifact account storage.
 - **v2.0-draft** (2026-11-20): research review applied. Adds F-4, F-10, F-13, F-16, F-18, F-21; changes F-2, F-3, F-5 to F-9, F-11, F-12, F-14, F-15, F-17, F-19, F-20. Awaiting approval.
+- **v2.3-draft** (2026-11-21): adds F-22 workbook check and milestone MW (D-19); records no external backend (D-20); resolves Q1; adds `sample` to section 6.
+- **v2.2-draft** (2026-11-21): milestone MD added (D-18); F-19.AC-5 and F-15.AC-6 move from M3 to MD.
 - **v2.1-draft** (2026-11-21): design system delivered and approved amendments applied (D-14 to D-17). Adds F-5.AC-6, F-15.AC-6, F-19.AC-6; changes F-6.AC-2 wording, F-10.AC-6 default, F-20.AC-1, section 7 Devices and Design system, section 8; resolves Q2; approves F-1.AC-2.
 
 ---
@@ -305,9 +322,11 @@ v1 teaching order (also the placement ladder): quantity, numberline, placevalue,
 | Milestone | Contents | Exit check |
 |---|---|---|
 | M0 Port | v1 moved into the repo structure in section 7 with no behaviour change; storage interface; seeded randomness; v1 tests ported. Needs no design input. | F-1, F-2.AC-1/2, F-5.AC-1/2, F-6.AC-1..3, F-7.AC-1..4, F-20.AC-1/3 pass; build is one file. |
+| MD Design (D-18) | Every existing screen restyled and re-laid out to `design/` (tokens, components, desktop and phone layouts, motion rules), F-19.AC-5, F-15.AC-6. No new behaviour beyond what the design itself changes. | M0 criteria still pass; F-19.AC-5 and F-15.AC-6 pass; owner review. |
+| MW Workbook check (D-19) | F-22. | F-22 criteria pass; M0 and MD criteria still pass. |
 | M1 Teach and retain | F-4 lessons for the 14 skills, F-3 notation strip, F-5.AC-3/5/6, F-7.AC-5/6, F-9, F-14. | Those criteria pass; simulation test F-7.AC-7 passes. |
 | M2 Facts, stories, number line, language | F-10, F-11, F-12, F-13. | Those criteria pass. |
-| M3 Safeguards and measurement | F-8, F-16, F-17, F-18, F-19.AC-5/6 and F-15.AC-6 with the design system's assets. | Those criteria pass; drift check clean. |
+| M3 Safeguards and measurement | F-8, F-16, F-17, F-18, F-19.AC-6 with the design system's components. | Those criteria pass; drift check clean. |
 | M4 Toward grade level | F-21, one skill at a time. | Each skill passes F-21.AC-1. |
 
 Acceptance tests run with one command: `npm run accept`. A drift check (inventory of what the code does, mapped to F-# items) is written to `DRIFT_REPORT.md` at the end of each milestone.

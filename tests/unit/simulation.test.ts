@@ -1,6 +1,6 @@
 // Port of the v1 learner simulations in source/tests/engine_test.js. v1 printed the outcomes; here the
 // v1 outcomes are asserted so a regression shows. The fuller simulation criterion is F-7.AC-7 (milestone M1).
-import { describe, expect, test } from 'vitest';
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import * as E from '../../src/engine';
 import type { Profile, Stage } from '../../src/engine';
 
@@ -21,6 +21,11 @@ function simulate(seed: number, pCorrect: (sk: string, st: Stage, p: Profile) =>
   return { start: E.LADDER[P.lo], mastered: E.SKILLS.filter(s => p.skills[s.id].mastered).length, p, events };
 }
 const idx = (id: string) => E.LADDER.indexOf(id);
+
+// Reviews pick the least recently seen skill, so answers need distinct times: a simulated clock keeps runs deterministic.
+let clock = 0;
+beforeEach(() => { clock = 1_700_000_000_000; vi.spyOn(Date, 'now').mockImplementation(() => (clock += 30_000)); });
+afterEach(() => { vi.restoreAllMocks(); });
 
 describe('v1 learner simulations', () => {
   test('a strong learner (95% right) masters all 14 skills', () => {

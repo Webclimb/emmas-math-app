@@ -6,6 +6,7 @@ import { describe, expect, test } from 'vitest';
 import * as E from '../../src/engine';
 import type { Option, Profile, Question, Stage } from '../../src/engine';
 import { migrateApp, migrateProfile, parseBackup, backupCode } from '../../src/storage/schema';
+import { THEMES } from '../../src/design/tokens';
 
 const SPEC = readFileSync(resolve(process.cwd(), 'SPEC.md'), 'utf8');
 const STAGES: Stage[] = [0, 1, 2];
@@ -264,9 +265,24 @@ describe('F-20 storage', () => {
     delete (old as Partial<Profile>).owned; delete (old as Partial<Profile>).theme; delete (old as Partial<Profile>).settings;
     old.skills.quantity.best = undefined as unknown as number;
     migrateProfile(old);
-    expect(old.owned.avatars).toEqual([old.avatar]);
-    expect(old.theme).toBe('marigold');
+    // Since MD (SPEC.md D-18): v1 emoji buddies load as the default badge and missing themes as Cobalt (F-15.AC-6).
+    expect(old.avatar).toBe('frame:square');
+    expect(old.owned.avatars).toContain(old.avatar);
+    expect(old.theme).toBe('cobalt');
     expect(typeof old.skills.quantity.best).toBe('number');
+  });
+
+  test('test_F15_AC6: themes are the design set, and a v1 theme outside it loads as Cobalt and stays owned', () => {
+    expect(Object.keys(THEMES)).toEqual(['cobalt', 'ocean', 'berry', 'graphite']);
+    expect(THEMES.cobalt.priceGems).toBe(0);
+    const d = migrateApp(structuredClone(v1raw))!, p = d.profiles[d.current!];
+    for (const [saved, loads] of [['marigold', 'cobalt'], ['lime', 'cobalt'], ['coral', 'cobalt'], ['lavender', 'cobalt'], ['ocean', 'ocean'], ['berry', 'berry']]) {
+      const q = structuredClone(p); q.theme = saved; q.owned.themes = ['marigold', saved];
+      migrateProfile(q);
+      expect(q.theme, saved).toBe(loads);
+      expect(q.owned.themes, saved).toContain(saved);
+      expect(q.owned.themes, saved).toContain('cobalt');
+    }
   });
 
   test('test_F20_AC3: a backup code round-trips, and malformed codes are rejected', () => {

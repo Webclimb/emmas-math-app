@@ -28,8 +28,16 @@ export async function createLearner(page: Page, name: string, avatarIndex = 0) {
 export async function holdGrownUps(page: Page) {
   await page.locator('[data-hold]').scrollIntoViewIfNeeded();
   const box = (await page.locator('[data-hold]').boundingBox())!;
-  await page.mouse.move(box.x + 10, box.y + 10); await page.mouse.down(); await page.waitForTimeout(1400); await page.mouse.up();
+  await page.mouse.move(box.x + 10, box.y + 10); await page.mouse.down(); await page.waitForTimeout(2300); await page.mouse.up();
   await expect(page.getByText('Grown-up view')).toBeVisible();
 }
+
+/** Opens one tab of the grown-up view (Progress, Patterns, Sessions, Settings, Data). */
+export async function grownTab(page: Page, tab: 'progress' | 'workbook' | 'patterns' | 'sessions' | 'settings' | 'data') {
+  await page.click(`[data-act=gtab][data-d=${tab}]`);
+}
+
+/** The learner's name as the home and grown-up headers show it. */
+export const nameOnHome = (page: Page) => page.locator('.head .who .name');
 
 export const saved = (page: Page) => page.evaluate(() => JSON.parse(localStorage.getItem('numbersky.v1') || 'null'));

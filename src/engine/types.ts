@@ -93,6 +93,19 @@ export interface Profile {
   sessions: SessionRecord[];
   log: LogEntry[];
   settings: Settings;
+  /** F-22: the confirmed workbook goal. Skill ids and dates only. */
+  workbook?: WorkbookGoal | null;
+}
+
+export interface WorkbookGoal {
+  /** When the grown-up confirmed it. */
+  at: number;
+  /** Confirmed skill ids, in teaching order. */
+  skills: string[];
+  /** When the learner finished the check; 0 until then. */
+  checkedAt: number;
+  /** Check results per probed skill. */
+  results: Record<string, 'pass' | 'fail'>;
 }
 
 export type ModelEvent =

@@ -1,7 +1,6 @@
 // Side effects with no game logic: accent colours, sound, read-aloud, confetti.
 // Each degrades to nothing when the browser or runtime lacks the feature.
-import { FALLBACK_ACCENT, THEMES, DEFAULT_THEME } from '../design/tokens';
-import { pick, random } from '../engine/rng';
+import { THEMES, DEFAULT_THEME } from '../design/tokens';
 import { G } from './state';
 
 declare global { interface Window { claude?: { use(cap: string): Promise<unknown>; hot?: { snapshot?(f: () => unknown): void; ready?(f: () => void): void } }; webkitAudioContext?: typeof AudioContext } }
@@ -15,7 +14,7 @@ export function isDark(): boolean {
 export function applyAccent(): void {
   const th = THEMES[(G.prof && G.prof.theme) || DEFAULT_THEME] || THEMES[DEFAULT_THEME];
   const c = isDark() ? th.dark : th.light, st = document.documentElement.style;
-  st.setProperty('--accent', c.accent); st.setProperty('--accent-ink', c['accent-ink']); st.setProperty('--accent-soft', c['accent-soft']);
+  for (const k of ['accent', 'accent-ink', 'accent-soft', 'accent-text', 'focus'] as const) st.setProperty('--' + k, c[k]);
 }
 export function watchTheme(): void {
   new MutationObserver(applyAccent).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
@@ -56,17 +55,4 @@ export async function speak(text: string): Promise<void> {
 
 // ---------- motion ----------
 export function reduced(): boolean { try { return matchMedia('(prefers-reduced-motion: reduce)').matches; } catch { return false; } }
-export function confetti(): void {
-  if (reduced()) return;
-  const c = document.getElementById('fx') as HTMLCanvasElement | null; if (!c) return;
-  const ctx = c.getContext('2d'); if (!ctx) return;
-  const dpr = window.devicePixelRatio || 1; const W = c.width = innerWidth * dpr, H = c.height = innerHeight * dpr; c.style.display = 'block';
-  const cs = getComputedStyle(document.documentElement), cols = ['--accent', '--sky', '--good', '--warm'].map(v => cs.getPropertyValue(v).trim() || FALLBACK_ACCENT);
-  const P = Array.from({ length: 110 }, () => ({ x: W / 2 + (random() - .5) * W * .35, y: H * .38, vx: (random() - .5) * 15 * dpr, vy: (-random() * 15 - 4) * dpr, r: (4 + random() * 5) * dpr, c: pick(cols), a: random() * 6, s: random() < .5 }));
-  const t0 = performance.now();
-  (function f(t: number) {
-    ctx.clearRect(0, 0, W, H);
-    P.forEach(p => { p.vy += .45 * dpr; p.x += p.vx; p.y += p.vy; p.a += .15; ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.a); ctx.fillStyle = p.c; if (p.s) ctx.fillRect(-p.r, -p.r / 2, p.r * 2, p.r); else { ctx.beginPath(); ctx.arc(0, 0, p.r * .7, 0, 7); ctx.fill(); } ctx.restore(); });
-    if (t - t0 < 1800) requestAnimationFrame(f); else { ctx.clearRect(0, 0, W, H); c.style.display = 'none'; }
-  })(t0);
-}
+// Confetti is removed in the Star Lines design: the star-lit dialog replaces it (design/MOTION.md).

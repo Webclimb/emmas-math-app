@@ -1,12 +1,14 @@
 // Learner model (spec F-7): Bayesian Knowledge Tracing per (skill, level), level moves, review choice.
 // Ported from v1 with no behaviour change.
+import { DEFAULT_THEME } from '../design/tokens';
 import { random } from './rng';
 import { LADDER, SK, SKILLS } from './skills';
 import type { Item, ModelEvent, Profile, Question, SkillState, Stage } from './types';
 
 export const BKT = { T: 0.12, S: 0.1 };
 export const START_PL: [number, number, number] = [0.3, 0.2, 0.1];
-export const DEFAULT_SETTINGS = { sessionLen: 10, sound: true, autoRead: false, chart: true };
+/** Sounds default off (design/MOTION.md, milestone MD); v1 defaulted them on. */
+export const DEFAULT_SETTINGS = { sessionLen: 10, sound: false, autoRead: false, chart: true };
 export const LOG_CAP = 400;
 
 export function newSkillState(): SkillState {
@@ -17,7 +19,7 @@ export function newProfile(name: string, avatar: string): Profile {
   const skills: Record<string, SkillState> = {}; SKILLS.forEach(s => skills[s.id] = newSkillState());
   return {
     id: 'p' + Date.now().toString(36) + Math.floor(random() * 1000), name, avatar, created: Date.now(), placementDone: false, skills, focus: null, mis: {}, gems: 10,
-    owned: { avatars: [avatar], themes: ['marigold'] }, theme: 'marigold', days: [], sessions: [], log: [], settings: { ...DEFAULT_SETTINGS },
+    owned: { avatars: [avatar], themes: [DEFAULT_THEME] }, theme: DEFAULT_THEME, days: [], sessions: [], log: [], settings: { ...DEFAULT_SETTINGS },
   };
 }
 
@@ -35,6 +37,13 @@ export function guessFor(q: Pick<Question, 'kind' | 'options'>): number {
   return 0.05;
 }
 
+/** A goal's skills plus all their prerequisites (F-22). */
+export function goalPathOf(skills: string[]): Set<string> {
+  const out = new Set<string>(), stack = [...skills];
+  while (stack.length) { const id = stack.pop()!; if (out.has(id) || !SK[id]) continue; out.add(id); stack.push(...SK[id].pre); }
+  return out;
+}
+
 /** Open skills: not mastered, every prerequisite mastered. */
 export function frontier(p: Profile) { return SKILLS.filter(s => !p.skills[s.id].mastered && s.pre.every(id => p.skills[id].mastered)); }
 
@@ -42,13 +51,20 @@ export function pickFocus(p: Profile): string | null {
   const fr = frontier(p);
   if (p.focus && fr.some(s => s.id === p.focus)) return p.focus;
   fr.sort((a, b) => LADDER.indexOf(a.id) - LADDER.indexOf(b.id));
+  // F-22.AC-6: with a workbook goal, aim at the earliest open skill on the path to the page.
+  if (p.workbook && p.workbook.skills.length) {
+    const path = goalPathOf(p.workbook.skills), onPath = fr.find(s => path.has(s.id));
+    if (onPath) { p.focus = onPath.id; return p.focus; }
+  }
   p.focus = fr[0] ? fr[0].id : null;
   return p.focus;
 }
 
 /** Next practice item. Every fourth question (or always, once all are mastered) reviews the least recently seen mastered skill. */
 export function nextItem(p: Profile, sess: { i: number }): Item | null {
-  const mastered = SKILLS.filter(s => p.skills[s.id].mastered), f = pickFocus(p);
+  let mastered = SKILLS.filter(s => p.skills[s.id].mastered); const f = pickFocus(p);
+  // F-22.AC-6: once every workbook skill is lit, reviews favour those skills.
+  if (p.workbook && p.workbook.skills.length && p.workbook.skills.every(id => p.skills[id].mastered)) mastered = mastered.filter(s => p.workbook!.skills.includes(s.id));
   if (mastered.length && (!f || sess.i % 4 === 3)) {
     mastered.sort((a, b) => p.skills[a.id].lastSeen - p.skills[b.id].lastSeen);
     return { skill: mastered[0].id, stage: random() < .7 ? 2 : 1, review: true };

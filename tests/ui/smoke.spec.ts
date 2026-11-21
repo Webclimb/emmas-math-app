@@ -89,7 +89,7 @@ test('test_F5_AC2: every skill, level and build widget solves correctly through 
   await holdGrownUps(page);
   await page.evaluate(() => document.documentElement.setAttribute('data-theme', 'dark'));
   await page.click('[data-act=back]');
-  await expect(page.locator('.hero')).toBeVisible();
+  await expect(page.locator('.mapcard')).toBeVisible();
   expect(errors).toEqual([]);
 });
 

@@ -8,3 +8,4 @@ export * from './visuals';
 export { GEN, makeQuestion, numOpts, pm, opMis } from './generators';
 export * from './model';
 export * from './placement';
+export * from './workbook';
