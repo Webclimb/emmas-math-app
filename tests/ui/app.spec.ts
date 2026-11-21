@@ -16,7 +16,7 @@ test('test_F1_AC1: with no saved data the welcome screen opens, and a learner is
   await expect(page.locator('#pname')).toBeVisible();
   // Only free badges are offered at sign-up (design kit badges since MD).
   const offered = await page.locator('button.av .tile__name').allTextContents();
-  expect(offered).toEqual(['Square', 'Circle', 'Roundel']);
+  expect(offered).toEqual(['Carré', 'Cercle', 'Cocarde']);
   // Empty nickname is refused.
   await page.click('button[type=submit]');
   await expect(page.locator('#pname')).toBeVisible();
@@ -26,7 +26,7 @@ test('test_F1_AC1: with no saved data the welcome screen opens, and a learner is
   await page.locator('#pname').pressSequentially('ABCDEFGHIJKLMNOPQRSTUVWXY');
   await page.click('button.av >> nth=2');
   await page.click('button[type=submit]');
-  await expect(page.getByText('First, a quick warm-up')).toBeVisible();
+  await expect(page.getByText('D’abord, un petit échauffement')).toBeVisible();
   let d = await saved(page), p = d.profiles[d.current];
   expect(p.name).toBe('ABCDEFGHIJKLMNOPQRST');
   expect(p.avatar).toBe('frame:roundel');
@@ -46,8 +46,8 @@ test('test_F1_AC1: with no saved data the welcome screen opens, and a learner is
 // F-1.AC-2 (CHANGE) was approved on 2026-11-21 (SPEC.md v2.1-draft). The test is unchanged from when it was parked.
 test('test_F1_AC2: the welcome form asks for a nickname, not a full name, and stores no birth date, school or diagnosis', async ({ page }) => {
   await open(page);
-  await expect(page.locator('label[for=pname]')).toContainText(/nickname/i);
-  await expect(page.locator('#newp')).not.toContainText(/full name/i);
+  await expect(page.locator('label[for=pname]')).toContainText(/surnom/i);
+  await expect(page.locator('#newp')).not.toContainText(/nom complet/i);
   expect(await page.locator('#newp input, #newp select, #newp textarea').count()).toBe(1);
   await createLearner(page, 'Sky', 0);
   const d = await saved(page), p = d.profiles[d.current];
@@ -121,11 +121,11 @@ test('test_F6_AC1: a wrong answer shows not-right, the pattern sentence, a worke
   // Order (F-6.AC-1): not right, pattern sentence, worked explanation with a visual, the correct answer.
   const order = await fb.evaluate(el => [...el.children].map(c => c.tagName.toLowerCase() + '.' + c.className));
   expect(order.slice(0, 5)).toEqual(['div.fb-head', 'p.fb-pattern', 'p.fb-text', 'figure.fb-figure', 'p.fb-text ans']);
-  await expect(fb.locator('.fb-head h2')).toHaveText("Not yet. Let's look at it another way.");
-  await expect(fb.locator('.fb-pattern')).toHaveText('That answer comes from taking away. Dividing means sharing into equal groups.');
+  await expect(fb.locator('.fb-head h2')).toHaveText('Pas encore. Regardons-le autrement.');
+  await expect(fb.locator('.fb-pattern')).toHaveText('Cette réponse vient d’une soustraction. Diviser, c’est partager en groupes égaux.');
   await expect(fb.locator('p.fb-text').first()).toContainText(`÷ ${q.b} = ${q.answer}`);
   await expect(fb.locator('.fb-figure svg')).toHaveCount(1);
-  await expect(fb.locator('p.ans')).toHaveText(`The answer is ${q.answer}.`);
+  await expect(fb.locator('p.ans')).toHaveText(`La réponse est ${q.answer}.`);
   // Gems: +1 for trying, never deducted.
   const after = await ns(page, n => n.G.prof.gems) as number;
   expect(after).toBe(q.gems + 1);
@@ -149,10 +149,10 @@ test('test_F6_AC3: the grown-up view lists observed patterns by count with the g
   const items = page.locator('ul.mis > li');
   await expect(items).toHaveCount(3);
   expect(await items.evaluateAll(els => els.map(e => e.getAttribute('data-pattern')))).toEqual(['op-sub-for-div', 'off-by-one', 'regroup']);
-  await expect(items.nth(0)).toContainText('Used subtraction on a division question');
-  await expect(items.nth(0)).toContainText('Seen 5 times');
-  await expect(items.nth(0).locator('dt').nth(1)).toHaveText('Try at home');
-  await expect(items.nth(0).locator('dd').nth(1)).toContainText('Deal real objects');
+  await expect(items.nth(0)).toContainText('A soustrait dans une question de division');
+  await expect(items.nth(0)).toContainText('Vue 5 fois');
+  await expect(items.nth(0).locator('dt').nth(1)).toHaveText('À essayer à la maison');
+  await expect(items.nth(0).locator('dd').nth(1)).toContainText('Distribuer de vrais objets');
   expect(errors).toEqual([]);
 });
 
@@ -205,7 +205,7 @@ test('test_F20_AC3: a backup code can be copied and restored; a malformed code i
   for (const bad of ['not a code', '{"profile":{}}', code.slice(0, 40)]) {
     await page.fill('#restoreText', bad);
     await page.click('#restoreForm button[type=submit]');
-    await expect(page.locator('.toast')).toHaveText("That code doesn't look right. Paste the whole backup code.");
+    await expect(page.locator('.toast')).toHaveText('Ce code ne semble pas valide. Colle le code de sauvegarde au complet.');
     await expect(page.locator('.modal')).toHaveCount(0);
     expect(await saved(page)).toEqual(original);
   }
@@ -218,7 +218,7 @@ test('test_F20_AC3: a backup code can be copied and restored; a malformed code i
   await grownTab(page, 'data');
   await page.fill('#restoreText', code);
   await page.click('#restoreForm button[type=submit]');
-  await expect(page.locator('.modal h2')).toHaveText('Restore Kit?');
+  await expect(page.locator('.modal h2')).toHaveText('Restaurer Kit?');
   await page.click('[data-act=doRestore]');
   await expect(nameOnHome(page)).toHaveText('Kit');
   const restored = await saved(page), p = restored.profiles[restored.current], o = original.profiles[original.current];

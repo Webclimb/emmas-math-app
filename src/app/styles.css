@@ -446,3 +446,44 @@ label.btn:focus-within{outline:3px solid var(--focus);outline-offset:3px}
   .hold.holding .holdlabel{visibility:hidden}
   .hold.holding .holdlabel::after{content:"Keep holding";visibility:visible;position:absolute;left:0;right:0;text-align:center}
 }
+
+/* ---------- F-23 grade-6 visuals ---------- */
+.pvt{border-collapse:collapse;align-self:center;font-variant-numeric:tabular-nums;max-width:100%}
+.pvt th,.pvt td{border:1.5px solid var(--line-strong);text-align:center;padding:6px 0;width:52px;min-width:52px;box-sizing:border-box}
+.pvt th{font-size:var(--type-small-size);font-weight:700;background:var(--surface-2)}
+.pvt th span{display:none}
+.pvt abbr{text-decoration:none}
+.pvt td{font-size:28px;font-weight:700;height:56px}
+.pvt .dec{background:var(--accent-soft)}
+.pvt th.dec{background:var(--accent-soft)}
+.pvt td.hi{outline:3px solid var(--accent-text);outline-offset:-3px}
+.pvt.hasdec th:has(+ th.dec):not(.dec),.pvt.hasdec td:has(+ td.dec):not(.dec){border-right:4px solid var(--ink)}
+.pvdots{display:flex;flex-wrap:wrap;gap:3px;justify-content:center;max-width:40px;margin:0 auto}
+.pvdots i{width:9px;height:9px;border-radius:50%;background:var(--ink)}
+.pvsteppers{--n:8;display:grid;grid-template-columns:repeat(var(--n),52px);gap:0;align-self:center}
+.pvst{display:flex;flex-direction:column;align-items:center;gap:4px}
+.pvst .sv{font-weight:700;font-size:20px}
+.decgrid{width:min(220px,60vw);height:auto;align-self:center}
+.decgrid .dg{fill:var(--surface);stroke:var(--line-strong);stroke-width:1}
+.decgrid .dg.on{fill:var(--accent)}
+.colop{border-collapse:collapse;align-self:center;font-family:var(--type-equation-family);font-size:30px;font-weight:700;font-variant-numeric:tabular-nums}
+.colop td{width:.9em;height:1.3em;text-align:center;padding:0 1px}
+.colop td.sg{width:1.2em;color:var(--ink-soft)}
+.colop td.cm{width:.3em;padding:0}
+.colop tr.last td{border-bottom:3px solid var(--ink)}
+.colop tr.last td.sg{border-bottom:3px solid var(--ink)}
+.colop tr.car td{font-size:16px;color:var(--accent-text);height:1em;vertical-align:bottom}
+.colop tr.part td{color:var(--ink-soft)}
+.colop tr.res td{color:var(--accent-text)}
+.tbars{display:flex;flex-direction:column;gap:8px;width:100%;max-width:520px;align-self:center}
+.tb{display:flex;align-items:center;gap:8px}
+.tbn{flex:0 0 7em;font-weight:700;font-size:var(--type-small-size)}
+.tbb{height:40px;border:2px solid var(--ink);border-radius:8px;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;font-weight:700}
+.tbb.s{width:18%}
+.tbb.l{width:62%}
+.tbk{font-weight:700;color:var(--accent-text)}
+.steplog{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.steplog li{display:flex;align-items:center;gap:8px;padding:6px 12px;border-radius:10px;background:var(--good-soft)}
+.steplog li .ki{color:var(--good);width:22px;height:22px;flex:none}
+.stepnow{display:flex;flex-direction:column;gap:12px}
+.pad .key.ok.wide{grid-column:1 / -1}

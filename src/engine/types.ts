@@ -12,6 +12,8 @@ export interface Skill {
   about: string;
   /** Learner description. */
   kid: string;
+  /** Québec Progression des apprentissages item (F-21.AC-2), for grade-level skills. */
+  pda?: string;
 }
 
 export interface Misconception { kid: string; parent: string; act: string }
@@ -21,14 +23,33 @@ export interface Option { value: string | number; label: string; mis?: string | 
 export type Build =
   | { type: 'tenframe'; frames: number; preset: number; target: number }
   | { type: 'blocks'; target: number; hundreds: boolean }
-  | { type: 'nlplace'; min: number; max: number; labels: number[]; target: number }
+  | { type: 'nlplace'; min: number; max: number; labels: number[]; target: number; scale?: number }
   | { type: 'jumps'; start: number; target: number; tens: boolean }
   | { type: 'crossout'; n: number; k: number; e: string }
   | { type: 'groups'; a: number; b: number; e: string }
   | { type: 'rows'; target: number; each: number }
   | { type: 'share'; n: number; k: number; e: string }
   | { type: 'makegroups'; n: number; k: number; e: string }
-  | { type: 'shade'; n: number; k: number };
+  | { type: 'shade'; n: number; k: number }
+  /** F-23: place-value chart with counters per column; target in thousandths. */
+  | { type: 'pvchart'; cols: string[]; target: number }
+  /** F-23: slide digits with × 10 / ÷ 10 until start × 10^k (k may be negative); values in thousandths. */
+  | { type: 'shift'; cols: string[]; start: number; k: number; op: string }
+  /** F-23: guided column work, one answer per step (typed, or chosen from choices). */
+  | { type: 'steps'; steps: Step[] };
+
+export interface Step {
+  /** What she is asked at this step (HTML). */
+  prompt: string;
+  /** Canonical answer: digits with a comma for decimals, or the chosen choice. */
+  answer: string;
+  /** If present, she picks one of these instead of typing. */
+  choices?: string[];
+  /** Shown in the list once the step is right. */
+  done: string;
+  /** Whether the typed answer may have a comma. */
+  decimal?: boolean;
+}
 export type BuildType = Build['type'];
 
 export interface Followup { prompt: string; say?: string; options: Option[]; answer: string | number }
@@ -46,7 +67,10 @@ export interface Question {
   explain: { text: string; visual?: string };
   options?: Option[];
   answer?: string | number;
-  padMis?: Record<number, string>;
+  /** Typed wrong answer (normalized text) -> pattern id. */
+  padMis?: Record<string, string>;
+  /** F-23.AC-4: the keypad offers a comma; the answer is a canonical decimal string. */
+  decimal?: boolean;
   build?: Build;
   followup?: Followup;
   chart?: boolean;

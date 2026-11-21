@@ -35,14 +35,14 @@ export interface WorkbookReading { topic: string; skills: string[]; beyond: stri
 export function workbookPrompt(): string {
   const map = SKILLS.map(s => ({ id: s.id, name: s.name, covers: s.about, needs: s.pre }));
   return [
-    'The image is a photo of one page from a maths workbook used in a Canadian school (Ontario curriculum).',
+    'The image is a photo of one page from a French-language maths workbook used in a Québec school (6e année primaire, Progression des apprentissages).',
     'A parent wants to know which basic skills a learner needs before she can do the exercises on this page.',
     'Here is the skill map of a practice app, as JSON. Each skill lists the skills it needs:',
     JSON.stringify(map),
     'Reply with only a JSON object with three fields:',
-    '- "topic": what the page practises, in at most 12 plain words. Maths only: do not copy any names, school, teacher, dates or handwriting.',
+    '- "topic": what the page practises, in at most 12 plain words, in Québec French. Maths only: do not copy any names, school, teacher, dates or handwriting.',
     '- "skills": the ids of the skills in the map that the exercises use directly. Include the most advanced skills the page needs; the app adds their prerequisites itself. Use only ids from the map.',
-    '- "beyond": up to 5 short phrases for skills the page needs that are not in the map (for example "dividing by a 2-digit number" or "decimals to hundredths"). Use [] if none.',
+    '- "beyond": up to 5 short phrases for skills the page needs that are not in the map in Québec French (for example "diviser par un nombre à 2 chiffres" or "fractions équivalentes"). Use [] if none.',
     'Do not solve the exercises and do not include any answers.',
   ].join('\n');
 }
@@ -70,9 +70,9 @@ export async function readWorkbookPhoto(photo: Blob): Promise<WorkbookReading> {
 }
 
 export const READ_ERROR_TEXT: Record<ReadError, string> = {
-  unavailable: "Reading photos works when the app is opened in Claude. You can choose the skills yourself instead.",
-  not_granted: "Reading the photo wasn't allowed. You can choose the skills yourself instead.",
-  image_rejected: "That photo couldn't be read. Try a clear photo of one page, or choose the skills yourself.",
-  busy: 'Claude is busy right now. Try again in a minute, or choose the skills yourself.',
-  failed: "The page couldn't be read this time. Try again, or choose the skills yourself.",
+  unavailable: 'La lecture de photos fonctionne quand l’appli est ouverte dans Claude. Vous pouvez choisir les habiletés vous-même.',
+  not_granted: 'La lecture de la photo n’a pas été permise. Vous pouvez choisir les habiletés vous-même.',
+  image_rejected: 'Cette photo n’a pas pu être lue. Essayez une photo nette d’une seule page, ou choisissez les habiletés vous-même.',
+  busy: 'Claude est occupé en ce moment. Réessayez dans une minute, ou choisissez les habiletés vous-même.',
+  failed: 'La page n’a pas pu être lue cette fois. Réessayez, ou choisissez les habiletés vous-même.',
 };

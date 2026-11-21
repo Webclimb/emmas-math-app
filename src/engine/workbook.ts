@@ -60,12 +60,17 @@ export function checkRecord(C: Check, ok: boolean): void {
 
 /** Ancestors of the goal skills (prerequisites, transitively), plus the skills themselves. */
 export { goalPathOf as goalPath } from './model';
+import { goalPathOf as goalPath } from './model';
 
 export function workbookActive(p: Profile): boolean { return !!(p.workbook && p.workbook.skills.length); }
 export function workbookReady(p: Profile): boolean { return workbookActive(p) && p.workbook!.skills.every(id => p.skills[id].mastered); }
 
 /** Apply the check: passed skills lit, failed skills reopened at pictures level, focus on the path. */
 export function checkApply(p: Profile, C: Check, now = Date.now()): void {
+  // F-22.AC-5, F-8.AC-4: prerequisites under a passed skill that were not checked are taken as known.
+  const known = new Set<string>();
+  for (const [id, r] of Object.entries(C.probed)) if (r === 'pass') for (const anc of goalPath([id])) if (anc !== id && !C.probed[anc]) known.add(anc);
+  for (const id of known) { const s = p.skills[id]; if (!s.mastered) { s.mastered = true; s.stage = 2; s.best = 2; s.pL = [Math.max(s.pL[0], 0.95), Math.max(s.pL[1], 0.92), Math.max(s.pL[2], 0.9)]; s.masteredAt = now; } }
   for (const [id, r] of Object.entries(C.probed)) {
     const s = p.skills[id];
     if (r === 'pass') {

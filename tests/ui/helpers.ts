@@ -29,7 +29,7 @@ export async function holdGrownUps(page: Page) {
   await page.locator('[data-hold]').scrollIntoViewIfNeeded();
   const box = (await page.locator('[data-hold]').boundingBox())!;
   await page.mouse.move(box.x + 10, box.y + 10); await page.mouse.down(); await page.waitForTimeout(2300); await page.mouse.up();
-  await expect(page.getByText('Grown-up view')).toBeVisible();
+  await expect(page.getByText('Espace parent ·')).toBeVisible();
 }
 
 /** Opens one tab of the grown-up view (Progress, Patterns, Sessions, Settings, Data). */

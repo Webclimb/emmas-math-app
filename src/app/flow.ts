@@ -6,9 +6,11 @@ import { placementApply, placementInit, placementNext, placementRecord } from '.
 import { checkApply, checkInit, checkNext, checkRecord, newWorkbookGoal } from '../engine/workbook';
 import { canReadPhotos, readWorkbookPhoto, READ_ERROR_TEXT, type ReadError } from './workbook';
 import { SK, STAGE_WITH } from '../engine/skills';
-import { NL } from '../engine/visuals';
+import { NL, digitAt } from '../engine/visuals';
+import { normAnswer } from '../engine/decimal';
+import { GRADE_TARGETS } from '../engine/skills';
 import { THEMES } from '../design/tokens';
-import type { Build, Question } from '../engine/types';
+import type { Build, Question, Step } from '../engine/types';
 import { backupCode, migrateProfile, parseBackup } from '../storage/schema';
 import { AVATARS, DEFAULT_AVATAR, GEMS, HOLD_MS, TOAST_MS } from './data';
 import { applyAccent, reduced, speak, strip, tone, SND } from './effects';
@@ -50,7 +52,7 @@ export function routeHome(): void {
   else if (!G.prof.placementDone) UI.screen = 'placeIntro'; else UI.screen = 'home';
   render(); window.scrollTo(0, 0);
 }
-const sayFor = (q: Question) => (q.lead ? q.lead + ' ' : '') + (q.say || strip(q.prompt));
+const sayFor = (q: Question) => (q.lead ? q.lead + ' ' : '') + strip(q.say || q.prompt);
 
 // ---------- build widgets ----------
 export function initBuild(bd: Build): BuildState {
@@ -65,6 +67,9 @@ export function initBuild(bd: Build): BuildState {
     case 'share': return { plates: Array(bd.k).fill(0), hist: [] };
     case 'makegroups': return { g: 0 };
     case 'shade': return { s: Array(bd.n).fill(false) };
+    case 'pvchart': return { counts: Array(bd.cols.length).fill(0) };
+    case 'shift': return { j: 0, hist: [] };
+    case 'steps': return { si: 0, log: [] };
   }
 }
 export function buildRight(bd: Build, b: BuildState): boolean {
@@ -79,30 +84,36 @@ export function buildRight(bd: Build, b: BuildState): boolean {
     case 'share': { const sum = b.plates!.reduce((a, c) => a + c, 0); return sum === bd.n && b.plates!.every(c => c === b.plates![0]); }
     case 'makegroups': return b.g! * bd.k === bd.n;
     case 'shade': return b.s!.filter(Boolean).length === bd.k;
+    case 'pvchart': return bd.cols.every((c, i) => (b.counts as number[])[i] === digitAt(bd.target, c));
+    case 'shift': return b.j === bd.k;
+    case 'steps': return (b.si as number) >= bd.steps.length;
   }
 }
 function buildNudge(bd: Build, b: BuildState): string {
   switch (bd.type) {
-    case 'tenframe': return `Not quite. Count your dots again. You need ${bd.target} in all.`;
-    case 'blocks': return 'Not quite. Check the tens and the ones again.';
-    case 'nlplace': return b.m === null ? 'Tap the line to place the dot first.' : 'Not quite. Find the nearest labelled number, then count the ticks.';
-    case 'jumps': return b.pos! < bd.target ? 'Not there yet. How many have you jumped so far?' : 'You went past it. Tap Undo and try again.';
-    case 'crossout': return `You need to take away exactly ${bd.k}. Count the crossed-out ones.`;
-    case 'groups': return `Check both numbers: ${bd.a} groups, with ${bd.b} in each group.`;
-    case 'rows': return `You need ${bd.target} rows. Count the rows again.`;
-    case 'share': return 'The plates aren\'t equal yet. Tap Undo to move some back, then share again.';
-    case 'shade': return `Shade exactly ${bd.k} parts.`;
+    case 'tenframe': return `Pas tout à fait. Recompte tes jetons. Il en faut ${bd.target} en tout.`;
+    case 'blocks': return 'Pas tout à fait. Vérifie encore les dizaines et les unités.';
+    case 'nlplace': return b.m === null ? 'Clique d’abord sur la droite pour placer le point.' : 'Pas tout à fait. Trouve le nombre écrit le plus proche, puis compte les graduations.';
+    case 'jumps': return b.pos! < bd.target ? 'Pas encore. De combien as-tu avancé jusqu’ici?' : 'Tu es allée trop loin. Clique sur Annuler et réessaie.';
+    case 'crossout': return `Il faut en enlever exactement ${bd.k}. Compte ceux qui sont barrés.`;
+    case 'groups': return `Vérifie les deux nombres : ${bd.a} groupes, avec ${bd.b} dans chaque groupe.`;
+    case 'rows': return `Il faut ${bd.target} rangées. Recompte les rangées.`;
+    case 'share': return 'Les assiettes ne sont pas encore égales. Clique sur Annuler pour en reprendre, puis partage encore.';
+    case 'pvchart': return 'Pas tout à fait. Lis le nombre colonne par colonne et vérifie chaque chiffre.';
+    case 'shift': return `Pas tout à fait. ${bd.op} : combien de colonnes, et vers quel côté?`;
+    case 'steps': return 'Pas tout à fait. Vérifie ce calcul et réessaie.';
+    case 'shade': return `Colorie exactement ${bd.k} parties.`;
   }
-  return 'Not quite. Try again.';
+  return 'Pas tout à fait. Réessaie.';
 }
 
 // ---------- session flow ----------
 export function newCurrent(q: Question): Current {
   return { q, phase: 'answer', hinted: false, hintShown: false, entry: '', chosen: null, fchosen: null, b: q.kind === 'build' ? initBuild(q.build!) : null, buildMiss: false };
 }
-function beginSession(mode: 'practice' | 'placement' | 'check', n = 0): void {
+function beginSession(mode: 'practice' | 'placement' | 'check', n = 0, warm = false): void {
   G.S = { mode, n: mode === 'placement' ? 12 : n, i: 0, answered: 0, correct: 0, gems: 0, start: Date.now(), events: [], P: mode === 'placement' ? placementInit() : null, early: false,
-    C: mode === 'check' ? checkInit(P().workbook ? P().workbook!.skills : []) : undefined };
+    C: mode === 'check' ? checkInit(P().workbook ? P().workbook!.skills : []) : undefined, warm };
   G.UI.screen = 'practice'; nextQuestion();
 }
 function nextQuestion(): void {
@@ -138,8 +149,8 @@ function submit(ok: boolean, mis: string | null, o: { unsure?: boolean } = {}): 
 const EV_ORDER = ['mastered', 'up', 'back', 'prereq', 'refresh', 'down'];
 function afterFeedback(): void {
   const S = G.S!, ev = (G.Cur!.events || []).slice().sort((a, b) => EV_ORDER.indexOf(a.type) - EV_ORDER.indexOf(b.type))[0];
-  if (ev && ev.type === 'back') { nextQuestion(); toast(`Back up to ${STAGE_WITH[ev.stage]} for ${SK[ev.skill].name}.`); return; }
-  if (ev && ev.type === 'down') { S.downs = S.downs || {}; if (S.downs[ev.skill]) { nextQuestion(); toast(`Trying it with ${STAGE_WITH[ev.stage]} for a bit.`); return; } S.downs[ev.skill] = 1; }
+  if (ev && ev.type === 'back') { nextQuestion(); toast(`De retour ${STAGE_WITH[ev.stage]} pour ${SK[ev.skill].name}.`); return; }
+  if (ev && ev.type === 'down') { S.downs = S.downs || {}; if (S.downs[ev.skill]) { nextQuestion(); toast(`On essaie ${STAGE_WITH[ev.stage]} un moment.`); return; } S.downs[ev.skill] = 1; }
   if (ev) { G.UI.modal = { type: 'event', ev }; render(); if (ev.type === 'mastered' || ev.type === 'up') tone(SND.up); return; }
   nextQuestion();
 }
@@ -160,7 +171,9 @@ function finishPlacement(): void {
 function finishCheck(): void {
   const S = G.S!, prof = P();
   checkApply(prof, S.C!);
-  prof.sessions.push({ d: Date.now(), n: S.answered, c: S.correct, min: Math.max(1, Math.round((Date.now() - S.start) / 60000)), m: 'check' }); if (prof.sessions.length > 100) prof.sessions.shift();
+  // F-8.AC-4: the first-run warm-up is this check aimed at grade level; its results stay as her goal.
+  if (S.warm) prof.placementDone = true;
+  prof.sessions.push({ d: Date.now(), n: S.answered, c: S.correct, min: Math.max(1, Math.round((Date.now() - S.start) / 60000)), m: S.warm ? 'placement' : 'check' }); if (prof.sessions.length > 100) prof.sessions.shift();
   save(); G.Cur = null; G.UI.screen = 'checked'; render(); window.scrollTo(0, 0); tone(SND.up);
 }
 
@@ -185,14 +198,41 @@ async function readPhoto(file: Blob): Promise<void> {
 
 function buildCheck(): void {
   const Cur = G.Cur!, q = Cur.q, b = Cur.b!; if (Cur.phase !== 'answer' || b.done) return;
-  if (buildRight(q.build!, b)) { b.done = true; b.msg = null; if (!q.followup) return submit(!Cur.buildMiss, null); render(); if (P().settings.autoRead) speak(q.followup.say || strip(q.followup.prompt)); return; }
+  if (buildRight(q.build!, b)) { b.done = true; b.msg = null; if (!q.followup) return submit(!Cur.buildMiss, null); render(); if (P().settings.autoRead) speak(strip(q.followup.say || q.followup.prompt)); return; }
   Cur.buildMiss = true; b.tries = (b.tries || 0) + 1; if (b.tries >= 2) return submit(false, null); b.msg = buildNudge(q.build!, b); render();
+}
+/** The step she is on, for a guided-steps build (F-23). */
+export function currentStep(): Step | null {
+  const Cur = G.Cur; if (!Cur || !Cur.q.build || Cur.q.build.type !== 'steps' || !Cur.b) return null;
+  return Cur.q.build.steps[Cur.b.si as number] || null;
+}
+/** Whether typed answers may have a comma right now (F-23.AC-4). */
+export function commaAllowed(): boolean { const Cur = G.Cur; if (!Cur) return false; const st = currentStep(); return st ? !!st.decimal : Cur.q.kind === 'pad' && !!Cur.q.decimal; }
+/** Check the current guided step. One retry after a wrong step with a nudge; a second wrong check ends the task (F-5.AC-4). */
+function stepCheck(): void {
+  const Cur = G.Cur!, b = Cur.b!, st = currentStep(); if (!st || Cur.phase !== 'answer' || b.done) return;
+  if (normAnswer(Cur.entry) === normAnswer(st.answer)) {
+    (b.log as string[]).push(st.done); b.si = (b.si as number) + 1; Cur.entry = ''; b.msg = null;
+    if ((b.si as number) >= (Cur.q.build as Extract<Build, { type: 'steps' }>).steps.length) { b.done = true; return submit(!Cur.buildMiss, null); }
+    render(); return;
+  }
+  Cur.buildMiss = true; b.tries = (b.tries || 0) + 1; Cur.entry = '';
+  if (b.tries >= 2) return submit(false, null);
+  b.msg = buildNudge(Cur.q.build!, b); render();
 }
 export function padKey(k: string): void {
   const Cur = G.Cur; if (!Cur || Cur.phase !== 'answer') return;
+  const step = currentStep(), max = commaAllowed() ? 9 : 7;
+  if (step && step.choices) return;
   if (k === 'del') Cur.entry = Cur.entry.slice(0, -1);
-  else if (k === 'ok') { if (!Cur.entry) return; const v = parseInt(Cur.entry, 10), ok = v === Cur.q.answer; return submit(ok, ok ? null : ((Cur.q.padMis && Cur.q.padMis[v]) || null)); }
-  else if (Cur.entry.length < 4) Cur.entry = (Cur.entry === '0' ? '' : Cur.entry) + k;
+  else if (k === 'ok') {
+    if (!Cur.entry) return;
+    if (step) return stepCheck();
+    const typed = normAnswer(Cur.entry), ok = typed === normAnswer(String(Cur.q.answer));
+    return submit(ok, ok ? null : ((Cur.q.padMis && Cur.q.padMis[typed]) || null));
+  }
+  else if (k === ',') { if (!commaAllowed() || Cur.entry.includes(',') || Cur.entry.length >= max) return; Cur.entry = (Cur.entry || '0') + ','; }
+  else if (Cur.entry.length < max) Cur.entry = (Cur.entry === '0' ? '' : Cur.entry) + k;
   render();
 }
 
@@ -207,7 +247,7 @@ export const ACT: Record<string, (el: El, e?: { clientX: number }) => void> = {
   back() { G.UI.tmp = {}; routeHome(); },
   shop() { G.UI.screen = 'shop'; render(); window.scrollTo(0, 0); },
   star(el) { G.UI.modal = { type: 'star', id: el.dataset.d! }; renderLayer(); },
-  focusSkill(el) { P().focus = el.dataset.d!; save(); G.UI.modal = null; render(); toast('Next practice: ' + SK[el.dataset.d!].name); },
+  focusSkill(el) { P().focus = el.dataset.d!; save(); G.UI.modal = null; render(); toast('Prochaine pratique : ' + SK[el.dataset.d!].name); },
   closeModal() { G.UI.modal = null; render(); },
   opt(el) { const Cur = G.Cur; if (!Cur || Cur.phase !== 'answer') return; const o = Cur.q.options![+el.dataset.i!]; Cur.chosen = +el.dataset.i!; submit(String(o.value) === String(Cur.q.answer), o.mis || null); },
   fopt(el) { const Cur = G.Cur; if (!Cur || Cur.phase !== 'answer') return; const f = Cur.q.followup!, o = f.options[+el.dataset.i!]; Cur.fchosen = +el.dataset.i!; const fok = String(o.value) === String(f.answer); submit(fok && !Cur.buildMiss, fok ? null : (o.mis || null)); },
@@ -217,9 +257,9 @@ export const ACT: Record<string, (el: El, e?: { clientX: number }) => void> = {
   chart() { if (!G.Cur) return; G.Cur.hinted = true; G.UI.modal = { type: 'chart', hi: null }; render(); },
   chartcell(el) { const m = G.UI.modal; if (m && m.type === 'chart') m.hi = [+el.dataset.i!, +el.dataset.d!]; renderLayer(); },
   speak() { if (G.Cur) speak(sayFor(G.Cur.q)); },
-  fspeak() { const f = G.Cur && G.Cur.q.followup; if (f) speak(f.say || strip(f.prompt)); },
+  fspeak() { const f = G.Cur && G.Cur.q.followup; if (f) speak(strip(f.say || f.prompt)); },
   next() { afterFeedback(); },
-  quit() { const m = G.S!.mode; G.UI.modal = { type: 'confirm', title: 'Stop for now?', text: m === 'placement' ? 'You can do the warm-up again later.' : m === 'check' ? 'You can do the workbook check again later.' : 'Everything you\'ve done so far is saved.', yes: 'Stop', act: 'doQuit' }; renderLayer(); },
+  quit() { const S = G.S!; G.UI.modal = { type: 'confirm', title: 'Arrêter pour l’instant?', text: S.mode === 'check' ? (S.warm ? 'Tu pourras refaire l’échauffement plus tard.' : 'Tu pourras refaire la vérification plus tard.') : 'Tout ce que tu as fait jusqu’ici est enregistré.', yes: 'Arrêter', act: 'doQuit' }; renderLayer(); },
   doQuit() { G.UI.modal = null; if (G.S!.mode !== 'practice') { G.Cur = null; routeHome(); return; } finishSession(true); },
   eventOk() { G.UI.modal = null; nextQuestion(); },
   cell(el) { if (!B()) return; const i = +el.dataset.i!, c = bs().cells!; if (c[i] === 2) return; c[i] = c[i] ? 0 : 1; bs().msg = null; render(); },
@@ -253,36 +293,47 @@ export const ACT: Record<string, (el: El, e?: { clientX: number }) => void> = {
   wbCancel() { G.UI.tmp.wb = undefined; render(); },
   wbConfirm() {
     const wb = G.UI.tmp.wb; if (!wb || !wb.picks.length) return;
-    P().workbook = newWorkbookGoal(wb.picks); G.UI.tmp.wb = undefined; save(); render(); toast('Workbook skills saved. The check starts from the home screen.');
+    P().workbook = newWorkbookGoal(wb.picks); G.UI.tmp.wb = undefined; save(); render(); toast('Habiletés du cahier enregistrées. La vérification se lance depuis l’accueil.');
   },
-  wbClear() { G.UI.modal = { type: 'confirm', title: 'Clear the workbook goal?', text: 'Practice goes back to the usual order. Levels she has reached stay.', yes: 'Clear', act: 'doWbClear' }; renderLayer(); },
+  wbClear() { G.UI.modal = { type: 'confirm', title: 'Effacer l’objectif du cahier?', text: 'La pratique reprend l’ordre habituel. Les niveaux atteints restent.', yes: 'Effacer', act: 'doWbClear' }; renderLayer(); },
   doWbClear() { G.UI.modal = null; P().workbook = null; P().focus = null; save(); render(); },
   beginCheck() { if (P().workbook) beginSession('check'); },
   buyAv(el) {
     const prof = P(), a = el.dataset.d!, item = AVATARS.find(x => x.id === a); if (!item) return; const price = item.price;
     if (prof.owned.avatars.includes(a) || price === 0) { prof.avatar = a; save(); render(); return; }
-    if (prof.gems < price) { toast(`You need ${price - prof.gems} more gems for that one.`); return; }
+    if (prof.gems < price) { toast(`Il te manque ${price - prof.gems} gemmes pour celui-là.`); return; }
     prof.gems -= price; prof.owned.avatars.push(a); prof.avatar = a; save(); render(); tone(SND.up); toast('Unlocked!');
   },
   buyTheme(el) {
     const prof = P(), k = el.dataset.d!, t = THEMES[k]; if (!t) return;
     if (prof.owned.themes.includes(k) || t.priceGems === 0) { prof.theme = k; save(); render(); return; }
-    if (prof.gems < t.priceGems) { toast(`You need ${t.priceGems - prof.gems} more gems for that one.`); return; }
+    if (prof.gems < t.priceGems) { toast(`Il te manque ${t.priceGems - prof.gems} gemmes pour celle-là.`); return; }
     prof.gems -= t.priceGems; prof.owned.themes.push(k); prof.theme = k; save(); render(); tone(SND.up); toast('Unlocked!');
   },
   set(el) { const k = el.dataset.k!, v = el.dataset.v!; P().settings[k] = v === 'true' ? true : v === 'false' ? false : (isNaN(+v) ? v : +v); save(); render(); },
   copyBackup() {
     const code = backupCode(P()); G.UI.tmp.code = code; render();
-    try { navigator.clipboard.writeText(code).then(() => toast('Backup code copied.'), () => toast('Select the code below and copy it.')); } catch { toast('Select the code below and copy it.'); }
+    try { navigator.clipboard.writeText(code).then(() => toast('Code de sauvegarde copié.'), () => toast('Sélectionne le code ci-dessous et copie-le.')); } catch { toast('Sélectionne le code ci-dessous et copie-le.'); }
   },
-  doRestore() { const np = G.UI.tmp.restore; G.UI.tmp.restore = null; G.UI.modal = null; if (!np) return; app().profiles[np.id] = np; app().current = np.id; save(); toast('Progress restored.'); routeHome(); },
-  redo() { G.UI.modal = { type: 'confirm', title: 'Redo the warm-up?', text: `${P().name}'s skill levels will be set again from a new warm-up. Gems and buddies stay.`, yes: 'Redo warm-up', act: 'doRedo' }; renderLayer(); },
+  doRestore() { const np = G.UI.tmp.restore; G.UI.tmp.restore = null; G.UI.modal = null; if (!np) return; app().profiles[np.id] = np; app().current = np.id; save(); toast('Progrès restaurés.'); routeHome(); },
+  redo() { G.UI.modal = { type: 'confirm', title: 'Refaire l’échauffement?', text: `Les niveaux de ${P().name} seront fixés de nouveau par un échauffement. Les gemmes et les badges restent.`, yes: 'Refaire l’échauffement', act: 'doRedo' }; renderLayer(); },
   doRedo() { G.UI.modal = null; P().placementDone = false; save(); routeHome(); },
-  reset() { G.UI.modal = { type: 'confirm', title: 'Reset all progress?', text: `This clears ${P().name}'s skill levels, patterns and history. Gems and buddies stay. This can't be undone.`, yes: 'Reset', act: 'doReset' }; renderLayer(); },
+  reset() { G.UI.modal = { type: 'confirm', title: 'Effacer tous les progrès?', text: `Cela efface les niveaux, les erreurs fréquentes et l’historique de ${P().name}. Les gemmes et les badges restent. On ne peut pas annuler.`, yes: 'Effacer', act: 'doReset' }; renderLayer(); },
   doReset() { G.UI.modal = null; const prof = P(), fresh = newProfile(prof.name, prof.avatar); Object.assign(prof, { skills: fresh.skills, focus: null, mis: {}, log: [], sessions: [], days: [], placementDone: false }); save(); routeHome(); },
   switchTo(el) { app().current = el.dataset.d!; save(); routeHome(); },
   addLearner() { G.UI.tmp = { adding: true }; G.UI.screen = 'welcome'; render(); window.scrollTo(0, 0); },
-  beginPlace() { beginSession('placement'); },
+  beginPlace() {
+    // F-8.AC-4: the warm-up starts at grade level (her workbook's themes) and steps back.
+    P().workbook = newWorkbookGoal(GRADE_TARGETS); beginSession('check', 0, true);
+  },
+  pvc(el) { if (!B()) return; const [i, d] = [Number(el.dataset.d!.slice(0, -1)), el.dataset.d!.slice(-1)], c = bs().counts as number[]; c[i] = Math.max(0, Math.min(9, c[i] + (d === '+' ? 1 : -1))); bs().msg = null; render(); },
+  shift(el) {
+    if (!B()) return; const bd = G.Cur!.q.build as Extract<Build, { type: 'shift' }>, b = bs(), d = el.dataset.d === 'm' ? 1 : -1, j = (b.j as number) + d;
+    const v = j >= 0 ? bd.start * 10 ** j : bd.start / 10 ** -j; if (!Number.isInteger(v) || v < 1 || v >= 10_000_000) return;
+    (b.hist as number[]).push(d); b.j = j; b.msg = null; render();
+  },
+  shundo() { if (!B()) return; const b = bs(), d = (b.hist as number[]).pop(); if (d !== undefined) b.j = (b.j as number) - d; b.msg = null; render(); },
+  stepChoice(el) { const Cur = G.Cur; if (!B() || !Cur) return; Cur.entry = el.dataset.d!; stepCheck(); },
   skipPlace() { placementApply(P(), { lo: 0, tested: {} }); save(); G.UI.screen = 'home'; render(); },
 };
 
@@ -293,7 +344,7 @@ function holdStart(el: El) {
   if (holdT) return; el.classList.add('holding');
   holdT = setTimeout(() => { holdT = null; el.classList.remove('holding'); G.UI.tmp.code = null; G.UI.tmp.gtab = 'progress'; G.UI.screen = 'grown'; render(); window.scrollTo(0, 0); }, HOLD_MS);
 }
-function holdEnd(el: El | null, hint: boolean) { if (holdT) { clearTimeout(holdT); holdT = null; if (hint) toast('Keep holding to open the grown-up view.'); } if (el) el.classList.remove('holding'); }
+function holdEnd(el: El | null, hint: boolean) { if (holdT) { clearTimeout(holdT); holdT = null; if (hint) toast('Garde le doigt appuyé pour ouvrir l’espace parent.'); } if (el) el.classList.remove('holding'); }
 const closest = (t: EventTarget | null, sel: string) => (t && (t as Element).closest ? (t as Element).closest(sel) as El | null : null);
 
 export function listen(): void {
@@ -312,15 +363,17 @@ export function listen(): void {
     }
     if (t.id === 'restoreForm') {
       const txt = ((document.getElementById('restoreText') as HTMLTextAreaElement).value || '').trim(), np = parseBackup(txt);
-      if (!np) { toast("That code doesn't look right. Paste the whole backup code."); return; }
-      G.UI.tmp.restore = np; G.UI.modal = { type: 'confirm', title: `Restore ${np.name || 'this learner'}?`, text: 'This replaces the saved progress for that learner on this page.', yes: 'Restore', act: 'doRestore' }; renderLayer();
+      if (!np) { toast('Ce code ne semble pas valide. Colle le code de sauvegarde au complet.'); return; }
+      G.UI.tmp.restore = np; G.UI.modal = { type: 'confirm', title: `Restaurer ${np.name || 'cet élève'}?`, text: 'Cela remplace les progrès enregistrés de cet élève sur cette page.', yes: 'Restaurer', act: 'doRestore' }; renderLayer();
     }
   });
   document.addEventListener('keydown', e => {
     const UI = G.UI, Cur = G.Cur;
     if (UI.modal && e.key === 'Escape') { e.preventDefault(); if (UI.modal.type === 'event') ACT.eventOk(document.body); else ACT.closeModal(document.body); return; }
-    if (UI.screen === 'practice' && Cur && Cur.phase === 'answer' && Cur.q.kind === 'pad' && !UI.modal) {
-      if (/^[0-9]$/.test(e.key)) { e.preventDefault(); padKey(e.key); } else if (e.key === 'Backspace') { e.preventDefault(); padKey('del'); } else if (e.key === 'Enter') { e.preventDefault(); padKey('ok'); }
+    const typing = Cur && (Cur.q.kind === 'pad' || (currentStep() && !currentStep()!.choices));
+    if (UI.screen === 'practice' && Cur && Cur.phase === 'answer' && typing && !UI.modal && !(e.target as HTMLElement).closest('input,textarea')) {
+      if (/^[0-9]$/.test(e.key)) { e.preventDefault(); padKey(e.key); }
+      else if (e.key === ',' || e.key === '.') { e.preventDefault(); padKey(','); } else if (e.key === 'Backspace') { e.preventDefault(); padKey('del'); } else if (e.key === 'Enter') { e.preventDefault(); padKey('ok'); }
     }
     const hEl = closest(e.target, '[data-hold]'); if (hEl && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); if (!e.repeat) holdStart(hEl); }
   });

@@ -28,18 +28,18 @@ beforeEach(() => { clock = 1_700_000_000_000; vi.spyOn(Date, 'now').mockImplemen
 afterEach(() => { vi.restoreAllMocks(); });
 
 describe('v1 learner simulations', () => {
-  test('a strong learner (95% right) masters all 14 skills', () => {
-    for (const seed of [1, 2, 3]) expect(simulate(seed, () => 0.95, 800).mastered).toBe(14);
+  test('a strong learner (95% right) masters every skill', () => {
+    for (const seed of [1, 2, 3]) expect(simulate(seed, () => 0.95, 1400).mastered).toBe(E.SKILLS.length);
   });
 
-  test('an uneven learner (fine to subtraction, weak beyond until practised) masters all skills within 1500 answers', () => {
+  test('an uneven learner (fine to subtraction, weak beyond until practised) masters all skills within 2600 answers', () => {
     for (const seed of [1, 2, 3]) {
       const r = simulate(seed, (sk, st, p) => {
         const base = idx(sk) <= idx('subtraction') ? 0.85 : 0.5, stageBoost = [0.25, 0.1, 0][st];
         const practice = Math.min(0.3, p.skills[sk].att.reduce((a, b) => a + b, 0) * 0.01);
         return Math.min(0.97, base + stageBoost + practice);
-      }, 1500);
-      expect(r.mastered).toBe(14);
+      }, 2600);
+      expect(r.mastered).toBe(E.SKILLS.length);
       expect(r.events.down || 0).toBeGreaterThan(0); // she was moved down at least once on the way
     }
   });
