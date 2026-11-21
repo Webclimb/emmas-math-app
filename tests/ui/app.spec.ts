@@ -42,9 +42,8 @@ test('test_F1_AC1: with no saved data the welcome screen opens, and a learner is
   expect(errors).toEqual([]);
 });
 
-// F-1.AC-2 is marked CHANGE in SPEC.md (label and help text). v1 asks "What's your name?".
-// The criterion is written as specified; it is parked until the owner approves the change.
-test.fixme('test_F1_AC2: the welcome form asks for a nickname, not a full name, and stores no birth date, school or diagnosis', async ({ page }) => {
+// F-1.AC-2 (CHANGE) was approved on 2026-11-21 (SPEC.md v2.1-draft). The test is unchanged from when it was parked.
+test('test_F1_AC2: the welcome form asks for a nickname, not a full name, and stores no birth date, school or diagnosis', async ({ page }) => {
   await open(page);
   await expect(page.locator('label[for=pname]')).toContainText(/nickname/i);
   await expect(page.locator('#newp')).not.toContainText(/full name/i);

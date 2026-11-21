@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Number Sky · Lesson player (reference)</title>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../components.css">
+<style>
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 24px clamp(16px, 4vw, 48px); display: flex; flex-direction: column; gap: 24px; }
+  .bar { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; }
+  .lesson { display: flex; flex-direction: column; gap: 22px; }
+  .work { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 24px; }
+  .work .ns-tray { flex: 0 1 240px; min-height: 140px; }
+  .plates { display: flex; gap: 16px; }
+  .nav { display: flex; flex-wrap: wrap; gap: 10px; justify-content: space-between; }
+  .theme-switch { position: fixed; right: 12px; bottom: 12px; }
+  @media (max-width: 719px) {
+    .wrap { padding-top: 16px; gap: 12px; }
+    .exit-label { display: none; }
+    .work .ns-tray { flex-basis: 100%; min-height: 0; }
+    .plates { gap: 10px; }
+  }
+</style>
+</head>
+<body class="ns ns-page" data-theme="light">
+<div class="wrap">
+  <header class="bar">
+    <button class="ns-btn" aria-label="Leave the lesson"><!--kit:icon-close--><span class="exit-label">Leave the lesson</span></button>
+    <span class="ns-chip">Sharing equally</span>
+    <span class="ns-level"><i class="on"></i><i></i><i></i><span>Hands-on</span></span>
+    <span class="ns-eyebrow" style="margin-left: auto">Lesson</span>
+  </header>
+
+  <section class="ns-card lesson" aria-labelledby="lesson-title">
+    <div class="ns-lessonbar">
+      <div class="ns-phases" role="img" aria-label="Lesson: together, step 4 of 6"><span class="ns-phase done">Watch</span><span class="ns-phase now">Together</span><span class="ns-phase">Your turn</span></div>
+      <div class="ns-stepdots" aria-hidden="true"><i class="done"></i><i class="done"></i><i class="done"></i><i class="now"></i><i></i><i></i></div>
+      <button class="ns-btn ns-btn--icon" style="margin-left: auto" aria-label="Read aloud"><!--kit:icon-read-aloud--></button>
+    </div>
+    <h1 class="ns-visually-hidden" id="lesson-title">Lesson: sharing equally</h1>
+    <p class="ns-prompt">Now you finish it. Each plate has 2 tickets. Share the last 3 so every plate gets one more.</p>
+    <div class="ns-strip" aria-label="9 divided by 3 equals unknown"><span>9</span><span>÷</span><span>3</span><span>=</span><span class="ns-slot">?</span></div>
+    <div class="work">
+      <div class="ns-tray"><span role="status">Left to share: <b>3</b></span><div class="ns-tray__items"><!--kit:item-ticket--><!--kit:item-ticket--><!--kit:item-ticket--></div></div>
+      <div class="plates">
+        <div class="ns-plate-wrap"><button class="ns-plate" aria-label="Plate 1, has 2"><!--kit:item-ticket--><!--kit:item-ticket--></button>Plate 1</div>
+        <div class="ns-plate-wrap"><button class="ns-plate" aria-label="Plate 2, has 2"><!--kit:item-ticket--><!--kit:item-ticket--></button>Plate 2</div>
+        <div class="ns-plate-wrap"><button class="ns-plate" aria-label="Plate 3, has 2"><!--kit:item-ticket--><!--kit:item-ticket--></button>Plate 3</div>
+      </div>
+    </div>
+    <div class="nav">
+      <button class="ns-btn"><!--kit:icon-left--> Back</button>
+      <button class="ns-btn ns-btn--ghost"><!--kit:icon-replay--> Watch again</button>
+      <button class="ns-btn ns-btn--primary" disabled>Next <!--kit:icon-arrow-right--></button>
+    </div>
+  </section>
+</div>
+<button class="ns-btn theme-switch" onclick="document.body.dataset.theme = document.body.dataset.theme === 'dark' ? 'light' : 'dark'">Light / dark</button>
+</body>
+</html>

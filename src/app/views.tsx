@@ -76,7 +76,8 @@ export function Welcome() {
     <h1>Light up a star for every math skill you master.</h1>
     <p class="muted">Short practice with no timers. The app finds the right level and changes as you learn.</p>
     <form id="newp" class="form" autocomplete="off">
-      <label for="pname">What's your name?</label>
+      {/* F-1.AC-2: ask for a nickname, not a name (wording from design/SCREENS.md §11). */}
+      <label for="pname">What should we call you?<span class="help muted small">A nickname is fine. We don't need your real name.</span></label>
       <input id="pname" name="pname" maxLength={20} required value={UI.tmp.name || ''} />
       <fieldset><legend>Pick a buddy</legend>
         <div class="avs">{AVATARS.filter(a => a[1] === 0).map(([a]) => <button type="button" class={`av${a === av ? ' on' : ''}`} data-act="pickAv" data-d={a} aria-pressed={pressed(a === av)} aria-label={`Buddy ${a}`}>{a}</button>)}</div>

@@ -3,14 +3,14 @@
 - **Spec:** `SPEC.md` v2.0-draft (awaiting approval). M0 is the only approved milestone.
 - **Date:** 2026-11-21
 - **Scope:** Move v1 (`source/index.html`) into the repository structure from SPEC section 7 with no behaviour change. Put storage behind an interface, route all randomness through one seedable generator, and port the v1 tests.
-- **Result:** `npm run accept` passes. 15 of the 16 M0 exit criteria have passing tests. F-1.AC-2 is parked: see "Needs a decision" below. The build is one file, `dist/index.html`, at 145 KB (limit 1.5 MB).
+- **Result:** `npm run accept` passes. All 16 M0 exit criteria have passing tests. F-1.AC-2 was parked until the owner approved it on 2026-11-21 (see "Update, 2026-11-21" at the end). The build is one file, `dist/index.html`, at 145 KB (limit 1.5 MB).
 
 ## M0 exit check
 
 | Criterion | Status | Test |
 |---|---|---|
 | F-1.AC-1 welcome, nickname of 1 to 20 characters, one free avatar | pass | `tests/ui/app.spec.ts` |
-| F-1.AC-2 asks for a nickname; stores no sensitive fields | **parked (CHANGE not approved)** | `tests/ui/app.spec.ts` (`test.fixme`) |
+| F-1.AC-2 asks for a nickname; stores no sensitive fields | pass (approved 2026-11-21) | `tests/ui/app.spec.ts` |
 | F-1.AC-3 two learners, switching, separate progress | pass | `tests/ui/app.spec.ts` |
 | F-2.AC-1 skills, groups and prerequisites match section 12 | pass (parsed from `SPEC.md` itself) | `tests/acceptance/m0-engine.test.ts` |
 | F-2.AC-2 skill with an unmastered prerequisite never picked for new practice | pass (300 random profiles) | same |
@@ -106,6 +106,21 @@ Each of these is kept as built. The spec should either adopt it or say it should
 1. **F-1.AC-2 conflicts with the M0 rules.** The M0 exit check says "F-1 passes", but F-1.AC-2 is marked CHANGE (the label and help text should say nickname). v1 asks "What's your name?", and CHANGE items are not approved. The test is written exactly as the criterion says and parked with `test.fixme`. The no-sensitive-fields half already holds: the form has one text field, and the saved profile has no birth date, school or diagnosis. If you approve the CHANGE, it is a one-line label change and the test can be un-parked.
 2. **F-6.AC-2 wording.** "Detected whenever the answer equals dividend minus divisor" cannot apply when the correct answer itself equals dividend minus divisor (only 4 ÷ 2). That answer is marked right, and the test excludes the case. Suggest adding "when that is not the correct answer".
 3. **Open questions Q1 to Q6** in `SPEC.md` section 9 are unchanged. Q1 (hosting) decides which storage adapter is primary. Both work today.
+
+## Update, 2026-11-21: approvals applied
+
+The owner approved the open items above and the design system's amendments. `SPEC.md` is now **v2.1-draft**.
+
+- **F-1.AC-2:** built. The welcome label reads "What should we call you?" with the help line "A nickname is fine. We don't need your real name." (`design/SCREENS.md` §11). The help line sits inside the label element, so screen readers hear it with the field. The test that was parked now runs unchanged and passes.
+- **F-6.AC-2:** wording now excludes the case where dividend minus divisor is the correct answer. The test already did.
+- **Design amendments (D-14 to D-17)** are in the spec as criteria and milestones, not built yet:
+  - F-5.AC-6 keyboard entry at numbers level (M1). v1 already accepts digits, Backspace and Enter on the keypad.
+  - F-19.AC-6 keyboard path for every build widget (M3).
+  - F-15.AC-6 the four accent themes, with v1 themes loading as Cobalt (M3).
+  - Quick rounds default Off (F-10, M2).
+  - Desktop first (section 7) and the 1280 × 800 key-screen size (`DESIGN_BRIEF.md` §5).
+- **Design swap:** the app still builds from `design/tokens.v1.json`. Moving onto `design/tokens.json` and the kit changes how every screen looks: new fonts, no shadows, removal of the confetti and the "Now" pulse, items and avatars as SVG instead of emoji. The spec places that work with F-19.AC-5 in M3, so it waits until the rest of the spec is approved, or until the owner asks for it sooner. Keys the port uses that `tokens.json` drops are: `on-sky`, `font.mono`, `type.heroH1`, `size.starTile`, `elevation.*` and `motion.currentStarPulse`. Each needs a mapping at the swap.
+- **Still open:** Q1 and Q3 to Q6 in `SPEC.md` section 9, and the design's choices waiting on her (avatar style, story themes, starting colour).
 
 ## Commands
 

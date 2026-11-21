@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Number Sky · Lesson player (reference)</title>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../components.css">
+<style>
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 24px clamp(16px, 4vw, 48px); display: flex; flex-direction: column; gap: 24px; }
+  .bar { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; }
+  .lesson { display: flex; flex-direction: column; gap: 22px; }
+  .work { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 24px; }
+  .work .ns-tray { flex: 0 1 240px; min-height: 140px; }
+  .plates { display: flex; gap: 16px; }
+  .nav { display: flex; flex-wrap: wrap; gap: 10px; justify-content: space-between; }
+  .theme-switch { position: fixed; right: 12px; bottom: 12px; }
+  @media (max-width: 719px) {
+    .wrap { padding-top: 16px; gap: 12px; }
+    .exit-label { display: none; }
+    .work .ns-tray { flex-basis: 100%; min-height: 0; }
+    .plates { gap: 10px; }
+  }
+</style>
+</head>
+<body class="ns ns-page" data-theme="light">
+<div class="wrap">
+  <header class="bar">
+    <button class="ns-btn" aria-label="Leave the lesson"><svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.2"/></svg><span class="exit-label">Leave the lesson</span></button>
+    <span class="ns-chip">Sharing equally</span>
+    <span class="ns-level"><i class="on"></i><i></i><i></i><span>Hands-on</span></span>
+    <span class="ns-eyebrow" style="margin-left: auto">Lesson</span>
+  </header>
+
+  <section class="ns-card lesson" aria-labelledby="lesson-title">
+    <div class="ns-lessonbar">
+      <div class="ns-phases" role="img" aria-label="Lesson: together, step 4 of 6"><span class="ns-phase done">Watch</span><span class="ns-phase now">Together</span><span class="ns-phase">Your turn</span></div>
+      <div class="ns-stepdots" aria-hidden="true"><i class="done"></i><i class="done"></i><i class="done"></i><i class="now"></i><i></i><i></i></div>
+      <button class="ns-btn ns-btn--icon" style="margin-left: auto" aria-label="Read aloud"><svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h4l5-4v14l-5-4H4zM16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12" stroke="currentColor" stroke-width="2.2"/></svg></button>
+    </div>
+    <h1 class="ns-visually-hidden" id="lesson-title">Lesson: sharing equally</h1>
+    <p class="ns-prompt">Now you finish it. Each plate has 2 tickets. Share the last 3 so every plate gets one more.</p>
+    <div class="ns-strip" aria-label="9 divided by 3 equals unknown"><span>9</span><span>÷</span><span>3</span><span>=</span><span class="ns-slot">?</span></div>
+    <div class="work">
+      <div class="ns-tray"><span role="status">Left to share: <b>3</b></span><div class="ns-tray__items"><svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h18a1.5 1.5 0 0 1 1.5 1.5v3a2.5 2.5 0 0 0 0 5v3A1.5 1.5 0 0 1 21 19H3a1.5 1.5 0 0 1-1.5-1.5v-3a2.5 2.5 0 0 0 0-5v-3A1.5 1.5 0 0 1 3 5z" style="fill:var(--item,#6D4AE0)"/><path d="M16 7.5v9" style="stroke:var(--item-detail,#FFFFFF);stroke-width:1.5;stroke-dasharray:1.5 1.5"/></svg><svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h18a1.5 1.5 0 0 1 1.5 1.5v3a2.5 2.5 0 0 0 0 5v3A1.5 1.5 0 0 1 21 19H3a1.5 1.5 0 0 1-1.5-1.5v-3a2.5 2.5 0 0 0 0-5v-3A1.5 1.5 0 0 1 3 5z" style="fill:var(--item,#6D4AE0)"/><path d="M16 7.5v9" style="stroke:var(--item-detail,#FFFFFF);stroke-width:1.5;stroke-dasharray:1.5 1.5"/></svg><svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h18a1.5 1.5 0 0 1 1.5 1.5v3a2.5 2.5 0 0 0 0 5v3A1.5 1.5 0 0 1 21 19H3a1.5 1.5 0 0 1-1.5-1.5v-3a2.5 2.5 0 0 0 0-5v-3A1.5 1.5 0 0 1 3 5z" style="fill:var(--item,#6D4AE0)"/><path d="M16 7.5v9" style="stroke:var(--item-detail,#FFFFFF);stroke-width:1.5;stroke-dasharray:1.5 1.5"/></svg></div></div>
+      <div class="plates">
+        <div class="ns-plate-wrap"><button class="ns-plate" aria-label="Plate 1, has 2"><svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h18a1.5 1.5 0 0 1 1.5 1.5v3a2.5 2.5 0 0 0 0 5v3A1.5 1.5 0 0 1 21 19H3a1.5 1.5 0 0 1-1.5-1.5v-3a2.5 2.5 0 0 0 0-5v-3A1.5 1.5 0 0 1 3 5z" style="fill:var(--item,#6D4AE0)"/><path d="M16 7.5v9" style="stroke:var(--item-detail,#FFFFFF);stroke-width:1.5;stroke-dasharray:1.5 1.5"/></svg><svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h18a1.5 1.5 0 0 1 1.5 1.5v3a2.5 2.5 0 0 0 0 5v3A1.5 1.5 0 0 1 21 19H3a1.5 1.5 0 0 1-1.5-1.5v-3a2.5 2.5 0 0 0 0-5v-3A1.5 1.5 0 0 1 3 5z" style="fill:var(--item,#6D4AE0)"/><path d="M16 7.5v9" style="stroke:var(--item-detail,#FFFFFF);stroke-width:1.5;stroke-dasharray:1.5 1.5"/></svg></button>Plate 1</div>
+        <div class="ns-plate-wrap"><button class="ns-plate" aria-label="Plate 2, has 2"><svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h18a1.5 1.5 0 0 1 1.5 1.5v3a2.5 2.5 0 0 0 0 5v3A1.5 1.5 0 0 1 21 19H3a1.5 1.5 0 0 1-1.5-1.5v-3a2.5 2.5 0 0 0 0-5v-3A1.5 1.5 0 0 1 3 5z" style="fill:var(--item,#6D4AE0)"/><path d="M16 7.5v9" style="stroke:var(--item-detail,#FFFFFF);stroke-width:1.5;stroke-dasharray:1.5 1.5"/></svg><svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h18a1.5 1.5 0 0 1 1.5 1.5v3a2.5 2.5 0 0 0 0 5v3A1.5 1.5 0 0 1 21 19H3a1.5 1.5 0 0 1-1.5-1.5v-3a2.5 2.5 0 0 0 0-5v-3A1.5 1.5 0 0 1 3 5z" style="fill:var(--item,#6D4AE0)"/><path d="M16 7.5v9" style="stroke:var(--item-detail,#FFFFFF);stroke-width:1.5;stroke-dasharray:1.5 1.5"/></svg></button>Plate 2</div>
+        <div class="ns-plate-wrap"><button class="ns-plate" aria-label="Plate 3, has 2"><svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h18a1.5 1.5 0 0 1 1.5 1.5v3a2.5 2.5 0 0 0 0 5v3A1.5 1.5 0 0 1 21 19H3a1.5 1.5 0 0 1-1.5-1.5v-3a2.5 2.5 0 0 0 0-5v-3A1.5 1.5 0 0 1 3 5z" style="fill:var(--item,#6D4AE0)"/><path d="M16 7.5v9" style="stroke:var(--item-detail,#FFFFFF);stroke-width:1.5;stroke-dasharray:1.5 1.5"/></svg><svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h18a1.5 1.5 0 0 1 1.5 1.5v3a2.5 2.5 0 0 0 0 5v3A1.5 1.5 0 0 1 21 19H3a1.5 1.5 0 0 1-1.5-1.5v-3a2.5 2.5 0 0 0 0-5v-3A1.5 1.5 0 0 1 3 5z" style="fill:var(--item,#6D4AE0)"/><path d="M16 7.5v9" style="stroke:var(--item-detail,#FFFFFF);stroke-width:1.5;stroke-dasharray:1.5 1.5"/></svg></button>Plate 3</div>
+      </div>
+    </div>
+    <div class="nav">
+      <button class="ns-btn"><svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="2.2"/></svg> Back</button>
+      <button class="ns-btn ns-btn--ghost"><svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.5-5.8M20 4v5h-5" stroke="currentColor" stroke-width="2.2"/></svg> Watch again</button>
+      <button class="ns-btn ns-btn--primary" disabled>Next <svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2"/></svg></button>
+    </div>
+  </section>
+</div>
+<button class="ns-btn theme-switch" onclick="document.body.dataset.theme = document.body.dataset.theme === 'dark' ? 'light' : 'dark'">Light / dark</button>
+</body>
+</html>

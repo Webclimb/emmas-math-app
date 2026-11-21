@@ -1,6 +1,8 @@
 # Number Sky: build spec
 
-**Spec version: v2.0-draft (awaiting approval).** v1.0 is the as-built prototype in `source/index.html`, written before this spec existed and described here after the fact. Nothing marked NEW or CHANGE is approved to build until the owner signs off and the blocking open questions in section 9 are answered. Milestone M0 (port, no behaviour change) may start immediately.
+**Spec version: v2.1-draft (awaiting approval).** v1.0 is the as-built prototype in `source/index.html`, written before this spec existed and described here after the fact. Nothing marked NEW or CHANGE is approved to build until the owner signs off and the blocking open questions in section 9 are answered. Milestone M0 (port, no behaviour change) may start immediately.
+
+**Approved so far (owner, 2026-11-21):** milestone M0; F-1.AC-2; the F-6.AC-2 wording; the design-system amendments in v2.1 (D-14 to D-17 below: desktop first with keyboard paths, quick rounds default Off, the four accent themes with a v1 theme migration, adoption of `design/` as the design system). Everything else marked NEW or CHANGE still awaits sign-off.
 
 Status tags on features: **BUILT** (in v1, keep), **CHANGE** (in v1, behaviour changes), **NEW** (not in v1). Evidence references (E#) and decisions (D-#) point to `RESEARCH_REVIEW.md`.
 
@@ -27,7 +29,7 @@ Acceptance criteria are checkable statements. Each becomes an automated test nam
 ### F-1 Learner profile and first run — BUILT, small CHANGE
 A learner has a nickname, an avatar, and settings. First run creates one.
 - F-1.AC-1: Given no saved data, the app opens on the welcome screen and a learner can be created with a nickname of 1 to 20 characters and one free avatar.
-- F-1.AC-2: The welcome form asks for a nickname, not a full name, and stores no birth date, school or diagnosis. (CHANGE: label and help text.)
+- F-1.AC-2: The welcome form asks for a nickname, not a full name, and stores no birth date, school or diagnosis. (CHANGE: label and help text. Approved 2026-11-21; wording from `design/SCREENS.md` §11.)
 - F-1.AC-3: Given two or more learners, the grown-up view can switch between them and each learner's progress is separate.
 
 ### F-2 Skill map — BUILT, CHANGE
@@ -58,10 +60,11 @@ Questions are generated, not stored. Modes: *build* (interactive manipulative, o
 - F-5.AC-3 (CHANGE, D-8): At numbers level, questions whose answer is a number use the keypad, not choice. Choice remains only where the answer is not a number (which sentence matches, which is bigger).
 - F-5.AC-4: A build task allows one retry after a wrong check with a nudge; a second wrong check is recorded as incorrect and the worked answer is shown.
 - F-5.AC-5 (NEW): The app records the time from question shown to answer submitted for every question, never displays it to the learner, and excludes any interval in which the page was hidden.
+- F-5.AC-6 (NEW, D-14): At numbers level a physical keyboard enters typed answers (digits, Backspace, Enter); the on-screen keypad stays.
 
 ### F-6 Feedback and error patterns — BUILT, CHANGE
 - F-6.AC-1: After a wrong answer the learner sees, in this order: a plain statement that it was not right, a pattern-specific sentence if the answer matches a known error pattern, a worked explanation with a visual, and the correct answer. No red, no buzzer, no lost gems.
-- F-6.AC-2: The 21 v1 error patterns (section 12) are detected from chosen options and typed answers. The subtract-on-division pattern is detected whenever the answer equals dividend minus divisor.
+- F-6.AC-2: The 21 v1 error patterns (section 12) are detected from chosen options and typed answers. The subtract-on-division pattern is detected whenever the answer equals dividend minus divisor, unless that is the correct answer (4 ÷ 2).
 - F-6.AC-3: Each pattern has a child-facing sentence, a grown-up description and an at-home activity, and the grown-up view lists observed patterns by count.
 - F-6.AC-4 (NEW): When the same pattern is seen 3 times within 10 answers, the next 3 questions come from that pattern's remediation set (for operation mix-ups: side-by-side "same numbers, different operation" questions at pictures level).
 
@@ -92,7 +95,7 @@ Tracks each multiplication fact (unordered pairs 2..10, 45 facts) and its linked
 - F-10.AC-3: New facts arrive at most 4 at a time, in the order ×2, ×5, ×10, then ×3, ×4, then ×6 to ×9, and each practice set mixes roughly 1 new fact with 3 known ones.
 - F-10.AC-4: Facts introduced together do not share a product or both factors' final digits with another new fact in the set where the set allows it (low-similarity grouping).
 - F-10.AC-5: A *quick round* (60 seconds, keypad) is offered only for sets in which every fact is accurate or fluent. It is always skippable, shows no countdown digits, shows only her own previous best afterwards, and awards the same gems whether or not she beats it.
-- F-10.AC-6: Quick rounds obey the grown-up setting (Off / Offer). After 3 consecutive skips, or accuracy below 80% in a round, the app stops offering them for 7 days.
+- F-10.AC-6: Quick rounds obey the grown-up setting (Off / Offer), default Off (D-15). After 3 consecutive skips, or accuracy below 80% in a round, the app stops offering them for 7 days.
 - F-10.AC-7: The times chart remains available outside quick rounds when the grown-up allows it, and using it counts as a hint.
 
 ### F-11 Word problems by problem type — CHANGE and NEW (D-4)
@@ -128,6 +131,7 @@ Replaces v1's "Which operation?" content. Types: *Total* (parts and whole), *Cha
 - F-15.AC-3 (CHANGE): She chooses which open skill to practise next, a context theme for stories, and her avatar and accent colour. Avatars, story items and reward language are redesigned for age 12 per the design system.
 - F-15.AC-4: Praise text refers to strategy or effort ("You built it from 5 × 6") and never to being smart or fast.
 - F-15.AC-5: There are no leaderboards, no comparison with other people and no social features.
+- F-15.AC-6 (CHANGE, D-16): The accent themes are those in `design/tokens.json`: Cobalt (default), Ocean, Berry, Graphite. A saved theme that is not in that set (v1 Marigold, Lime, Coral, Lavender) loads as Cobalt and stays owned; Ocean and Berry keep their names.
 
 ### F-16 Anxiety-aware safeguards — NEW
 - F-16.AC-1: "I'm not sure" and "Hint" are on every practice question and cost no gems.
@@ -152,9 +156,10 @@ Replaces v1's "Which operation?" content. Types: *Total* (parts and whole), *Cha
 - F-19.AC-3: With reduced motion set, no animation plays and nothing depends on animation to be understood.
 - F-19.AC-4: No information is carried by colour alone.
 - F-19.AC-5 (CHANGE): Countable objects and avatars are drawn assets from the design system, not platform emoji, so they look the same on every device.
+- F-19.AC-6 (NEW, D-14): Every build widget can be completed with the keyboard alone, using the keyboard path for that widget in `design/SCREENS.md` §3.
 
 ### F-20 Storage, backup, privacy — BUILT, CHANGE
-- F-20.AC-1: Progress persists across reloads and survives a version update through schema migrations (a v1 save loads in v2).
+- F-20.AC-1: Progress persists across reloads and survives a version update through schema migrations (a v1 save loads in v2, including a v1 accent theme per F-15.AC-6).
 - F-20.AC-2 (CHANGE): Storage sits behind one interface with two adapters: on-device (default) and Claude-artifact account storage (when published as an artifact). The newest save wins on load; a save is never silently discarded during a session.
 - F-20.AC-3: A backup code can be copied and restored from the grown-up view; a malformed code is rejected with a message and changes nothing.
 - F-20.AC-4: The app makes no network requests other than loading fonts, and includes no analytics or third-party scripts.
@@ -196,8 +201,8 @@ New skills, each with three levels, lessons and error patterns: multi-digit mult
 - **Stack:** TypeScript, Vite, Preact, Vitest (engine and acceptance tests), Playwright (UI checks). The engine (skills, generators, learner model, scheduler) is pure TypeScript with no DOM access and is tested without a browser.
 - **Build output:** one self-contained `index.html` (inline script and styles) no larger than 1.5 MB, so it can be hosted as a static file or published as a Claude artifact. Works offline after first load apart from fonts.
 - **Artifact compatibility:** no remote images, no network calls, no `alert`/`confirm`, no downloads started by script; storage calls wrapped so absence never breaks rendering.
-- **Devices:** phones from 360 px wide, tablets, laptops; touch first; current Safari, Chrome, Edge, Firefox.
-- **Design system:** consumes `design/tokens.json` and the graphics kit from Claude Design (`DESIGN_BRIEF.md`). Until delivered, use `design/tokens.v1.json`, which reproduces v1. No colour, size or font literal outside the token file.
+- **Devices:** desktop browser first, with mouse and keyboard (D-14); tablets and phones from 360 px wide must still work; current Safari, Chrome, Edge, Firefox.
+- **Design system:** consumes `design/tokens.json`, the graphics kit and the specs in `design/` (direction B, "Star Lines", delivered 2026-11-21; D-17). Until the app is moved onto it, the build uses `design/tokens.v1.json`, which reproduces v1. No colour, size or font literal outside the token file.
 - **Language:** Canadian English spelling. Reading level about grade 4 for learner-facing text.
 - **Performance:** any tap produces its visual response within 100 ms on a mid-range tablet.
 - **Determinism:** all random choices go through one seedable generator so tests and check-ups are reproducible.
@@ -208,9 +213,9 @@ New skills, each with three levels, lessons and error patterns: multi-digit mult
 - One primary learner; multiple learners stay supported but are not a design driver.
 - She can read short sentences with read-aloud support.
 - An adult is nearby for the first few sessions and looks at the grown-up view weekly.
-- A tablet or laptop is the main device; a phone must work.
+- A desktop or laptop browser with mouse and keyboard is the main device; tablets and phones from 360 px must work.
 - The build stays a personal project: static hosting or a private Claude artifact, no backend.
-- Default session length 15 minutes; quick rounds set to "Offer".
+- Default session length 15 minutes; quick rounds set to "Off".
 - English only.
 
 ## 9. Open questions
@@ -220,7 +225,7 @@ Blocking items stop the named features only.
 | # | Question | Blocks |
 |---|---|---|
 | Q1 | Where will it be hosted: private Claude artifact (account-synced), a static site, or both? | F-20 adapter priority |
-| Q2 | Are short optional timed rounds acceptable for her, given how she reacts to time pressure? Default is "Offer". | F-10.AC-5/6 default |
+| Q2 | ~~Are short optional timed rounds acceptable for her?~~ Resolved 2026-11-21: default Off (D-15); the grown-up can turn them on. | — |
 | Q3 | Which story themes and avatar styles would she choose? Her input should drive the redesign. | F-15.AC-3, design brief |
 | Q4 | Does she also have reading or attention difficulties? This changes the read-aloud default and lesson length, and such learners gained less in trials. | F-19 defaults, F-4.AC-2 |
 | Q5 | Is a teacher, tutor or specialist involved who should receive the report, and has her school set IEP goals the skill order should follow? | F-17.AC-3, F-21 order |
@@ -241,11 +246,17 @@ Blocking items stop the named features only.
 | 2026-11-20 | Fortnightly check-ups (D-11). | Evidence for age 12 is thin; measure instead of assuming. |
 | 2026-11-20 | Move from one HTML file to a TypeScript repo that still builds to one file. | Lessons, facts and scheduler need tested modules; single-file output keeps artifact publishing possible. |
 | 2026-11-20 | No dot-comparison or memory-training games. | E1, E15. |
+| 2026-11-21 | M0 port done; F-1.AC-2 approved with the design's welcome wording; F-6.AC-2 excludes the case where dividend minus divisor is the correct answer. | Owner approval; `DRIFT_REPORT.md` M0. |
+| 2026-11-21 | D-14: desktop browser first, mouse and keyboard; keyboard entry at numbers level (F-5.AC-6) and a keyboard path for every build widget (F-19.AC-6). | How she will use it; `design/README.md`. |
+| 2026-11-21 | D-15: quick rounds default Off (F-10.AC-6, section 8). | Owner's decision to leave timed rounds out for now (Q2). The quick round keeps F-10.AC-5 and F-16.AC-2: slim bar, no digits, no clock. |
+| 2026-11-21 | D-16: accent themes become Cobalt, Ocean, Berry, Graphite; v1 themes outside the set load as Cobalt (F-15.AC-6, F-20.AC-1). | v1's Lime, Coral and Lavender clashed with correct, not-yet and item colours. |
+| 2026-11-21 | D-17: adopt `design/` (direction B, "Star Lines") as the design system; key-screen sizes 390 px and 1280 × 800. | Delivered against `DESIGN_BRIEF.md` §5. |
 
 ## 11. Change log
 
 - **v1.0** (2026-11-20): as-built prototype: 14 skills, three levels, BKT per skill and level, single-ladder placement, 21 error patterns, star chart, gems and shop, grown-up view, read-aloud, artifact account storage.
 - **v2.0-draft** (2026-11-20): research review applied. Adds F-4, F-10, F-13, F-16, F-18, F-21; changes F-2, F-3, F-5 to F-9, F-11, F-12, F-14, F-15, F-17, F-19, F-20. Awaiting approval.
+- **v2.1-draft** (2026-11-21): design system delivered and approved amendments applied (D-14 to D-17). Adds F-5.AC-6, F-15.AC-6, F-19.AC-6; changes F-6.AC-2 wording, F-10.AC-6 default, F-20.AC-1, section 7 Devices and Design system, section 8; resolves Q2; approves F-1.AC-2.
 
 ---
 
@@ -294,9 +305,9 @@ v1 teaching order (also the placement ladder): quantity, numberline, placevalue,
 | Milestone | Contents | Exit check |
 |---|---|---|
 | M0 Port | v1 moved into the repo structure in section 7 with no behaviour change; storage interface; seeded randomness; v1 tests ported. Needs no design input. | F-1, F-2.AC-1/2, F-5.AC-1/2, F-6.AC-1..3, F-7.AC-1..4, F-20.AC-1/3 pass; build is one file. |
-| M1 Teach and retain | F-4 lessons for the 14 skills, F-3 notation strip, F-5.AC-3/5, F-7.AC-5/6, F-9, F-14. | Those criteria pass; simulation test F-7.AC-7 passes. |
+| M1 Teach and retain | F-4 lessons for the 14 skills, F-3 notation strip, F-5.AC-3/5/6, F-7.AC-5/6, F-9, F-14. | Those criteria pass; simulation test F-7.AC-7 passes. |
 | M2 Facts, stories, number line, language | F-10, F-11, F-12, F-13. | Those criteria pass. |
-| M3 Safeguards and measurement | F-8, F-16, F-17, F-18, F-19.AC-5 with the design system's assets. | Those criteria pass; drift check clean. |
+| M3 Safeguards and measurement | F-8, F-16, F-17, F-18, F-19.AC-5/6 and F-15.AC-6 with the design system's assets. | Those criteria pass; drift check clean. |
 | M4 Toward grade level | F-21, one skill at a time. | Each skill passes F-21.AC-1. |
 
 Acceptance tests run with one command: `npm run accept`. A drift check (inventory of what the code does, mapped to F-# items) is written to `DRIFT_REPORT.md` at the end of each milestone.
