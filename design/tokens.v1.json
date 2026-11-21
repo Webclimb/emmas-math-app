@@ -1,0 +1,336 @@
+{
+  "$schema_note": "Number Sky design tokens. v1 values, captured from the running build. Claude Design: return design/tokens.json in this same shape. Claude Code: read colours, type, radius, space and size only from this file.",
+  "version": "1.0.0",
+  "color": {
+    "light": {
+      "bg": {
+        "value": "#EEF1F9",
+        "role": "page background"
+      },
+      "surface": {
+        "value": "#FFFFFF",
+        "role": "cards, buttons"
+      },
+      "surface-2": {
+        "value": "#E3E8F5",
+        "role": "insets, trays, plates"
+      },
+      "ink": {
+        "value": "#19203F",
+        "role": "primary text, number-line axis"
+      },
+      "ink-soft": {
+        "value": "#4D5679",
+        "role": "secondary text, outlines of frames"
+      },
+      "line": {
+        "value": "#C9D0E6",
+        "role": "borders, dividers"
+      },
+      "sky": {
+        "value": "#3A55C4",
+        "role": "counters (dots), focus ring, bar-model whole"
+      },
+      "accent": {
+        "value": "#E59A0B",
+        "role": "primary action, lit stars, filled counters, progress (learner can swap via themes)"
+      },
+      "accent-ink": {
+        "value": "#2E1D00",
+        "role": "text on accent"
+      },
+      "accent-soft": {
+        "value": "#FBEBC5",
+        "role": "accent tint: hints, highlights, unknown parts"
+      },
+      "good": {
+        "value": "#167F63",
+        "role": "correct state border/text"
+      },
+      "good-soft": {
+        "value": "#D5F0E6",
+        "role": "correct state fill"
+      },
+      "warm": {
+        "value": "#B8532E",
+        "role": "not-yet state border (never red)"
+      },
+      "warm-soft": {
+        "value": "#FAE2D7",
+        "role": "not-yet state fill"
+      },
+      "blk": {
+        "value": "#86A0F4",
+        "role": "base-ten block fill"
+      },
+      "blk-line": {
+        "value": "#2F4AB0",
+        "role": "base-ten block edges"
+      }
+    },
+    "dark": {
+      "bg": {
+        "value": "#0D1330",
+        "role": "page background"
+      },
+      "surface": {
+        "value": "#171F47",
+        "role": "cards, buttons"
+      },
+      "surface-2": {
+        "value": "#212B5B",
+        "role": "insets, trays, plates"
+      },
+      "ink": {
+        "value": "#EEF0FA",
+        "role": "primary text, number-line axis"
+      },
+      "ink-soft": {
+        "value": "#AAB2D6",
+        "role": "secondary text, outlines of frames"
+      },
+      "line": {
+        "value": "#2E3A73",
+        "role": "borders, dividers"
+      },
+      "sky": {
+        "value": "#93A6FF",
+        "role": "counters (dots), focus ring, bar-model whole"
+      },
+      "accent": {
+        "value": "#F7B932",
+        "role": "primary action, lit stars, filled counters, progress (learner can swap via themes)"
+      },
+      "accent-ink": {
+        "value": "#2A1B00",
+        "role": "text on accent"
+      },
+      "accent-soft": {
+        "value": "#3B3218",
+        "role": "accent tint: hints, highlights, unknown parts"
+      },
+      "good": {
+        "value": "#52D3A6",
+        "role": "correct state border/text"
+      },
+      "good-soft": {
+        "value": "#163E35",
+        "role": "correct state fill"
+      },
+      "warm": {
+        "value": "#FF9C7B",
+        "role": "not-yet state border (never red)"
+      },
+      "warm-soft": {
+        "value": "#46271F",
+        "role": "not-yet state fill"
+      },
+      "blk": {
+        "value": "#5671DE",
+        "role": "base-ten block fill"
+      },
+      "blk-line": {
+        "value": "#C3CEFF",
+        "role": "base-ten block edges"
+      }
+    }
+  },
+  "accentThemes": {
+    "marigold": {
+      "name": "Marigold",
+      "priceGems": 0,
+      "light": {
+        "accent": "#E59A0B",
+        "accent-ink": "#2E1D00",
+        "accent-soft": "#FBEBC5"
+      },
+      "dark": {
+        "accent": "#F7B932",
+        "accent-ink": "#2A1B00",
+        "accent-soft": "#3B3218"
+      }
+    },
+    "ocean": {
+      "name": "Ocean",
+      "priceGems": 30,
+      "light": {
+        "accent": "#0B86A8",
+        "accent-ink": "#FFFFFF",
+        "accent-soft": "#D3EFF7"
+      },
+      "dark": {
+        "accent": "#45C6EC",
+        "accent-ink": "#04222C",
+        "accent-soft": "#173843"
+      }
+    },
+    "berry": {
+      "name": "Berry",
+      "priceGems": 30,
+      "light": {
+        "accent": "#C13A7E",
+        "accent-ink": "#FFFFFF",
+        "accent-soft": "#F7DCEA"
+      },
+      "dark": {
+        "accent": "#FF73B7",
+        "accent-ink": "#33081E",
+        "accent-soft": "#43213A"
+      }
+    },
+    "lime": {
+      "name": "Lime",
+      "priceGems": 40,
+      "light": {
+        "accent": "#4F850E",
+        "accent-ink": "#FFFFFF",
+        "accent-soft": "#E2F0CC"
+      },
+      "dark": {
+        "accent": "#A6E04B",
+        "accent-ink": "#1A2A03",
+        "accent-soft": "#2C3A1E"
+      }
+    },
+    "coral": {
+      "name": "Coral",
+      "priceGems": 40,
+      "light": {
+        "accent": "#CC5030",
+        "accent-ink": "#FFFFFF",
+        "accent-soft": "#F9E0D7"
+      },
+      "dark": {
+        "accent": "#FF8F6B",
+        "accent-ink": "#3A1206",
+        "accent-soft": "#45281F"
+      }
+    },
+    "lavender": {
+      "name": "Lavender",
+      "priceGems": 50,
+      "light": {
+        "accent": "#7256D4",
+        "accent-ink": "#FFFFFF",
+        "accent-soft": "#E6E0FA"
+      },
+      "dark": {
+        "accent": "#B3A0FF",
+        "accent-ink": "#1E1442",
+        "accent-soft": "#2E2A55"
+      }
+    }
+  },
+  "font": {
+    "display": {
+      "family": "Bricolage Grotesque",
+      "fallback": "\"Trebuchet MS\", system-ui, sans-serif",
+      "weights": [
+        600,
+        800
+      ],
+      "use": "headings, big numbers in stats"
+    },
+    "body": {
+      "family": "Atkinson Hyperlegible",
+      "fallback": "Verdana, \"Segoe UI\", system-ui, sans-serif",
+      "weights": [
+        400,
+        700
+      ],
+      "use": "all running text, all maths, buttons",
+      "features": "tabular-nums"
+    }
+  },
+  "type": {
+    "base": "18px / 1.5",
+    "h1": "clamp(1.85rem, 6vw, 2.5rem) / 1.12, 800",
+    "heroH1": "clamp(2rem, 7vw, 2.8rem)",
+    "h2": "1.3rem, 800",
+    "h3": "1.08rem, 600",
+    "prompt": "clamp(1.2rem, 4.4vw, 1.5rem) / 1.45",
+    "equation": "clamp(2rem, 9vw, 2.8rem), 700",
+    "option": "1.7rem, 700",
+    "key": "1.7rem, 700",
+    "small": "0.88rem",
+    "eyebrow": "0.85rem, 600, uppercase, 0.08em tracking"
+  },
+  "radius": {
+    "card": "18px",
+    "button": "16px",
+    "key": "14px",
+    "chip": "999px",
+    "tenFrameCell": "7px"
+  },
+  "space": {
+    "pageGutter": "16px",
+    "cardPadding": "20px (16px under 420px wide)",
+    "stackGap": "16px",
+    "cardGap": "14px",
+    "optionGap": "12px"
+  },
+  "size": {
+    "contentMaxWidth": "760px",
+    "touchTargetMin": "48px",
+    "primaryButtonHeight": "56-62px",
+    "optionMinHeight": "72px",
+    "keyMinHeight": "64px",
+    "avatar": "52px",
+    "starTile": "48px"
+  },
+  "elevation": {
+    "card": "0 1px 2px rgba(25,32,63,.06), 0 6px 20px rgba(25,32,63,.07)",
+    "buttonPress": "3px solid offset shadow, moves 2px on press"
+  },
+  "motion": {
+    "buttonPress": "80ms ease",
+    "currentStarPulse": "2.4s ease-in-out, scale 1 to 1.08",
+    "confetti": "1.8s canvas burst on star lit and session end",
+    "reducedMotion": "all animation and transition off"
+  },
+  "graphics": {
+    "tenFrame": {
+      "cell": 40,
+      "gap": 5,
+      "counterRadius": 13,
+      "layout": "5 x 2"
+    },
+    "baseTen": {
+      "unit": "12px cube; rod 12 x 84; flat 84 x 84",
+      "note": "drawn on a 10-unit grid with non-scaling strokes"
+    },
+    "array": {
+      "pitch": 24,
+      "dotRadius": 8.5
+    },
+    "numberLine": {
+      "viewBox": "480 x 112",
+      "axisY": 64,
+      "left": 24,
+      "right": 456,
+      "markerRadius": 10
+    },
+    "fractionBar": {
+      "viewBox": "320 x 64"
+    },
+    "fractionCircle": {
+      "viewBox": "120 x 120",
+      "radius": 54
+    },
+    "factTriangle": {
+      "viewBox": "240 x 200",
+      "nodeRadius": 32
+    },
+    "star": {
+      "viewBox": "48 x 48",
+      "outerRadius": 20,
+      "innerRadius": 8.5,
+      "points": 5
+    },
+    "icons": {
+      "viewBox": "24 x 24",
+      "stroke": 2.4,
+      "caps": "round"
+    }
+  }
+}
