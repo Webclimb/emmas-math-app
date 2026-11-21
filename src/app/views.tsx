@@ -11,6 +11,7 @@ import { pick } from '../engine/rng';
 import { GROUPS, SK, SKILLS, STAGES, STAGE_WITH } from '../engine/skills';
 import type { Option, Skill } from '../engine/types';
 import { plural, tensLabels, vBlocks, vFracBar, vLine, vPlates, vTF } from '../engine/visuals';
+import { CHECK_MAX, goalPath, workbookReady } from '../engine/workbook';
 import { AVATARS, OK_LINES, STATE_LABEL } from './data';
 import { canSpeak, isDark } from './effects';
 import { G, P, app, type BuildState } from './state';
@@ -56,7 +57,7 @@ function OptBtn({ o, i, act, chosen, answer }: { o: Option; i: number; act: stri
   const fbk = G.Cur!.phase === 'feedback'; let cls = 'opt' + optClass(o), mark = '', label = '';
   if (fbk) {
     const right = String(o.value) === String(answer);
-    if (G.S!.mode !== 'placement') {
+    if (G.S!.mode === 'practice') {
       if (right) { cls += ' right'; mark = kit('icon-check', 'st'); label = ', correct answer'; }
       else if (i === chosen) { cls += ' wrong'; mark = kit('icon-not-yet', 'st'); label = ', your answer, not yet'; }
       else cls += ' dim';
@@ -153,8 +154,14 @@ export function Home() {
     </header>
     <div class="homebody">
       <div class="side">
+        {p.workbook && !p.workbook.checkedAt ? <section class="card next" aria-label="Workbook check">
+          <span class="eyebrow">Workbook check</span>
+          <h1>Check the skills for your workbook</h1>
+          <p class="kid">{`A few questions on ${p.workbook.skills.length === 1 ? 'one skill' : `${p.workbook.skills.length} skills`}, with no timer and no score, so we know where to start.`}</p>
+          <button class="btn primary big" data-act="beginCheck">Start the check <K n="icon-arrow-right" /></button>
+        </section> : null}
         <section class="card next">
-          <span class="eyebrow">Next stop</span>
+          <span class="eyebrow">{p.workbook && p.workbook.checkedAt ? (workbookReady(p) ? 'Workbook skills ready' : 'Next stop for your workbook') : 'Next stop'}</span>
           <h1 class={f && /\d/.test(SK[f].name) ? 'nums' : ''}>{f ? SK[f].name : 'Keep your stars bright'}</h1>
           {f ? <Level st={st} word={`${STAGES[st]} level`} /> : null}
           <p class="kid">{f ? SK[f].kid : 'You have lit every star. Practice now reviews them so they stay strong.'}</p>
@@ -179,12 +186,12 @@ export function Home() {
 
 // ---------- practice ----------
 function TopBar() {
-  const Cur = G.Cur!, S = G.S!, q = Cur.q, fbk = Cur.phase === 'feedback', pl = S.mode === 'placement';
+  const Cur = G.Cur!, S = G.S!, q = Cur.q, fbk = Cur.phase === 'feedback', pl = S.mode !== 'practice', probeName = S.mode === 'check' ? 'Workbook check' : 'Warm-up';
   return <header class="bar">
     <button class="btn" data-act="quit" aria-label="Stop for now"><K n="icon-close" /><span class="stoplabel">Stop for now</span></button>
-    {pl ? <span class="chip">Warm-up</span> : <><span class={`chip${/\d/.test(SK[q.skill].name) ? ' nums' : ''}`}>{SK[q.skill].name}</span><Level st={q.stage} />{q.review ? <span class="chip quiet">Review</span> : null}</>}
+    {pl ? <span class="chip">{probeName}</span> : <><span class={`chip${/\d/.test(SK[q.skill].name) ? ' nums' : ''}`}>{SK[q.skill].name}</span><Level st={q.stage} />{q.review ? <span class="chip quiet">Review</span> : null}</>}
     <div class="grow">{pl
-      ? <div class="prog-text">{`Warm-up · question ${Math.min(S.P!.asked + (fbk ? 0 : 1), 12)}`}</div>
+      ? <div class="prog-text">{S.mode === 'check' ? `Workbook check · question ${Math.min(S.C!.asked + (fbk ? 0 : 1), CHECK_MAX)}` : `Warm-up · question ${Math.min(S.P!.asked + (fbk ? 0 : 1), 12)}`}</div>
       : <div class="qdots" role="progressbar" aria-label="Progress" aria-valuemin={0} aria-valuemax={S.n} aria-valuenow={S.i}>{Array.from({ length: S.n }, (_, i) => <i class={i < S.i ? 'done' : (i === S.i && !fbk ? 'cur' : '')} />)}</div>}
     </div>
     <GemPill />
@@ -203,7 +210,7 @@ function QuestionMain() {
 }
 
 function HelpAside() {
-  const Cur = G.Cur!, q = Cur.q, pl = G.S!.mode === 'placement', p = P();
+  const Cur = G.Cur!, q = Cur.q, pl = G.S!.mode !== 'practice', p = P();
   const tip = q.kind === 'pad' ? 'On a keyboard: type the digits, Backspace deletes, and Enter checks.' : 'On a keyboard: Tab moves between buttons, and Enter or Space presses one.';
   return <aside class="helpaside" aria-label="Help">
     <h2>Need a hand?</h2>
@@ -226,7 +233,7 @@ export function Practice() {
 
 function Pad() {
   const Cur = G.Cur!, fbk = Cur.phase === 'feedback', keys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'del', '0', 'ok'];
-  const state = fbk && G.S!.mode !== 'placement' ? (Cur.ok ? 'right' : 'wrong') : '';
+  const state = fbk && G.S!.mode === 'practice' ? (Cur.ok ? 'right' : 'wrong') : '';
   return <div class="padwrap">
     <div class={`padshow${Cur.entry ? '' : ' empty'}${state ? ' ' + state : ''}`} aria-live="polite" aria-label="Your answer">
       {Cur.entry ? <>{Cur.entry}{state ? <K n={state === 'right' ? 'icon-check' : 'icon-not-yet'} /> : fbk ? null : <span class="caret" />}</> : <span class="ph">Type your answer</span>}
@@ -321,8 +328,8 @@ const FbGain = ({ n, trying }: { n: number; trying?: boolean }) => <span class="
 /** Feedback card (design/COMPONENTS.md §12). Order in the not-yet card follows F-6.AC-1. */
 function Feedback() {
   const Cur = G.Cur!, q = Cur.q;
-  if (G.S!.mode === 'placement') return <section class={`fb${Cur.ok ? ' good' : ' unsure'}`} id="fb">
-    <div class="fb-head"><span class="fb-icon"><K n={Cur.ok ? 'icon-check' : 'icon-info'} /></span><h2 class="fb-title" role="status">{Cur.ok ? "That's right." : 'Thanks. That helps find your starting point.'}</h2></div>
+  if (G.S!.mode !== 'practice') return <section class={`fb${Cur.ok ? ' good' : ' unsure'}`} id="fb">
+    <div class="fb-head"><span class="fb-icon"><K n={Cur.ok ? 'icon-check' : 'icon-info'} /></span><h2 class="fb-title" role="status">{Cur.ok ? "That's right." : G.S!.mode === 'check' ? 'Thanks. That helps us know where to start.' : 'Thanks. That helps find your starting point.'}</h2></div>
     <button class="btn primary" data-act="next">Next <K n="icon-arrow-right" /></button></section>;
   if (Cur.ok) return <section class="fb good" id="fb">
     <div class="fb-head"><span class="fb-icon"><K n="icon-check" /></span><h2 class="fb-title" role="status">{pick(OK_LINES) + (Cur.hinted ? ' (with a hint)' : '')}</h2><FbGain n={Cur.gain!} /></div>
@@ -335,6 +342,52 @@ function Feedback() {
     {q.explain.visual ? <figure class="fb-figure"><div class="visual" {...inner(q.explain.visual)} /></figure> : null}
     {at ? <p class="fb-text ans">The answer is <b {...inner(at)} />.</p> : null}
     <button class="btn primary" data-act="next">Got it, next <K n="icon-arrow-right" /></button></section>;
+}
+
+/** After the workbook check (F-22.AC-5): what is solid, what to build, where she starts. */
+export function Checked() {
+  const p = P(), r = p.workbook ? p.workbook.results : {}, f = pickFocus(p);
+  const solid = Object.keys(r).filter(id => r[id] === 'pass'), build = Object.keys(r).filter(id => r[id] === 'fail');
+  const names = (ids: string[]) => ids.map(id => <li><K n={r[id] === 'pass' ? 'station-lit' : 'station-open'} /><span class={/\d/.test(SK[id].name) ? 'nums' : ''}>{SK[id].name}</span></li>);
+  return <section class="card"><p class="eyebrow">Workbook check done</p><h1>{`Thanks, ${p.name}.`}</h1>
+    {solid.length ? <><h2>Already solid</h2><ul class="wins">{names(solid)}</ul></> : null}
+    {build.length ? <><h2>Let's build these up</h2><ul class="wins">{names(build)}</ul></> : null}
+    <p>{f ? <>You're starting with <b>{SK[f].name}</b>. Each step makes your workbook page easier.</> : 'Every skill for your workbook is lit. Practice keeps them strong.'}</p>
+    <button class="btn primary big" data-act="home">See my star lines</button></section>;
+}
+
+/** Grown-up view, Workbook tab (F-22.AC-1, AC-2, AC-6). */
+function WorkbookTab() {
+  const p = P(), wb = G.UI.tmp.wb, goal = p.workbook;
+  if (wb && wb.step === 'reading') return <section class="card"><h2>Reading the page…</h2><p class="muted">This can take up to a minute. Claude is only working out which skills the page needs.</p></section>;
+  if (wb && wb.step === 'confirm') {
+    const path = goalPath(wb.picks);
+    return <section class="card"><h2>Which skills does the page need?</h2>
+      {wb.topic ? <p>{'This page looks like: '}<b>{wb.topic}</b></p> : null}
+      <p class="muted">{wb.topic ? 'Check the list. Add or remove skills, then confirm. Nothing changes until you do.' : 'Pick the skills the workbook page uses. The check adds what they depend on.'}</p>
+      {GROUPS.map(g => <fieldset><legend>{g}</legend><div class="row">{SKILLS.filter(s => s.group === g).map(s => <button class={`btn${wb.picks.includes(s.id) ? ' picked' : ''}`} data-act="wbToggle" data-d={s.id} aria-pressed={pressed(wb.picks.includes(s.id))}>{wb.picks.includes(s.id) ? <K n="icon-check" /> : null}<span class={/\d/.test(s.name) ? 'nums' : ''}>{s.name}</span></button>)}</div></fieldset>)}
+      {wb.picks.length ? <p class="small">{`The check covers these and steps back through what they depend on if needed: ${path.size} ${plural(path.size, 'skill')} in all.`}</p> : null}
+      {wb.beyond && wb.beyond.length ? <div class="hint" role="note"><K n="icon-info" /><div><b>Also needed, not in the app yet</b><ul class="how">{wb.beyond.map(t => <li>{t}</li>)}</ul></div></div> : null}
+      <div class="row"><button class="btn primary" data-act="wbConfirm" disabled={!wb.picks.length}>Confirm and set up the check</button><button class="btn" data-act="wbCancel">Cancel</button></div>
+    </section>;
+  }
+  return <>
+    {goal ? <section class="card"><h2>Current workbook goal</h2>
+      <p class="muted">{`Set ${rel(goal.at)}. ${goal.checkedAt ? `Check done ${rel(goal.checkedAt)}.` : 'Check not done yet: she starts it from the home screen.'}`}</p>
+      <ul class="learners">{goal.skills.map(id => <li><K n={`station-${starState(id)}`} /><span class="lname">{SK[id].name}</span>{goal.results[id] ? <span class="chip quiet">{goal.results[id] === 'pass' ? 'Passed the check' : 'Building up'}</span> : null}</li>)}</ul>
+      <div class="row"><button class="btn" data-act="beginCheck">{goal.checkedAt ? 'Run the check again' : 'Start the check now'}</button><button class="btn ghost" data-act="wbClear">Clear this goal</button></div>
+    </section> : null}
+    <section class="card"><h2>{goal ? 'Check a new workbook page' : 'Check a workbook page'}</h2>
+      <p>Take a photo of the page she's working on. Claude reads which skills it needs, you confirm, then she does a short check. Practice steps back to anything she's missing, then climbs toward the page.</p>
+      <p class="small">The photo is read once and not kept. Only the skills you confirm are saved. Claude doesn't write questions or answers.</p>
+      {wb && wb.err ? <p class="nudge" role="status">{wb.err}</p> : null}
+      <div class="row">
+        {G.photos ? <label class="btn primary" for="wbPhoto"><K n="icon-plus" /> Take or choose a photo<input id="wbPhoto" type="file" accept="image/jpeg,image/png,image/webp" capture="environment" class="vh" /></label> : null}
+        <button class={`btn${G.photos ? '' : ' primary'}`} data-act="wbManual">Choose the skills myself</button>
+      </div>
+      {G.photos === false ? <p class="small">Reading photos works when the app is opened in Claude.</p> : null}
+    </section>
+  </>;
 }
 
 export function Summary() {
@@ -384,7 +437,7 @@ function SkillRow({ s }: { s: Skill }) {
 function Seg({ k, label, opts }: { k: string; label: string; opts: [string | number | boolean, string][] }) {
   return <div class="set"><span class="set-l" id={`set-${k}`}>{label}</span><div class="segc" role="group" aria-labelledby={`set-${k}`}>{opts.map(([v, t]) => <button data-act="set" data-k={k} data-v={String(v)} aria-pressed={pressed(String(P().settings[k]) === String(v))}>{t}</button>)}</div></div>;
 }
-const GTABS: [string, string][] = [['progress', 'Progress'], ['patterns', 'Patterns'], ['sessions', 'Sessions'], ['settings', 'Settings'], ['data', 'Data']];
+const GTABS: [string, string][] = [['progress', 'Progress'], ['workbook', 'Workbook'], ['patterns', 'Patterns'], ['sessions', 'Sessions'], ['settings', 'Settings'], ['data', 'Data']];
 
 export function Grown() {
   const p = P(), UI = G.UI, tab = UI.tmp.gtab || 'progress', wk = Date.now() - 7 * 864e5, rec = p.log.filter(l => l.t >= wk && !l.p), acc = rec.length ? Math.round(rec.filter(l => l.ok).length / rec.length * 100) : null;
@@ -404,11 +457,12 @@ export function Grown() {
       <li>Every fourth question reviews a skill she has already mastered. Two misses in review reopen that skill.</li>
       <li>No timers. Hints and "I'm not sure" are always there; they slow progress a little but never cost gems.</li>
     </ul></section></>;
+  else if (tab === 'workbook') body = <WorkbookTab />;
   else if (tab === 'patterns') body = <section class="card"><h2>Patterns noticed</h2>
     {misList.length
       ? <><ul class="mis">{misList.map(([k, v]) => <li data-pattern={k}><div class="mis-top"><b>{MIS[k].parent}</b><span class="chip quiet">{`Seen ${v.count} ${plural(v.count, 'time')}`}</span></div><p class="small">{`Last seen ${rel(v.last)}`}</p><dl><dt>What she sees</dt><dd>{MIS[k].kid}</dd><dt>Try at home</dt><dd>{MIS[k].act}</dd></dl></li>)}</ul><p class="small">Worth sharing with her teacher or tutor.</p></>
       : <p class="muted">Nothing yet. When a wrong answer matches a common pattern, such as subtracting on a division question, it shows up here with an activity to try at home.</p>}</section>;
-  else if (tab === 'sessions') body = <section class="card"><h2>Recent sessions</h2>{sess.length ? <ul class="sess">{sess.map(s => <li><span>{new Date(s.d).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' }) + (s.m === 'placement' ? ' · warm-up' : '')}</span><span class="muted">{`${s.n} ${plural(s.n, 'question')}, ${s.c} right, ${s.min} min`}</span></li>)}</ul> : <p class="muted">No sessions yet.</p>}</section>;
+  else if (tab === 'sessions') body = <section class="card"><h2>Recent sessions</h2>{sess.length ? <ul class="sess">{sess.map(s => <li><span>{new Date(s.d).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' }) + (s.m === 'placement' ? ' · warm-up' : s.m === 'check' ? ' · workbook check' : '')}</span><span class="muted">{`${s.n} ${plural(s.n, 'question')}, ${s.c} right, ${s.min} min`}</span></li>)}</ul> : <p class="muted">No sessions yet.</p>}</section>;
   else if (tab === 'settings') body = <section class="card"><h2>Settings</h2>
     <Seg k="sessionLen" label="Questions per session" opts={[[5, '5'], [10, '10'], [15, '15']]} />
     <Seg k="sound" label="Sounds" opts={[[true, 'On'], [false, 'Off']]} />
@@ -471,6 +525,7 @@ export function Screen() {
     case 'placeIntro': return <PlaceIntro />;
     case 'practice': return <Practice />;
     case 'placed': return <Placed />;
+    case 'checked': return <Checked />;
     case 'summary': return <Summary />;
     case 'shop': return <Shop />;
     case 'grown': return <Grown />;

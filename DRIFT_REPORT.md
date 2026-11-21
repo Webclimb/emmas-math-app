@@ -194,6 +194,30 @@ Other test changes:
 - **Breakpoints:** 720 px and 1024 px appear in media queries, because media queries cannot read CSS variables.
 - **Keyboard paths:** the per-widget keyboard paths in `SCREENS.md` §3 (arrows on ten-frames and fraction bars, Shift+arrow on number lines) are F-19.AC-6, which is M3. Every control is already a button reachable with Tab.
 
+## Milestone MW: workbook check (2026-11-21)
+
+- **Spec:** v2.3-draft.
+  - D-19 adds F-22 (workbook check) and milestone MW.
+  - D-20 records no external backend (no Supabase) and resolves Q1: private Claude artifact with on-device fallback.
+  - Section 6 adds the runtime's `sample` capability with images.
+- **Result:** `npm run accept` passes. All 7 F-22 criteria are tested, and M0 and MD criteria still pass. The build is 257 KB.
+
+### How it works
+
+1. **Grown-up view → Workbook:** take or choose a photo of the page. `src/app/workbook.ts` sends it to Claude with the skill map. The reply is cleaned to known skill ids, a short topic and up to 5 "not in the app yet" phrases (`cleanReading`).
+2. **Confirm:** the grown-up adds or removes skills, then confirms. Only `{at, skills, checkedAt, results}` is saved on the learner. The topic text, the "not in the app yet" list and the photo live in memory only.
+3. **Check:** the learner starts it from the home card. Up to 2 numbers-level questions per skill, no hints, "I'm not sure" always there. A miss queues that skill's prerequisites next, so it steps back one skill at a time, at most 16 questions (`src/engine/workbook.ts`).
+4. **Results:** passed skills light. Missed skills reopen at pictures level. Focus becomes the earliest open skill on the path to the page, and the normal F-7 moves take her back up. Once every goal skill is lit, reviews favour them. The grown-up can clear the goal.
+5. **Without photo reading** (a browser copy, or permission declined), the grown-up picks skills by hand. Everything else is the same.
+
+### Notes and limits
+
+- **Content gap:** the app's 14 skills run to about grade 3. A mid-year grade 6 or 7 page will mostly map to prerequisites; the "not in the app yet" list shows what M4 (F-21) needs to add. Q5 (her school's order) decides which F-21 skill to build first.
+- **Usage and consent:** reading a photo uses the viewer's own Claude usage, and the first use asks them to allow images to be sent to Claude.
+- **Checked offline only:** the photo path is tested against a stand-in for the runtime. The real call can only be exercised in the published artifact.
+- **Pending stars:** passed skills light at once. They become "pending" when F-7.AC-6 (next-day retention check) is built in M1.
+- **No external backend.** Progress stays on the device and in her Claude account (D-20).
+
 ## Commands
 
 ```

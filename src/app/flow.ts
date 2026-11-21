@@ -3,6 +3,8 @@ import { h, render as preactRender } from 'preact';
 import { guessFor, newProfile, noteMis, nextItem, record, LOG_CAP } from '../engine/model';
 import { makeQuestion } from '../engine/generators';
 import { placementApply, placementInit, placementNext, placementRecord } from '../engine/placement';
+import { checkApply, checkInit, checkNext, checkRecord, newWorkbookGoal } from '../engine/workbook';
+import { canReadPhotos, readWorkbookPhoto, READ_ERROR_TEXT, type ReadError } from './workbook';
 import { SK, STAGE_WITH } from '../engine/skills';
 import { NL } from '../engine/visuals';
 import { THEMES } from '../design/tokens';
@@ -98,16 +100,18 @@ function buildNudge(bd: Build, b: BuildState): string {
 export function newCurrent(q: Question): Current {
   return { q, phase: 'answer', hinted: false, hintShown: false, entry: '', chosen: null, fchosen: null, b: q.kind === 'build' ? initBuild(q.build!) : null, buildMiss: false };
 }
-function beginSession(mode: 'practice' | 'placement', n = 0): void {
-  G.S = { mode, n: mode === 'placement' ? 12 : n, i: 0, answered: 0, correct: 0, gems: 0, start: Date.now(), events: [], P: mode === 'placement' ? placementInit() : null, early: false };
+function beginSession(mode: 'practice' | 'placement' | 'check', n = 0): void {
+  G.S = { mode, n: mode === 'placement' ? 12 : n, i: 0, answered: 0, correct: 0, gems: 0, start: Date.now(), events: [], P: mode === 'placement' ? placementInit() : null, early: false,
+    C: mode === 'check' ? checkInit(P().workbook ? P().workbook!.skills : []) : undefined };
   G.UI.screen = 'practice'; nextQuestion();
 }
 function nextQuestion(): void {
   const S = G.S!, prof = P(); let item;
   if (S.mode === 'placement') { item = placementNext(S.P!); if (!item) return finishPlacement(); }
+  else if (S.mode === 'check') { item = checkNext(S.C!); if (!item) return finishCheck(); }
   else { if (S.i >= S.n) return finishSession(false); item = nextItem(prof, S); if (!item) return finishSession(false); }
   const review = 'review' in item ? item.review : false;
-  const sk = prof.skills[item.skill], easy = S.mode === 'placement' ? false : (!review && sk.pL[item.stage] < 0.5);
+  const sk = prof.skills[item.skill], easy = S.mode !== 'practice' ? false : (!review && sk.pL[item.stage] < 0.5);
   let q: Question; try { q = makeQuestion(item.skill, item.stage, easy); } catch { q = makeQuestion('quantity', 1, true); }
   q.review = !!review;
   G.Cur = newCurrent(q);
@@ -117,8 +121,9 @@ function submit(ok: boolean, mis: string | null, o: { unsure?: boolean } = {}): 
   const Cur = G.Cur, S = G.S!, prof = P();
   if (!Cur || Cur.phase !== 'answer') return; const q = Cur.q, hinted = Cur.hinted;
   Cur.phase = 'feedback'; Cur.ok = ok; Cur.mis = ok ? null : mis; Cur.unsure = !!o.unsure; let gain = GEMS.answer + (ok && !hinted ? GEMS.clean : 0);
-  if (S.mode === 'placement') {
-    placementRecord(S.P!, ok); Cur.events = []; noteMis(prof, Cur.mis);
+  if (S.mode !== 'practice') {
+    if (S.mode === 'placement') placementRecord(S.P!, ok); else checkRecord(S.C!, ok);
+    Cur.events = []; noteMis(prof, Cur.mis);
     prof.log.push({ t: Date.now(), s: q.skill, g: q.stage, ok, p: 1, m: Cur.mis }); if (prof.log.length > LOG_CAP) prof.log.splice(0, prof.log.length - LOG_CAP);
   } else {
     const ev = record(prof, q.skill, q.stage, ok, { hinted, mis: Cur.mis, G: guessFor(q), review: q.review, unsure: Cur.unsure });
@@ -152,6 +157,32 @@ function finishPlacement(): void {
   placementApply(prof, S.P!); prof.sessions.push({ d: Date.now(), n: S.answered, c: S.correct, min: Math.max(1, Math.round((Date.now() - S.start) / 60000)), m: 'placement' });
   save(); G.Cur = null; G.UI.screen = 'placed'; render(); window.scrollTo(0, 0); tone(SND.up);
 }
+function finishCheck(): void {
+  const S = G.S!, prof = P();
+  checkApply(prof, S.C!);
+  prof.sessions.push({ d: Date.now(), n: S.answered, c: S.correct, min: Math.max(1, Math.round((Date.now() - S.start) / 60000)), m: 'check' }); if (prof.sessions.length > 100) prof.sessions.shift();
+  save(); G.Cur = null; G.UI.screen = 'checked'; render(); window.scrollTo(0, 0); tone(SND.up);
+}
+
+// ---------- workbook (F-22) ----------
+/** Learn whether photos can be read here, then re-render the workbook tab. */
+export function probePhotos(): void {
+  if (G.photos !== null) return;
+  canReadPhotos().then(v => { G.photos = v; if (G.UI.screen === 'grown') render(); }, () => { G.photos = false; });
+}
+async function readPhoto(file: Blob): Promise<void> {
+  G.UI.tmp.wb = { step: 'reading', picks: [] }; render();
+  try {
+    const r = await readWorkbookPhoto(file);
+    G.UI.tmp.wb = { step: 'confirm', picks: r.skills, topic: r.topic, beyond: r.beyond };
+  } catch (e) {
+    const code = ((e as { code?: ReadError })?.code) || 'failed';
+    if (code === 'unavailable' || code === 'not_granted') G.photos = false;
+    G.UI.tmp.wb = { step: 'start', picks: [], err: READ_ERROR_TEXT[code] };
+  }
+  if (G.UI.screen === 'grown') render();
+}
+
 function buildCheck(): void {
   const Cur = G.Cur!, q = Cur.q, b = Cur.b!; if (Cur.phase !== 'answer' || b.done) return;
   if (buildRight(q.build!, b)) { b.done = true; b.msg = null; if (!q.followup) return submit(!Cur.buildMiss, null); render(); if (P().settings.autoRead) speak(q.followup.say || strip(q.followup.prompt)); return; }
@@ -188,8 +219,8 @@ export const ACT: Record<string, (el: El, e?: { clientX: number }) => void> = {
   speak() { if (G.Cur) speak(sayFor(G.Cur.q)); },
   fspeak() { const f = G.Cur && G.Cur.q.followup; if (f) speak(f.say || strip(f.prompt)); },
   next() { afterFeedback(); },
-  quit() { G.UI.modal = { type: 'confirm', title: 'Stop for now?', text: G.S!.mode === 'placement' ? 'You can do the warm-up again later.' : 'Everything you\'ve done so far is saved.', yes: 'Stop', act: 'doQuit' }; renderLayer(); },
-  doQuit() { G.UI.modal = null; if (G.S!.mode === 'placement') { G.Cur = null; routeHome(); return; } finishSession(true); },
+  quit() { const m = G.S!.mode; G.UI.modal = { type: 'confirm', title: 'Stop for now?', text: m === 'placement' ? 'You can do the warm-up again later.' : m === 'check' ? 'You can do the workbook check again later.' : 'Everything you\'ve done so far is saved.', yes: 'Stop', act: 'doQuit' }; renderLayer(); },
+  doQuit() { G.UI.modal = null; if (G.S!.mode !== 'practice') { G.Cur = null; routeHome(); return; } finishSession(true); },
   eventOk() { G.UI.modal = null; nextQuestion(); },
   cell(el) { if (!B()) return; const i = +el.dataset.i!, c = bs().cells!; if (c[i] === 2) return; c[i] = c[i] ? 0 : 1; bs().msg = null; render(); },
   blk(el) { if (!B()) return; const [k, d] = [el.dataset.d![0], el.dataset.d![1]], mx = k === 'h' ? 3 : 9, b = bs(); b[k] = Math.max(0, Math.min(mx, (b[k] as number) + (d === '+' ? 1 : -1))); b.msg = null; render(); },
@@ -216,7 +247,17 @@ export const ACT: Record<string, (el: El, e?: { clientX: number }) => void> = {
   bcheck() { buildCheck(); },
   pickAv(el) { G.UI.tmp.av = el.dataset.d; render(); },
   stab(el) { G.UI.tmp.stab = el.dataset.d; render(); },
-  gtab(el) { G.UI.tmp.gtab = el.dataset.d; G.UI.tmp.code = null; render(); window.scrollTo(0, 0); },
+  gtab(el) { G.UI.tmp.gtab = el.dataset.d; G.UI.tmp.code = null; if (el.dataset.d === 'workbook') probePhotos(); render(); window.scrollTo(0, 0); },
+  wbManual() { G.UI.tmp.wb = { step: 'confirm', picks: [] }; render(); },
+  wbToggle(el) { const wb = G.UI.tmp.wb; if (!wb) return; const id = el.dataset.d!; wb.picks = wb.picks.includes(id) ? wb.picks.filter(x => x !== id) : [...wb.picks, id]; render(); },
+  wbCancel() { G.UI.tmp.wb = undefined; render(); },
+  wbConfirm() {
+    const wb = G.UI.tmp.wb; if (!wb || !wb.picks.length) return;
+    P().workbook = newWorkbookGoal(wb.picks); G.UI.tmp.wb = undefined; save(); render(); toast('Workbook skills saved. The check starts from the home screen.');
+  },
+  wbClear() { G.UI.modal = { type: 'confirm', title: 'Clear the workbook goal?', text: 'Practice goes back to the usual order. Levels she has reached stay.', yes: 'Clear', act: 'doWbClear' }; renderLayer(); },
+  doWbClear() { G.UI.modal = null; P().workbook = null; P().focus = null; save(); render(); },
+  beginCheck() { if (P().workbook) beginSession('check'); },
   buyAv(el) {
     const prof = P(), a = el.dataset.d!, item = AVATARS.find(x => x.id === a); if (!item) return; const price = item.price;
     if (prof.owned.avatars.includes(a) || price === 0) { prof.avatar = a; save(); render(); return; }
@@ -259,6 +300,10 @@ export function listen(): void {
   document.addEventListener('click', e => { const el = closest(e.target, '[data-act]') as HTMLButtonElement | null; if (!el || el.disabled) return; const f = ACT[el.dataset.act!]; if (f) { e.preventDefault(); f(el, e); } });
   // The badges on the welcome form show her initial, so they update as she types.
   document.addEventListener('input', e => { const t = e.target as HTMLInputElement; if (t.id === 'pname') { const was = (G.UI.tmp.name || '').trim()[0]; G.UI.tmp.name = t.value; if (t.value.trim()[0] !== was) render(); } });
+  document.addEventListener('change', e => {
+    const t = e.target as HTMLInputElement;
+    if (t.id === 'wbPhoto' && t.files && t.files[0]) { const f = t.files[0]; t.value = ''; void readPhoto(f); }
+  });
   document.addEventListener('submit', e => {
     e.preventDefault(); const t = e.target as HTMLFormElement;
     if (t.id === 'newp') {

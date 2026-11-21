@@ -33,7 +33,7 @@ export async function holdGrownUps(page: Page) {
 }
 
 /** Opens one tab of the grown-up view (Progress, Patterns, Sessions, Settings, Data). */
-export async function grownTab(page: Page, tab: 'progress' | 'patterns' | 'sessions' | 'settings' | 'data') {
+export async function grownTab(page: Page, tab: 'progress' | 'workbook' | 'patterns' | 'sessions' | 'settings' | 'data') {
   await page.click(`[data-act=gtab][data-d=${tab}]`);
 }
 

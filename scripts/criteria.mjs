@@ -22,5 +22,9 @@ for (const id of M0) { const e = found.get(id); console.log(`  ${!e ? 'MISSING' 
 const MD = ['F-15.AC-6', 'F-19.AC-5'];
 console.log('\nMD design criteria');
 for (const id of MD) { const e = found.get(id); console.log(`  ${!e ? 'MISSING' : e.parked ? 'PARKED ' : 'tested '}  ${id}`); }
-const extra = [...found.keys()].filter(k => !M0.includes(k) && !MD.includes(k)).sort();
+// Milestone MW (SPEC.md D-19).
+const MW = ['F-22.AC-1', 'F-22.AC-2', 'F-22.AC-3', 'F-22.AC-4', 'F-22.AC-5', 'F-22.AC-6', 'F-22.AC-7'];
+console.log('\nMW workbook criteria');
+for (const id of MW) { const e = found.get(id); console.log(`  ${!e ? 'MISSING' : e.parked ? 'PARKED ' : 'tested '}  ${id}`); }
+const extra = [...found.keys()].filter(k => !M0.includes(k) && !MD.includes(k) && !MW.includes(k)).sort();
 if (extra.length) console.log('Also tested: ' + extra.join(', '));
