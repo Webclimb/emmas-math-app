@@ -26,5 +26,9 @@ for (const id of MD) { const e = found.get(id); console.log(`  ${!e ? 'MISSING' 
 const MW = ['F-22.AC-1', 'F-22.AC-2', 'F-22.AC-3', 'F-22.AC-4', 'F-22.AC-5', 'F-22.AC-6', 'F-22.AC-7'];
 console.log('\nMW workbook criteria');
 for (const id of MW) { const e = found.get(id); console.log(`  ${!e ? 'MISSING' : e.parked ? 'PARKED ' : 'tested '}  ${id}`); }
-const extra = [...found.keys()].filter(k => !M0.includes(k) && !MD.includes(k) && !MW.includes(k)).sort();
+// Milestone MG (SPEC.md D-23).
+const MG = ['F-23.AC-1', 'F-23.AC-2', 'F-23.AC-3', 'F-23.AC-4', 'F-23.AC-5', 'F-8.AC-4'];
+console.log('\nMG grade-level criteria');
+for (const id of MG) { const e = found.get(id); console.log(`  ${!e ? 'MISSING' : e.parked ? 'PARKED ' : 'tested '}  ${id}`); }
+const extra = [...found.keys()].filter(k => ![...M0, ...MD, ...MW, ...MG].includes(k)).sort();
 if (extra.length) console.log('Also tested: ' + extra.join(', '));

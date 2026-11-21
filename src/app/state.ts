@@ -8,6 +8,8 @@ export interface Session {
   mode: 'practice' | 'placement' | 'check';
   n: number; i: number; answered: number; correct: number; gems: number; start: number;
   events: ModelEvent[]; P: Placement | null; early: boolean; downs?: Record<string, number>; C?: Check;
+  /** F-8.AC-4: this check is the first-run warm-up. */
+  warm?: boolean;
 }
 
 // Build-widget working state; fields depend on the widget type.
@@ -15,6 +17,7 @@ export interface BuildState {
   done?: boolean; msg?: string | null; tries?: number;
   cells?: number[]; h?: number; t?: number; o?: number; m?: number | null;
   pos?: number; hist?: unknown[]; lo?: number; hi?: number; x?: boolean[];
+  counts?: number[]; j?: number; si?: number; log?: string[];
   a?: number; b?: number; r?: number; plates?: number[]; g?: number; s?: boolean[];
   [k: string]: unknown;
 }

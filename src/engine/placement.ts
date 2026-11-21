@@ -1,7 +1,7 @@
 // Placement warm-up (spec F-8): v1 binary search along the 14-step ladder, two numbers-level
 // questions per probe. Strand-based placement replaces this in M3 (F-8.AC-2, CHANGE).
 import { newSkillState, pickFocus } from './model';
-import { LADDER } from './skills';
+import { V1_LADDER as LADDER } from './skills';
 import type { Placement, Profile, Stage } from './types';
 
 export const PLACEMENT_MAX = 12;

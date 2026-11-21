@@ -218,6 +218,71 @@ Other test changes:
 - **Pending stars:** passed skills light at once. They become "pending" when F-7.AC-6 (next-day retention check) is built in M1.
 - **No external backend.** Progress stays on the device and in her Claude account (D-20).
 
+## Milestone MG: grade-level decimals, in French (2026-11-21)
+
+- **Spec:** v2.4-draft.
+  - D-21: the whole app is in Québec French.
+  - D-22: the Québec curriculum (PDA), 6e année.
+  - D-23: F-23 (eight grade-level skills) and F-8.AC-4 (the warm-up starts at grade level).
+- **Result:** `npm run accept` passes: 43 Vitest tests and 41 Playwright tests. All 6 MG criteria are tested, and M0, MD and MW criteria still pass. The build is about 310 KB.
+
+### What changed
+
+1. **Language (D-21):** every screen, message, skill name, story, hint, explanation, error pattern and grown-up text is in Québec French.
+   - Read-aloud asks for `fr-CA`, and symbols are spoken in French (« fois », « divisé par », « sur »).
+   - Numbers use a decimal comma, and a narrow space between thousands from 10 000 up.
+   - The workbook reading asks Claude for the topic and the "not in the app yet" list in French.
+   - The page is `lang="fr-CA"`.
+2. **Eight new skills (F-23), in two new lines:**
+   - Grands nombres et décimaux: `grandsnombres`, `puissances`, `decimaux`, `arrondir`.
+   - Calcul écrit: `addcol`, `multcol`, `multdec`, `probdec`.
+   - Each skill has three levels and lists its PDA item. Lessons come in M1.
+3. **Hands-on widgets:**
+   - **Tableau de numération with counters:** she builds a number column by column.
+   - **Slide the digits:** a × 10 / ÷ 10 chart.
+   - **Guided steps:** a column layout she fills in one step at a time, choosing the operation where a story needs one.
+4. **Pictures:** a 100-grid for tenths and hundredths, place-value charts, column layouts, "fois plus" bars and rate bars.
+5. **Exact decimals:** values are whole thousandths, so there is no floating-point error. Typed answers ignore trailing zeros (3,5 = 3,50). The keypad shows a comma key on decimal questions only, and a keyboard's "," or "." types it.
+6. **Seven new error patterns:**
+   - misplaced comma;
+   - dixièmes read as dizaines;
+   - "more digits is bigger";
+   - missing 0 in the second partial product;
+   - forgotten carry;
+   - an empty place left out;
+   - « fois moins » read the wrong way.
+7. **Warm-up at grade level (F-8.AC-4):**
+   - A new learner's warm-up is the F-22 check aimed at `decimaux`, `multdec` and `probdec`.
+   - A miss steps back through prerequisites, one skill at a time, at most 16 questions.
+   - Passed skills, and unchecked skills under them, are lit. The results become her workbook goal, so practice climbs back toward grade level.
+   - "Passer" still starts at the very beginning.
+
+### Found and fixed while testing
+
+- **`arrondir` hands-on:** it used a number line. F-23.AC-2 asks for a place-value chart or column layout, so she now builds the number in the chart, then rounds it. The number line stays in the explanation.
+- **Pictures level without a picture:** three pictures-level questions had none (F-3.AC-1):
+  - comparing decimals now shows both numbers in place-value charts;
+  - decimal products now show the column layout;
+  - rate stories now show a "1 unit / all of it" bar.
+- **Whole-number products:** decimal products could draw a whole number (6 × 9 in a decimals skill). Fixed.
+- **Two-step story picture:** it showed the first step's answer. The question now shows « ? », and the explanation shows the number.
+- **Chart zeros:** the chart showed zeros before the first digit and after the last decimal. Those cells are now empty.
+
+### Tests changed for MG
+
+- **UI tests:** assertions on English copy now assert the French copy (D-21). What each test checks is unchanged.
+- **Warm-up loops:** they allow 20 questions instead of 14, because the warm-up is now the check (at most 16).
+- **Smoke sweep:** it now solves the new widgets. Its number-line solve counts from the line's start, since lines no longer always start at 0.
+- **Parity test:** it compares the 14 v1 skills only. Numbers are compared sorted, because French word order moves them.
+- **New tests:** `tests/acceptance/mg.test.ts` (F-23.AC-1, 2, 3, 5 and F-8.AC-4) and `tests/ui/mg.spec.ts` (F-23.AC-4, real taps on every new widget, the warm-up from the welcome screen).
+
+### Notes and limits
+
+- **No lessons yet:** F-21.AC-1 is amended so the F-23 skills switch on before lessons exist. Explanations and hints carry the teaching until M1.
+- **Placement test is v1 only:** the v1 single-ladder placement still exists for the parity test, but new learners no longer use it.
+- **Ear check needed:** decimals go to the voice as written (3,5), with the language set to `fr-CA`. Thousands are joined for speech (48297), so they are read as one number. The Claude voice's French has not been heard on a device yet.
+- **Workbook photos stay out of the repo.** The four pages she started from were used only to choose the skills, and are not committed.
+
 ## Commands
 
 ```

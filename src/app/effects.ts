@@ -37,20 +37,20 @@ export function tone(seq: [number, number, number][]): void {
 }
 
 // ---------- read-aloud ----------
-let TTS: { speak(t: string, o: { rate: number }): Promise<void> } | null = null;
+let TTS: { speak(t: string, o: { rate: number; language?: string }): Promise<void> } | null = null;
 export async function initTTS(onReady: () => void): Promise<void> {
   try { if (window.claude && window.claude.use) { TTS = await window.claude.use('tts') as typeof TTS; onReady(); } } catch { TTS = null; }
 }
 export function canSpeak(): boolean { return !!TTS || ('speechSynthesis' in window); }
-/** Plain text for speech: fractions as "k out of n", symbols as words. */
+/** Plain text for speech, in French: fractions as "k sur n", symbols as words. */
 export function strip(h: string): string {
-  return String(h).replace(/<span class="frac"[^>]*><span>(\d+)<\/span><span>(\d+)<\/span><\/span>/g, '$1 out of $2').replace(/<[^>]+>/g, ' ')
-    .replace(/×/g, ' times ').replace(/÷/g, ' divided by ').replace(/−/g, ' minus ').replace(/=\s*\?/g, ' equals what?').replace(/\s+/g, ' ').trim();
+  return String(h).replace(/<span class="frac"[^>]*><span>(\d+)<\/span><span>(\d+)<\/span><\/span>/g, '$1 sur $2').replace(/<[^>]+>/g, ' ')
+    .replace(/×/g, ' fois ').replace(/÷/g, ' divisé par ').replace(/−/g, ' moins ').replace(/=\s*\?/g, ' égale combien?').replace(/(\d)[\u202f ](?=\d{3}\b)/g, '$1').replace(/\u202f/g, ' ').replace(/\s+/g, ' ').trim();
 }
 export async function speak(text: string): Promise<void> {
   text = String(text).slice(0, 1900);
-  if (TTS) { try { await TTS.speak(text, { rate: 0.9 }); return; } catch (e) { if ((e as { code?: string })?.code === 'not_granted') { TTS = null; } else return; } }
-  try { if ('speechSynthesis' in window) { speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(text); u.rate = 0.9; speechSynthesis.speak(u); } } catch { /* none */ }
+  if (TTS) { try { await TTS.speak(text, { rate: 0.9, language: 'fr-CA' }); return; } catch (e) { if ((e as { code?: string })?.code === 'not_granted') { TTS = null; } else return; } }
+  try { if ('speechSynthesis' in window) { speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(text); u.rate = 0.9; u.lang = 'fr-CA'; speechSynthesis.speak(u); } } catch { /* none */ }
 }
 
 // ---------- motion ----------

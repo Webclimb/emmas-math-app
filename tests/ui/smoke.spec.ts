@@ -7,7 +7,7 @@ test('test_F5_AC2: every skill, level and build widget solves correctly through 
   const errors = await open(page);
   await createLearner(page, 'Ava', 1);
   await page.click('[data-act=beginPlace]');
-  for (let i = 0; i < 14; i++) {
+  for (let i = 0; i < 20; i++) {
     if (await page.locator('[data-act=home]').count()) break;
     if (await page.locator('[data-act=next]').count() === 0) {
       if (await page.locator('[data-act=opt]').count()) await page.click('[data-act=opt] >> nth=0');
@@ -34,7 +34,7 @@ test('test_F5_AC2: every skill, level and build widget solves correctly through 
           switch (bd.type) {
             case 'tenframe': for (let i = bd.preset; i < bd.target; i++) click('cell', { i: String(i) }); click('bcheck'); break;
             case 'blocks': { const H = Math.floor(bd.target / 100), T = Math.floor(bd.target / 10) % 10, O = bd.target % 10; for (let i = 0; i < H; i++) click('blk', { d: 'h+' }); for (let i = 0; i < T; i++) click('blk', { d: 't+' }); for (let i = 0; i < O; i++) click('blk', { d: 'o+' }); click('bcheck'); break; }
-            case 'nlplace': click('nlnudge', { d: '1' }); for (let i = 1; i < bd.target; i++) click('nlnudge', { d: '1' }); click('bcheck'); break;
+            case 'nlplace': click('nlnudge', { d: '1' }); for (let i = bd.min + 1; i < bd.target; i++) click('nlnudge', { d: '1' }); click('bcheck'); break; // lines that start above 0 (F-23 arrondir)
             case 'jumps': { let rem = bd.target - bd.start; while (rem >= 10 && bd.tens) { click('jump', { d: '10' }); rem -= 10; } while (rem > 0) { click('jump', { d: '1' }); rem--; } click('jdone'); break; }
             case 'crossout': for (let i = 0; i < bd.k; i++) click('cross', { i: String(i) }); click('bcheck'); break;
             case 'groups': for (let i = 1; i < bd.a; i++) click('grp', { d: 'a+' }); for (let i = 1; i < bd.b; i++) click('grp', { d: 'b+' }); click('bcheck'); break;
@@ -42,6 +42,9 @@ test('test_F5_AC2: every skill, level and build widget solves correctly through 
             case 'share': for (let i = 0; i < bd.n; i++) click('plate', { i: String(i % bd.k) }); break;
             case 'makegroups': for (let i = 0; i < bd.n / bd.k; i++) click('mkgrp'); break;
             case 'shade': for (let i = 0; i < bd.k; i++) click('part', { i: String(i) }); click('bcheck'); break;
+            case 'pvchart': bd.cols.forEach((c: string, i: number) => { for (let n = 0; n < ns.digitAt(bd.target, c); n++) click('pvc', { d: `${i}+` }); }); click('bcheck'); break;
+            case 'shift': for (let n = 0; n < Math.abs(bd.k); n++) click('shift', { d: bd.k > 0 ? 'm' : 'd' }); click('bcheck'); break;
+            case 'steps': for (const stp of bd.steps) { if (stp.choices) click('stepChoice', { d: stp.answer }); else { for (const ch of stp.answer) ns.padKey(ch); ns.padKey('ok'); } ns.render(); } break;
           }
           if (q.followup) {
             if (!G.Cur.b.done) out.push(`${s.id}[${st}] build not done (${bd.type})`);

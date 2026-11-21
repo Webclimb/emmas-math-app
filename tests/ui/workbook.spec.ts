@@ -31,12 +31,12 @@ test('test_F22_AC1: a photo is read into skills from the skill map plus a list o
   const errors = await open(page);
   await toWorkbookTab(page);
   await page.locator('#wbPhoto').setInputFiles({ name: 'page.png', mimeType: 'image/png', buffer: PNG });
-  await expect(page.getByText('Which skills does the page need?')).toBeVisible();
+  await expect(page.getByText('Quelles habiletés la page demande-t-elle?')).toBeVisible();
   await expect(page.getByText(TOPIC)).toBeVisible();
   // Known ids are pre-selected; unknown ones are dropped.
   const picked = await page.locator('[data-act=wbToggle][aria-pressed=true]').evaluateAll(els => els.map(e => (e as HTMLElement).dataset.d));
   expect(picked).toEqual(['divfacts']);
-  await expect(page.getByText('Also needed, not in the app yet')).toBeVisible();
+  await expect(page.getByText('Aussi nécessaire, pas encore dans l’appli')).toBeVisible();
   await expect(page.getByText('long division with remainders')).toBeVisible();
   expect(errors).toEqual([]);
 });
@@ -45,7 +45,7 @@ test('test_F22_AC1: without the Claude runtime there is no photo button, and ski
   const errors = await open(page);
   await toWorkbookTab(page);
   await expect(page.locator('#wbPhoto')).toHaveCount(0);
-  await expect(page.getByText('Reading photos works when the app is opened in Claude.')).toBeVisible({ timeout: 15000 });
+  await expect(page.getByText('La lecture de photos fonctionne quand l’appli est ouverte dans Claude.')).toBeVisible({ timeout: 15000 });
   await page.click('[data-act=wbManual]');
   await page.click('[data-act=wbToggle][data-d=fractions]');
   await page.click('[data-act=wbConfirm]');
@@ -60,7 +60,7 @@ test('test_F22_AC2: nothing changes until the grown-up confirms; skills can be a
   await toWorkbookTab(page);
   const before = await saved(page);
   await page.locator('#wbPhoto').setInputFiles({ name: 'page.png', mimeType: 'image/png', buffer: PNG });
-  await expect(page.getByText('Which skills does the page need?')).toBeVisible();
+  await expect(page.getByText('Quelles habiletés la page demande-t-elle?')).toBeVisible();
   const p0 = before.profiles[before.current], d1 = await saved(page), p1 = d1.profiles[d1.current];
   expect(p1.skills).toEqual(p0.skills); expect(p1.focus).toEqual(p0.focus); expect(p1.workbook ?? null).toBeNull();
   await page.click('[data-act=wbCancel]');
@@ -103,20 +103,20 @@ test('test_F22_AC4: the learner takes the check from home: numbers level, no hin
   await createLearner(page, 'Kai', 0);
   await page.click('[data-act=skipPlace]');
   await page.evaluate(() => { const ns = (window as any).__ns; ns.G.prof.workbook = { at: Date.now(), skills: ['divfacts'], checkedAt: 0, results: {} }; ns.G.store.save(); ns.G.UI.screen = 'home'; ns.render(); });
-  await expect(page.getByText('Check the skills for your workbook')).toBeVisible();
+  await expect(page.getByText('Vérifions les habiletés de ton cahier')).toBeVisible();
   await page.click('[data-act=beginCheck]');
   for (let i = 0; i < 20; i++) {
     if (await page.locator('[data-act=home]').count()) break;
-    await expect(page.locator('.chip').first()).toHaveText('Workbook check');
+    await expect(page.locator('.chip').first()).toHaveText('Vérification du cahier');
     await expect(page.locator('[data-act=hint]')).toHaveCount(0);
     await expect(page.locator('[data-act=chart]')).toHaveCount(0);
     await expect(page.locator('[data-act=unsure]')).toBeVisible();
     expect(await page.evaluate(() => (window as any).__ns.G.Cur.q.stage)).toBe(2);
     await page.click('[data-act=unsure]');
-    await expect(page.locator('#fb')).not.toContainText(/score|wrong/i);
+    await expect(page.locator('#fb')).not.toContainText(/pointage|faux|mauvais/i);
     await page.click('[data-act=next]');
   }
-  await expect(page.getByText('Workbook check done')).toBeVisible();
+  await expect(page.getByText('Vérification terminée')).toBeVisible();
   expect(errors).toEqual([]);
 });
 
@@ -137,14 +137,14 @@ test('test_F22_AC5: after the check, the results screen shows what is solid and 
     else await page.click(`[data-act=opt][data-i="${right}"]`);
     await page.click('[data-act=next]');
   }
-  await expect(page.getByText("Let's build these up")).toBeVisible();
-  await expect(page.locator('.card')).toContainText('Division facts');
+  await expect(page.getByText('On va construire ces habiletés')).toBeVisible();
+  await expect(page.locator('.card')).toContainText('Faits de division');
   const p = await page.evaluate(() => (window as any).__ns.G.prof);
   expect(p.workbook.results.divfacts).toBe('fail');
   expect(p.workbook.checkedAt).toBeGreaterThan(0);
   expect(p.skills.divfacts.stage).toBe(1);
   await page.click('[data-act=home]');
-  await expect(page.locator('.side .next .eyebrow').last()).toHaveText(/for your workbook/i);
+  await expect(page.locator('.side .next .eyebrow').last()).toHaveText(/pour ton cahier/i);
 });
 
 test('test_F22_AC6: the grown-up can clear the goal and practice returns to the usual order', async ({ page }) => {
@@ -154,7 +154,7 @@ test('test_F22_AC6: the grown-up can clear the goal and practice returns to the 
   await page.evaluate(() => { const ns = (window as any).__ns; ns.G.prof.workbook = { at: Date.now(), skills: ['fractions'], checkedAt: 1, results: {} }; ns.G.store.save(); });
   await holdGrownUps(page);
   await grownTab(page, 'workbook');
-  await expect(page.getByText('Current workbook goal')).toBeVisible();
+  await expect(page.getByText('Objectif actuel du cahier')).toBeVisible();
   await page.click('[data-act=wbClear]');
   await page.click('[data-act=doWbClear]');
   const d = await saved(page);

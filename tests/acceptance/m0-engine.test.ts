@@ -25,10 +25,12 @@ describe('F-2 skill map', () => {
     const sec = SPEC.slice(SPEC.indexOf('**Skills (id: name, group, prerequisites)**'), SPEC.indexOf('v1 teaching order'));
     const rows = sec.split('\n').filter(l => /^\| [a-z0-9]+ \|/.test(l) && !/^\| id \|/.test(l)).map(l => l.split('|').slice(1, -1).map(c => c.trim()));
     expect(rows).toHaveLength(14);
-    const table = rows.map(([id, name, group, pre]) => ({ id, name, group, pre: pre === 'none' ? [] : pre.split(/,\s*/) }));
-    expect(E.SKILLS.map(s => ({ id: s.id, name: s.name, group: s.group, pre: s.pre }))).toEqual(table);
+    // Ids and prerequisites unchanged from v1; names and lines are the French ones in the table (D-21).
+    const table = rows.map(([id, , , pre, nom, ligne]) => ({ id, name: nom, group: ligne, pre: pre === 'none' ? [] : pre.split(/,\s*/) }));
+    expect(E.SKILLS.slice(0, 14).map(s => ({ id: s.id, name: s.name, group: s.group, pre: s.pre }))).toEqual(table);
     const order = SPEC.match(/v1 teaching order \(also the placement ladder\): ([a-z0-9, ]+)\./)![1].split(/,\s*/);
-    expect([...E.LADDER]).toEqual(order);
+    expect([...E.V1_LADDER]).toEqual(order);
+    expect(E.LADDER.slice(0, 14)).toEqual(order);
   });
 
   test('test_F2_AC2: a skill with any unmastered prerequisite is never selected for new practice', () => {
@@ -63,6 +65,8 @@ function checkMC(errors: string[], where: string, opts: Option[] | undefined, an
   if (new Set(labels).size !== labels.length) errors.push(`${where}: duplicate labels ${labels}`);
   opts.forEach(o => { checkText(errors, where + ' label', o.label); if (o.mis && !E.MIS[o.mis]) errors.push(`${where}: unknown mis ${o.mis}`); });
   opts.forEach(o => { if (typeof o.value === 'number' && (o.value < 0 || !Number.isInteger(o.value))) errors.push(`${where}: bad numeric option ${o.value}`); });
+  // Decimal options (F-23) are canonical strings: no negatives, comma not point.
+  opts.forEach(o => { if (typeof o.value === 'string' && /^[-−]\d|\d\.\d/.test(o.value)) errors.push(`${where}: bad decimal option ${o.value}`); });
 }
 function checkBuild(errors: string[], where: string, bd: NonNullable<Question['build']>) {
   switch (bd.type) {
@@ -76,6 +80,22 @@ function checkBuild(errors: string[], where: string, bd: NonNullable<Question['b
     case 'share': if (bd.n % bd.k !== 0) errors.push(`${where}: share not divisible`); break;
     case 'makegroups': if (bd.n % bd.k !== 0) errors.push(`${where}: makegroups not divisible`); break;
     case 'shade': if (!(bd.k >= 1 && bd.k < bd.n)) errors.push(`${where}: shade`); break;
+    // F-23 widgets
+    case 'pvchart': {
+      // every digit of the target sits in one of the chart's columns
+      const pow: Record<string, number> = { cm: 5, dm: 4, um: 3, c: 2, d: 1, u: 0, ds: -1, cs: -2, ms: -3 };
+      const rebuilt = bd.cols.reduce((t, c) => t + (Math.floor(bd.target / Math.round(1000 * 10 ** pow[c])) % 10) * Math.round(1000 * 10 ** pow[c]), 0);
+      if (rebuilt !== bd.target || bd.target <= 0) errors.push(`${where}: pvchart target ${bd.target} does not fit ${bd.cols}`); break;
+    }
+    case 'shift': { const t = bd.k > 0 ? bd.start * 10 ** bd.k : bd.start / 10 ** -bd.k; if (!Number.isInteger(t) || t < 1 || t >= 10_000_000) errors.push(`${where}: shift target ${t}`); break; }
+    case 'steps':
+      if (!bd.steps.length) errors.push(`${where}: no steps`);
+      for (const st of bd.steps) {
+        checkText(errors, where + ' step', st.prompt); checkText(errors, where + ' step done', st.done);
+        if (st.choices) { if (st.choices.filter(c => c === st.answer).length !== 1) errors.push(`${where}: step answer ${st.answer} not once in ${st.choices}`); }
+        else if (!/^\d+(,\d+)?$/.test(st.answer) || (!st.decimal && st.answer.includes(','))) errors.push(`${where}: bad step answer ${st.answer}`);
+      }
+      break;
   }
 }
 
@@ -91,15 +111,17 @@ describe('F-5 questions', () => {
       if (!q.explain || !q.explain.text) errors.push(`${where}: no explain`);
       if (q.kind === 'mc') checkMC(errors, where, q.options, q.answer);
       else if (q.kind === 'pad') {
-        const a = q.answer as number;
-        if (!Number.isInteger(a) || a < 0 || a > 9999) errors.push(`${where}: bad pad answer ${a}`);
-        if (q.padMis) for (const [k, v] of Object.entries(q.padMis)) { if (+k === a) errors.push(`${where}: padMis includes answer`); if (!E.MIS[v]) errors.push(`${where}: unknown mis ${v}`); }
+        // Whole answers up to 999 999; decimals only in F-23 decimal questions, written canonically with a comma.
+        const a = String(q.answer);
+        if (q.decimal ? !/^\d+(,\d{1,3})?$/.test(a) || /,\d*0$/.test(a) : !/^\d{1,6}$/.test(a)) errors.push(`${where}: bad pad answer ${a}`);
+        if (/^0\d/.test(a)) errors.push(`${where}: leading zero ${a}`);
+        if (q.padMis) for (const [k, v] of Object.entries(q.padMis)) { if (k === a) errors.push(`${where}: padMis includes answer`); if (!E.MIS[v]) errors.push(`${where}: unknown mis ${v}`); }
       } else if (q.kind === 'build') {
         checkBuild(errors, where, q.build!);
         if (q.followup) checkMC(errors, where + ' followup', q.followup.options, q.followup.answer);
       } else errors.push(`${where}: unknown kind ${q.kind}`);
     });
-    expect(count).toBe(14 * 3 * 2 * N);
+    expect(count).toBe(E.SKILLS.length * 3 * 2 * N);
     expect([...new Set(errors)].slice(0, 30)).toEqual([]);
   });
 });
@@ -110,7 +132,7 @@ const SPEC_PATTERNS = SPEC.match(/\*\*Error patterns \(21\):\*\* ([a-z0-9, -]+)\
 describe('F-6 error patterns', () => {
   test('test_F6_AC2: the 21 v1 patterns exist and each is detectable from a chosen option or typed answer', () => {
     expect(SPEC_PATTERNS).toHaveLength(21);
-    expect(Object.keys(E.MIS).sort()).toEqual([...SPEC_PATTERNS].sort());
+    for (const id of SPEC_PATTERNS) expect(E.MIS[id], id).toBeDefined();
     E.seed(5);
     const seen = new Set<string>();
     eachQuestion(150, q => {
