@@ -1,17 +1,22 @@
-// M0 "no behaviour change" check: with the same seed, the ported engine produces exactly what v1 produces.
+// M0 "no behaviour change" check, kept through MD: with the same seed and the same story items, the engine
+// asks exactly what v1 asks. Since MD the visuals are drawn from the design kit, so questions are compared
+// as text (HTML and SVG markup stripped) plus every number, answer, option value and pattern tag.
 import { describe, expect, test, vi } from 'vitest';
 import * as E from '../../src/engine';
 import type { Stage } from '../../src/engine';
 import { loadV1Engine } from './v1';
 
-const v1 = loadV1Engine();
+const v1 = loadV1Engine(E.ITEMS);
 const strip = (q: object) => JSON.parse(JSON.stringify(q));
+const textOnly = (x: unknown): unknown => typeof x === 'string' ? x.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()
+  : Array.isArray(x) ? x.map(textOnly) : x && typeof x === 'object' ? Object.fromEntries(Object.entries(x).map(([k, v]) => [k, textOnly(v)])) : x;
 
 describe('port parity with v1 engine', () => {
   test('skill table, ladder and error patterns are identical', () => {
     expect(strip(E.SKILLS)).toEqual(strip(v1.api.SKILLS));
     expect([...E.LADDER]).toEqual([...v1.api.LADDER]);
     expect(strip(E.MIS)).toEqual(strip(v1.api.MIS));
+    expect(v1.api.SKILLS.length).toBe(14);
   });
 
   test('every generator gives identical questions for the same seed', () => {
@@ -20,7 +25,7 @@ describe('port parity with v1 engine', () => {
       for (let i = 0; i < 60; i++) {
         const seed = 1000 + n++;
         E.seed(seed); v1.seed(seed);
-        const a = strip(E.makeQuestion(s.id, st, easy)), b = strip(v1.api.makeQuestion(s.id, st, easy));
+        const a = textOnly(strip(E.makeQuestion(s.id, st, easy))) as Record<string, unknown>, b = textOnly(strip(v1.api.makeQuestion(s.id, st, easy))) as Record<string, unknown>;
         delete a.meta; delete a.skill; delete a.stage; delete b.skill; delete b.stage;
         expect(a, `${s.id}[${st}]${easy ? 'e' : ''} seed ${seed}`).toEqual(b);
       }
@@ -47,6 +52,8 @@ describe('port parity with v1 engine', () => {
     }
     const norm = (p: { log: { t: number }[]; skills: Record<string, { lastSeen: number; masteredAt: number }> }) => {
       const c = strip(p); c.log.forEach((l: { t: number }) => l.t = 0);
+      // Cosmetic defaults changed in MD (theme, owned items, sound off); the learner model must not.
+      delete c.theme; delete c.owned; delete c.settings.sound;
       Object.values(c.skills as Record<string, { lastSeen: number; masteredAt: number }>).forEach(s => { s.lastSeen = 0; s.masteredAt = 0; });
       return c;
     };

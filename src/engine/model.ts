@@ -1,12 +1,14 @@
 // Learner model (spec F-7): Bayesian Knowledge Tracing per (skill, level), level moves, review choice.
 // Ported from v1 with no behaviour change.
+import { DEFAULT_THEME } from '../design/tokens';
 import { random } from './rng';
 import { LADDER, SK, SKILLS } from './skills';
 import type { Item, ModelEvent, Profile, Question, SkillState, Stage } from './types';
 
 export const BKT = { T: 0.12, S: 0.1 };
 export const START_PL: [number, number, number] = [0.3, 0.2, 0.1];
-export const DEFAULT_SETTINGS = { sessionLen: 10, sound: true, autoRead: false, chart: true };
+/** Sounds default off (design/MOTION.md, milestone MD); v1 defaulted them on. */
+export const DEFAULT_SETTINGS = { sessionLen: 10, sound: false, autoRead: false, chart: true };
 export const LOG_CAP = 400;
 
 export function newSkillState(): SkillState {
@@ -17,7 +19,7 @@ export function newProfile(name: string, avatar: string): Profile {
   const skills: Record<string, SkillState> = {}; SKILLS.forEach(s => skills[s.id] = newSkillState());
   return {
     id: 'p' + Date.now().toString(36) + Math.floor(random() * 1000), name, avatar, created: Date.now(), placementDone: false, skills, focus: null, mis: {}, gems: 10,
-    owned: { avatars: [avatar], themes: ['marigold'] }, theme: 'marigold', days: [], sessions: [], log: [], settings: { ...DEFAULT_SETTINGS },
+    owned: { avatars: [avatar], themes: [DEFAULT_THEME] }, theme: DEFAULT_THEME, days: [], sessions: [], log: [], settings: { ...DEFAULT_SETTINGS },
   };
 }
 

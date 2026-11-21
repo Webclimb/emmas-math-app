@@ -43,7 +43,7 @@ The app now lives in a TypeScript repo that still builds to one self-contained `
 ```
 src/engine/    skills, generators, learner model, placement, seeded random (pure TypeScript, no DOM)
 src/storage/   storage interface, device and artifact-account adapters, schema migrations
-src/design/    design tokens -> CSS variables (reads design/tokens.v1.json)
+src/design/    design tokens -> CSS variables (reads design/tokens.json) and the kit SVG loader
 src/app/       Preact screens, session flow, effects
 tests/         acceptance (Vitest), unit, ui (Playwright, against dist/index.html), fixtures
 ```

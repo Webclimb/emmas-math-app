@@ -33,7 +33,7 @@ export interface UIState {
   screen: 'boot' | 'welcome' | 'profiles' | 'placeIntro' | 'practice' | 'placed' | 'summary' | 'shop' | 'grown' | 'home';
   modal: Modal | null;
   toast: string | null;
-  tmp: { av?: string; name?: string; adding?: boolean; code?: string | null; restore?: Profile | null };
+  tmp: { av?: string; name?: string; adding?: boolean; code?: string | null; restore?: Profile | null; gtab?: string; stab?: string };
 }
 
 export const G = {

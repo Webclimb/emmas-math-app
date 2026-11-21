@@ -122,6 +122,78 @@ The owner approved the open items above and the design system's amendments. `SPE
 - **Design swap:** the app still builds from `design/tokens.v1.json`. Moving onto `design/tokens.json` and the kit changes how every screen looks: new fonts, no shadows, removal of the confetti and the "Now" pulse, items and avatars as SVG instead of emoji. The spec places that work with F-19.AC-5 in M3, so it waits until the rest of the spec is approved, or until the owner asks for it sooner. Keys the port uses that `tokens.json` drops are: `on-sky`, `font.mono`, `type.heroH1`, `size.starTile`, `elevation.*` and `motion.currentStarPulse`. Each needs a mapping at the swap.
 - **Still open:** Q1 and Q3 to Q6 in `SPEC.md` section 9, and the design's choices waiting on her (avatar style, story themes, starting colour).
 
+## Milestone MD: design brought forward (2026-11-21)
+
+- **Spec:** v2.2-draft. D-18 adds milestone MD before M1: restyle and re-lay out every existing screen to `design/` ("Star Lines"). F-19.AC-5 and F-15.AC-6 moved from M3 to MD.
+- **Result:** `npm run accept` passes. All 16 M0 criteria still pass, plus F-15.AC-6 and F-19.AC-5. The build is 246 KB.
+
+### What changed
+
+- **Tokens:**
+  - `src/design/tokens.ts` now reads `design/tokens.json`.
+  - Compact values switch in below 720 px through CSS variables.
+  - `tokens.v1.json` stays in the repo for reference.
+- **Kit:**
+  - `src/design/kit.ts` inlines `design/kit-*.svg`, so theme colours apply. Items, badges, stations, icons, blocks, dialog badges and operation cards all come from the kit.
+  - Story items are the 10 kit items (tickets, coins, pucks...) in place of v1's emoji foods and shapes. Which themes ship is her choice (Q3).
+- **Layouts (desktop first, phone still works):**
+  - Home has a header, a side column (Next stop, This week, key) and the star-lines map. It fits 1280 × 800.
+  - Practice has the question card and a "Need a hand?" aside on wide screens. On phones the aside becomes a three-button row.
+  - Feedback sits beside the question on wide screens and below it on phones.
+  - Grown-up view has five tabs.
+  - The shop becomes Customize, with Badge and Colour tabs.
+- **Look:**
+  - Borders instead of shadows, and a dot-grid page.
+  - Space Grotesk for words, Atkinson Hyperlegible for all text and numerals.
+  - Given counters are discs; added counters are rings with a centre dot.
+  - Correct = solid border plus a check; not yet = dashed border plus a turn-around arrow.
+  - "I'm not sure" gets a neutral card, not the warm one.
+
+### Behaviour the design changed (all from `design/`, approved with D-18)
+
+- **Confetti and the pulsing "Now" star are removed.** The star-lit dialog replaces confetti.
+- **Grown-ups hold:** 2 s instead of 1.2 s, with a ring that fills while she holds.
+- **Toasts** stay up 4 s instead of 2.4 s.
+- **Sounds** default off for new learners. There is no sound for a wrong answer at all; v1 played a soft tone.
+- **Themes:** Cobalt (default), Ocean, Berry and Graphite. A saved theme outside that set loads as Cobalt and stays owned (F-15.AC-6).
+- **Badges** replace emoji buddies (F-19.AC-5):
+  - Square, Circle and Roundel are free.
+  - Ticket and the six emblems cost what v1's buddies cost (20 to 50 gems). That's a placeholder until she chooses (Q3).
+  - A saved emoji buddy loads as the Square badge.
+- **Copy** follows the design:
+  - "Next stop", "Start today's practice", "Your star lines", "Customize".
+  - "Light up a star for every maths skill you master."
+
+### Kept as v1 because the design part needs an unbuilt feature
+
+- **Question dots** stay in the top bar. The session-parts indicator waits for F-14.
+- **"This week"** shows the last 7 days as in v1. The 4-day goal is F-14.AC-4.
+- **No number-sentence strip** (F-3.AC-2), "Show me how" (F-4) or lesson player (F-4).
+- **Wrap-up** keeps v1's stats. "What changed" and "How did that feel?" are F-14.AC-5.
+- **Customize has no Story theme tab** (F-11).
+- **Grown-up view** has no theme setting, check-up trend, report or supplement statement (F-17, F-18).
+
+### Tests changed for MD
+
+These acceptance tests had selectors or values pinned to v1's look. Each now checks the same criterion against the approved design:
+- **F-1.AC-1:** free badges instead of emoji buddies.
+- **F-1.AC-3, F-20.AC-1, F-20.AC-3:** the grown-up tabs and the name header.
+- **F-6.AC-1:** the new card structure, in the same order the criterion requires. "No buzzer" is now checked with sounds switched on, and expects no sound at all.
+- **F-6.AC-3:** "Seen N times" and the definition list.
+- **F-20.AC-1 (unit):** v1 avatar and theme migration.
+
+Other test changes:
+- **New:** `test_F15_AC6` and `test_F19_AC5`.
+- **Retired:** the v1 pixel-parity check (`tests/ui/parity.spec.ts`), which proved M0 changed nothing visible.
+- **Engine parity kept:** it now injects the kit items into v1 and compares question text and maths, so the questions are still proven identical to v1's.
+- **Simulations:** now run on a simulated clock. They had a timing dependence (reviews pick the least recently seen skill), which made one run fail once.
+
+### Gaps
+
+- **Literal sizes:** many component sizes in `src/app/styles.css` are still written in px. That's where the design specifies them only in `COMPONENTS.md` and not in `tokens.json`. Colours, fonts, radius, borders, spacing and token sizes all come from variables.
+- **Breakpoints:** 720 px and 1024 px appear in media queries, because media queries cannot read CSS variables.
+- **Keyboard paths:** the per-widget keyboard paths in `SCREENS.md` §3 (arrows on ten-frames and fraction bars, Shift+arrow on number lines) are F-19.AC-6, which is M3. Every control is already a button reachable with Tab.
+
 ## Commands
 
 ```

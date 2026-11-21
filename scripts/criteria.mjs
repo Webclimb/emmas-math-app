@@ -18,5 +18,9 @@ for (const f of walk('tests')) {
 const M0 = ['F-1.AC-1', 'F-1.AC-2', 'F-1.AC-3', 'F-2.AC-1', 'F-2.AC-2', 'F-5.AC-1', 'F-5.AC-2', 'F-6.AC-1', 'F-6.AC-2', 'F-6.AC-3', 'F-7.AC-1', 'F-7.AC-2', 'F-7.AC-3', 'F-7.AC-4', 'F-20.AC-1', 'F-20.AC-3'];
 console.log('\nM0 exit criteria');
 for (const id of M0) { const e = found.get(id); console.log(`  ${!e ? 'MISSING' : e.parked ? 'PARKED ' : 'tested '}  ${id}`); }
-const extra = [...found.keys()].filter(k => !M0.includes(k)).sort();
+// Milestone MD (SPEC.md D-18).
+const MD = ['F-15.AC-6', 'F-19.AC-5'];
+console.log('\nMD design criteria');
+for (const id of MD) { const e = found.get(id); console.log(`  ${!e ? 'MISSING' : e.parked ? 'PARKED ' : 'tested '}  ${id}`); }
+const extra = [...found.keys()].filter(k => !M0.includes(k) && !MD.includes(k)).sort();
 if (extra.length) console.log('Also tested: ' + extra.join(', '));

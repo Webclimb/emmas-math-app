@@ -8,8 +8,8 @@ import { NL } from '../engine/visuals';
 import { THEMES } from '../design/tokens';
 import type { Build, Question } from '../engine/types';
 import { backupCode, migrateProfile, parseBackup } from '../storage/schema';
-import { AVATARS, DEFAULT_AVATAR, GEMS, HOLD_MS } from './data';
-import { applyAccent, confetti, reduced, speak, strip, tone, SND } from './effects';
+import { AVATARS, DEFAULT_AVATAR, GEMS, HOLD_MS, TOAST_MS } from './data';
+import { applyAccent, reduced, speak, strip, tone, SND } from './effects';
 import { G, P, app, type BuildState, type Current } from './state';
 import { markDay } from './util';
 import { Layer, Screen } from './views';
@@ -27,6 +27,7 @@ function focusKey(): string | null {
 }
 export function render(): void {
   applyAccent(); const fk = focusKey();
+  $app.dataset.screen = G.UI.screen;
   preactRender(h(Screen, null), $app);
   renderLayer();
   if (fk && !G.UI.modal) { try { const el = document.querySelector(fk) as HTMLButtonElement | null; if (el && !el.disabled) el.focus({ preventScroll: true }); } catch { /* bad selector */ } }
@@ -36,7 +37,7 @@ export function renderLayer(): void {
   if (G.UI.modal) { const b = ($layer.querySelector('.modal [data-focus]') || $layer.querySelector('.modal button')) as HTMLElement | null; if (b) b.focus({ preventScroll: true }); }
 }
 let toastT: ReturnType<typeof setTimeout> | undefined;
-export function toast(text: string): void { G.UI.toast = text; renderLayer(); clearTimeout(toastT); toastT = setTimeout(() => { G.UI.toast = null; renderLayer(); }, 2400); }
+export function toast(text: string): void { G.UI.toast = text; renderLayer(); clearTimeout(toastT); toastT = setTimeout(() => { G.UI.toast = null; renderLayer(); }, TOAST_MS); }
 
 // ---------- profile and routing ----------
 export function save(): void { G.store.save(); }
@@ -125,7 +126,8 @@ function submit(ok: boolean, mis: string | null, o: { unsure?: boolean } = {}): 
     ev.forEach(x => { if (x.type === 'up') gain += GEMS.up; if (x.type === 'back') gain += GEMS.back; if (x.type === 'mastered') gain += GEMS.mastered; });
   }
   Cur.gain = gain; prof.gems += gain; S.gems += gain; S.i++; S.answered++; if (ok) S.correct++; markDay(prof);
-  save(); render(); tone(ok ? SND.ok : SND.soft);
+  // No sound for a wrong answer (design/MOTION.md, F-6.AC-1).
+  save(); render(); if (ok) tone(SND.ok);
   requestAnimationFrame(() => { const fb = document.getElementById('fb'); if (fb) { fb.scrollIntoView({ block: 'nearest', behavior: reduced() ? 'auto' : 'smooth' }); const nb = fb.querySelector('[data-act="next"]') as HTMLElement | null; if (nb) nb.focus({ preventScroll: true }); } });
 }
 const EV_ORDER = ['mastered', 'up', 'back', 'prereq', 'refresh', 'down'];
@@ -133,7 +135,7 @@ function afterFeedback(): void {
   const S = G.S!, ev = (G.Cur!.events || []).slice().sort((a, b) => EV_ORDER.indexOf(a.type) - EV_ORDER.indexOf(b.type))[0];
   if (ev && ev.type === 'back') { nextQuestion(); toast(`Back up to ${STAGE_WITH[ev.stage]} for ${SK[ev.skill].name}.`); return; }
   if (ev && ev.type === 'down') { S.downs = S.downs || {}; if (S.downs[ev.skill]) { nextQuestion(); toast(`Trying it with ${STAGE_WITH[ev.stage]} for a bit.`); return; } S.downs[ev.skill] = 1; }
-  if (ev) { G.UI.modal = { type: 'event', ev }; render(); if (ev.type === 'mastered' || ev.type === 'up') { tone(SND.up); if (ev.type === 'mastered') confetti(); } return; }
+  if (ev) { G.UI.modal = { type: 'event', ev }; render(); if (ev.type === 'mastered' || ev.type === 'up') tone(SND.up); return; }
   nextQuestion();
 }
 function finishSession(early: boolean): void {
@@ -143,12 +145,12 @@ function finishSession(early: boolean): void {
     if (!early) { prof.gems += GEMS.session; S.gems += GEMS.session; }
   }
   save(); G.Cur = null; G.UI.screen = S.answered > 0 ? 'summary' : 'home'; render(); window.scrollTo(0, 0);
-  if (G.UI.screen === 'summary' && !early) { tone(SND.up); confetti(); }
+  if (G.UI.screen === 'summary' && !early) tone(SND.up);
 }
 function finishPlacement(): void {
   const S = G.S!, prof = P();
   placementApply(prof, S.P!); prof.sessions.push({ d: Date.now(), n: S.answered, c: S.correct, min: Math.max(1, Math.round((Date.now() - S.start) / 60000)), m: 'placement' });
-  save(); G.Cur = null; G.UI.screen = 'placed'; render(); window.scrollTo(0, 0); tone(SND.up); confetti();
+  save(); G.Cur = null; G.UI.screen = 'placed'; render(); window.scrollTo(0, 0); tone(SND.up);
 }
 function buildCheck(): void {
   const Cur = G.Cur!, q = Cur.q, b = Cur.b!; if (Cur.phase !== 'answer' || b.done) return;
@@ -213,8 +215,10 @@ export const ACT: Record<string, (el: El, e?: { clientX: number }) => void> = {
   part(el) { if (!B()) return; const i = +el.dataset.i!; bs().s![i] = !bs().s![i]; bs().msg = null; render(); },
   bcheck() { buildCheck(); },
   pickAv(el) { G.UI.tmp.av = el.dataset.d; render(); },
+  stab(el) { G.UI.tmp.stab = el.dataset.d; render(); },
+  gtab(el) { G.UI.tmp.gtab = el.dataset.d; G.UI.tmp.code = null; render(); window.scrollTo(0, 0); },
   buyAv(el) {
-    const prof = P(), a = el.dataset.d!, price = (AVATARS.find(x => x[0] === a) || [a, 0])[1];
+    const prof = P(), a = el.dataset.d!, item = AVATARS.find(x => x.id === a); if (!item) return; const price = item.price;
     if (prof.owned.avatars.includes(a) || price === 0) { prof.avatar = a; save(); render(); return; }
     if (prof.gems < price) { toast(`You need ${price - prof.gems} more gems for that one.`); return; }
     prof.gems -= price; prof.owned.avatars.push(a); prof.avatar = a; save(); render(); tone(SND.up); toast('Unlocked!');
@@ -246,14 +250,15 @@ let holdT: ReturnType<typeof setTimeout> | null = null;
 export const holdTimer = () => holdT;
 function holdStart(el: El) {
   if (holdT) return; el.classList.add('holding');
-  holdT = setTimeout(() => { holdT = null; el.classList.remove('holding'); G.UI.tmp.code = null; G.UI.screen = 'grown'; render(); window.scrollTo(0, 0); }, HOLD_MS);
+  holdT = setTimeout(() => { holdT = null; el.classList.remove('holding'); G.UI.tmp.code = null; G.UI.tmp.gtab = 'progress'; G.UI.screen = 'grown'; render(); window.scrollTo(0, 0); }, HOLD_MS);
 }
 function holdEnd(el: El | null, hint: boolean) { if (holdT) { clearTimeout(holdT); holdT = null; if (hint) toast('Keep holding to open the grown-up view.'); } if (el) el.classList.remove('holding'); }
 const closest = (t: EventTarget | null, sel: string) => (t && (t as Element).closest ? (t as Element).closest(sel) as El | null : null);
 
 export function listen(): void {
   document.addEventListener('click', e => { const el = closest(e.target, '[data-act]') as HTMLButtonElement | null; if (!el || el.disabled) return; const f = ACT[el.dataset.act!]; if (f) { e.preventDefault(); f(el, e); } });
-  document.addEventListener('input', e => { const t = e.target as HTMLInputElement; if (t.id === 'pname') G.UI.tmp.name = t.value; });
+  // The badges on the welcome form show her initial, so they update as she types.
+  document.addEventListener('input', e => { const t = e.target as HTMLInputElement; if (t.id === 'pname') { const was = (G.UI.tmp.name || '').trim()[0]; G.UI.tmp.name = t.value; if (t.value.trim()[0] !== was) render(); } });
   document.addEventListener('submit', e => {
     e.preventDefault(); const t = e.target as HTMLFormElement;
     if (t.id === 'newp') {

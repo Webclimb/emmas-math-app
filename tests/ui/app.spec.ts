@@ -2,9 +2,9 @@
 import { expect, test, type Page } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { createLearner, holdGrownUps, open, saved } from './helpers';
+import { createLearner, grownTab, holdGrownUps, nameOnHome, open, saved } from './helpers';
 
-const TOKENS = JSON.parse(readFileSync(resolve(process.cwd(), 'design/tokens.v1.json'), 'utf8'));
+const TOKENS = JSON.parse(readFileSync(resolve(process.cwd(), 'design/tokens.json'), 'utf8'));
 const V1_SAVE = readFileSync(resolve(process.cwd(), 'tests/fixtures/v1-save.json'), 'utf8');
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -14,9 +14,9 @@ const ns = (page: Page, f: (ns: any) => unknown) => page.evaluate(`(${f.toString
 test('test_F1_AC1: with no saved data the welcome screen opens, and a learner is created with a 1-20 character nickname and one free avatar', async ({ page }) => {
   const errors = await open(page);
   await expect(page.locator('#pname')).toBeVisible();
-  // Only free avatars are offered at sign-up.
-  const offered = await page.locator('button.av').allTextContents();
-  expect(offered).toEqual(['🦊', '🐢', '🐙']);
+  // Only free badges are offered at sign-up (design kit badges since MD).
+  const offered = await page.locator('button.av .tile__name').allTextContents();
+  expect(offered).toEqual(['Square', 'Circle', 'Roundel']);
   // Empty nickname is refused.
   await page.click('button[type=submit]');
   await expect(page.locator('#pname')).toBeVisible();
@@ -29,16 +29,17 @@ test('test_F1_AC1: with no saved data the welcome screen opens, and a learner is
   await expect(page.getByText('First, a quick warm-up')).toBeVisible();
   let d = await saved(page), p = d.profiles[d.current];
   expect(p.name).toBe('ABCDEFGHIJKLMNOPQRST');
-  expect(p.avatar).toBe('🐙');
-  expect(p.owned.avatars).toEqual(['🐙']);
+  expect(p.avatar).toBe('frame:roundel');
+  expect(p.owned.avatars).toEqual(['frame:roundel']);
   // A 1-character nickname also works (second learner, from the grown-up view).
   await page.click('[data-act=skipPlace]');
   await holdGrownUps(page);
+  await grownTab(page, 'data');
   await page.click('[data-act=addLearner]');
   await createLearner(page, 'Z', 0);
   d = await saved(page); p = d.profiles[d.current];
   expect(p.name).toBe('Z');
-  expect(p.avatar).toBe('🦊');
+  expect(p.avatar).toBe('frame:square');
   expect(errors).toEqual([]);
 });
 
@@ -65,15 +66,17 @@ test('test_F1_AC3: with two learners the grown-up view switches between them and
   const ana = await ns(page, n => ({ gems: n.G.prof.gems, log: n.G.prof.log.length, id: n.G.prof.id })) as { gems: number; log: number; id: string };
   expect(ana.log).toBe(1);
   await holdGrownUps(page);
+  await grownTab(page, 'data');
   await page.click('[data-act=addLearner]');
   await createLearner(page, 'Ben', 1);
   await page.click('[data-act=skipPlace]');
   const ben = await ns(page, n => ({ gems: n.G.prof.gems, log: n.G.prof.log.length, name: n.G.prof.name })) as { gems: number; log: number; name: string };
   expect(ben).toEqual({ gems: 10, log: 0, name: 'Ben' });
   await holdGrownUps(page);
+  await grownTab(page, 'data');
   await expect(page.locator('.learners li')).toHaveCount(2);
   await page.click(`[data-act=switchTo][data-d="${ana.id}"]`);
-  await expect(page.locator('.hello .hi')).toHaveText('Hi, Ana');
+  await expect(nameOnHome(page)).toHaveText('Ana');
   const back = await ns(page, n => ({ gems: n.G.prof.gems, log: n.G.prof.log.length })) as { gems: number; log: number };
   expect(back).toEqual({ gems: ana.gems, log: 1 });
   const d = await saved(page);
@@ -103,6 +106,8 @@ test('test_F6_AC1: a wrong answer shows not-right, the pattern sentence, a worke
   const errors = await open(page);
   await createLearner(page, 'Mo', 0);
   await page.click('[data-act=skipPlace]');
+  // Sounds default off since MD; turn them on so "no buzzer" is actually tested.
+  await ns(page, n => { n.G.prof.settings.sound = true; });
   const q = await ns(page, n => {
     n.seed(11);
     n.G.S = { mode: 'practice', n: 10, i: 0, answered: 0, correct: 0, gems: 0, start: Date.now(), events: [], P: null, early: false };
@@ -113,23 +118,24 @@ test('test_F6_AC1: a wrong answer shows not-right, the pattern sentence, a worke
   await page.click('[data-act=key][data-d=ok]');
   const fb = page.locator('#fb');
   await expect(fb).toBeVisible();
-  const order = await fb.evaluate(el => [...el.children].map(c => c.tagName.toLowerCase() + (c.className ? '.' + c.className : '')));
-  expect(order.slice(0, 5)).toEqual(['h2', 'p', 'p', 'div.visual', 'p.ans']);
-  await expect(fb.locator('h2')).toHaveText("Not quite. Let's look at it another way.");
-  await expect(fb.locator('p').nth(0)).toHaveText('That answer comes from taking away. Dividing means sharing into equal groups.');
-  await expect(fb.locator('p').nth(1)).toContainText(`÷ ${q.b} = ${q.answer}`);
-  await expect(fb.locator('.visual svg')).toHaveCount(1);
+  // Order (F-6.AC-1): not right, pattern sentence, worked explanation with a visual, the correct answer.
+  const order = await fb.evaluate(el => [...el.children].map(c => c.tagName.toLowerCase() + '.' + c.className));
+  expect(order.slice(0, 5)).toEqual(['div.fb-head', 'p.fb-pattern', 'p.fb-text', 'figure.fb-figure', 'p.fb-text ans']);
+  await expect(fb.locator('.fb-head h2')).toHaveText("Not yet. Let's look at it another way.");
+  await expect(fb.locator('.fb-pattern')).toHaveText('That answer comes from taking away. Dividing means sharing into equal groups.');
+  await expect(fb.locator('p.fb-text').first()).toContainText(`÷ ${q.b} = ${q.answer}`);
+  await expect(fb.locator('.fb-figure svg')).toHaveCount(1);
   await expect(fb.locator('p.ans')).toHaveText(`The answer is ${q.answer}.`);
   // Gems: +1 for trying, never deducted.
   const after = await ns(page, n => n.G.prof.gems) as number;
   expect(after).toBe(q.gems + 1);
-  // Not red: the card and the typed answer use the warm token, whose hue is orange, not red.
+  // Not red: the card uses the warm token, whose hue is orange, not red.
   const warm = TOKENS.color.light.warm.value;
   expect(await fb.evaluate(el => getComputedStyle(el).borderTopColor)).toBe(rgb(warm));
   for (const mode of ['light', 'dark']) { const hh = hue(TOKENS.color[mode].warm.value); expect(hh, mode).toBeGreaterThan(12); expect(hh, mode).toBeLessThan(45); }
-  // No buzzer: one soft sine tone.
+  // No buzzer: no sound at all for a wrong answer (design/MOTION.md), even with sounds on.
   const tones = await page.evaluate(() => (window as unknown as { __tones: { f: number; type: string }[] }).__tones);
-  expect(tones).toEqual([{ f: 392, type: 'sine' }]);
+  expect(tones).toEqual([]);
   expect(errors).toEqual([]);
 });
 
@@ -139,12 +145,14 @@ test('test_F6_AC3: the grown-up view lists observed patterns by count with the g
   await page.click('[data-act=skipPlace]');
   await ns(page, n => { const now = Date.now(); n.G.prof.mis = { regroup: { count: 1, last: now }, 'op-sub-for-div': { count: 5, last: now }, 'off-by-one': { count: 3, last: now } }; n.G.store.save(); });
   await holdGrownUps(page);
+  await grownTab(page, 'patterns');
   const items = page.locator('ul.mis > li');
   await expect(items).toHaveCount(3);
   expect(await items.evaluateAll(els => els.map(e => e.getAttribute('data-pattern')))).toEqual(['op-sub-for-div', 'off-by-one', 'regroup']);
   await expect(items.nth(0)).toContainText('Used subtraction on a division question');
-  await expect(items.nth(0)).toContainText('5×');
-  await expect(items.nth(0)).toContainText('Try at home: Deal real objects');
+  await expect(items.nth(0)).toContainText('Seen 5 times');
+  await expect(items.nth(0).locator('dt').nth(1)).toHaveText('Try at home');
+  await expect(items.nth(0).locator('dd').nth(1)).toContainText('Deal real objects');
   expect(errors).toEqual([]);
 });
 
@@ -159,7 +167,7 @@ test('test_F20_AC1: progress persists across reloads', async ({ page }) => {
   const before = await ns(page, n => ({ gems: n.G.prof.gems, log: n.G.prof.log.length, mis: n.G.prof.mis })) as object;
   await page.reload();
   await expect(page.locator('.boot')).toHaveCount(0, { timeout: 5000 });
-  await expect(page.locator('.hello .hi')).toHaveText('Hi, Rae');
+  await expect(nameOnHome(page)).toHaveText('Rae');
   expect(await ns(page, n => ({ gems: n.G.prof.gems, log: n.G.prof.log.length, mis: n.G.prof.mis }))).toEqual(before);
   expect(errors).toEqual([]);
 });
@@ -167,10 +175,12 @@ test('test_F20_AC1: progress persists across reloads', async ({ page }) => {
 test('test_F20_AC1: the v1 fixture save opens on the learner\'s star chart with progress intact', async ({ page }) => {
   const v1 = JSON.parse(V1_SAVE), p1 = v1.profiles[v1.current];
   const errors = await open(page, { save: V1_SAVE });
-  await expect(page.locator('.hello .hi')).toHaveText(`Hi, ${p1.name}`);
+  await expect(nameOnHome(page)).toHaveText(p1.name);
   await expect(page.locator('.gems b')).toHaveText(String(p1.gems));
   await holdGrownUps(page);
+  await grownTab(page, 'sessions');
   await expect(page.locator('.sess li')).toHaveCount(p1.sessions.length);
+  await grownTab(page, 'patterns');
   await expect(page.locator('ul.mis > li')).toHaveCount(Object.keys(p1.mis).length);
   expect(errors).toEqual([]);
 });
@@ -185,6 +195,7 @@ test('test_F20_AC3: a backup code can be copied and restored; a malformed code i
   await page.click('[data-act=quit]'); await page.click('[data-act=doQuit]');
   await page.click('[data-act=home]');
   await holdGrownUps(page);
+  await grownTab(page, 'data');
   await page.click('[data-act=copyBackup]');
   const code = await page.locator('#codeOut').inputValue();
   expect(JSON.parse(code).profile.name).toBe('Kit');
@@ -204,11 +215,12 @@ test('test_F20_AC3: a backup code can be copied and restored; a malformed code i
   await page.click('[data-act=skipPlace]');
   expect(await ns(page, n => n.G.prof.log.length)).toBe(0);
   await holdGrownUps(page);
+  await grownTab(page, 'data');
   await page.fill('#restoreText', code);
   await page.click('#restoreForm button[type=submit]');
   await expect(page.locator('.modal h2')).toHaveText('Restore Kit?');
   await page.click('[data-act=doRestore]');
-  await expect(page.locator('.hello .hi')).toHaveText('Hi, Kit');
+  await expect(nameOnHome(page)).toHaveText('Kit');
   const restored = await saved(page), p = restored.profiles[restored.current], o = original.profiles[original.current];
   expect(p.log).toEqual(o.log);
   expect(p.skills).toEqual(o.skills);
@@ -226,4 +238,34 @@ test('test_F20_AC4: the app makes no network requests other than fonts', async (
   await page.click('[data-act=next]');
   const external = requests.filter(u => !u.startsWith('file://'));
   expect(external.filter(u => !/^https:\/\/fonts\.(googleapis|gstatic)\.com\//.test(u))).toEqual([]);
+});
+
+// ---------- F-19.AC-5 (milestone MD) ----------
+test('test_F19_AC5: countable objects and badges are drawn kit graphics, never platform emoji', async ({ page }) => {
+  const errors = await open(page);
+  const EMOJI = /\p{Extended_Pictographic}/u;
+  const seen: string[] = [];
+  const check = async (where: string) => { const t = await page.evaluate(() => document.body.innerText); if (EMOJI.test(t)) seen.push(`${where}: ${t.match(/\p{Extended_Pictographic}/gu)!.join('')}`); };
+  await check('welcome');
+  await createLearner(page, 'Em', 1);
+  await page.click('[data-act=skipPlace]');
+  await check('home');
+  // Every skill, level and difficulty: the question, its build widget and its worked feedback.
+  const bad = await ns(page, n => {
+    const out: string[] = []; n.seed(3);
+    n.G.S = { mode: 'practice', n: 10, i: 0, answered: 0, correct: 0, gems: 0, start: Date.now(), events: [], P: null, early: false };
+    n.G.UI.screen = 'practice';
+    for (const s of n.SKILLS) for (let st = 0; st < 3; st++) for (const easy of [true, false]) for (let r = 0; r < 4; r++) {
+      const q = n.makeQuestion(s.id, st, easy); q.review = false; n.G.Cur = n.newCurrent(q); n.render(); n.ACT.unsure(); n.render();
+      const t = document.body.innerText; if (/\p{Extended_Pictographic}/u.test(t)) out.push(`${s.id}[${st}]`);
+      if (q.build && 'e' in q.build && !/^<svg /.test(q.build.e)) out.push(`${s.id}[${st}] item is not a kit SVG`);
+    }
+    return out;
+  }) as string[];
+  expect(bad).toEqual([]);
+  await ns(page, n => { n.G.UI.screen = 'shop'; n.render(); });
+  await check('customize');
+  await expect(page.locator('.tile .avatar svg').first()).toBeVisible();
+  expect(seen).toEqual([]);
+  expect(errors).toEqual([]);
 });

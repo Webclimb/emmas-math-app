@@ -1,8 +1,8 @@
 # Number Sky: build spec
 
-**Spec version: v2.1-draft (awaiting approval).** v1.0 is the as-built prototype in `source/index.html`, written before this spec existed and described here after the fact. Nothing marked NEW or CHANGE is approved to build until the owner signs off and the blocking open questions in section 9 are answered. Milestone M0 (port, no behaviour change) may start immediately.
+**Spec version: v2.2-draft (awaiting approval).** v1.0 is the as-built prototype in `source/index.html`, written before this spec existed and described here after the fact. Nothing marked NEW or CHANGE is approved to build until the owner signs off and the blocking open questions in section 9 are answered. Milestone M0 (port, no behaviour change) may start immediately.
 
-**Approved so far (owner, 2026-11-21):** milestone M0; F-1.AC-2; the F-6.AC-2 wording; the design-system amendments in v2.1 (D-14 to D-17 below: desktop first with keyboard paths, quick rounds default Off, the four accent themes with a v1 theme migration, adoption of `design/` as the design system). Everything else marked NEW or CHANGE still awaits sign-off.
+**Approved so far (owner, 2026-11-21):** milestone M0; F-1.AC-2; the F-6.AC-2 wording; the design-system amendments in v2.1 (D-14 to D-17 below: desktop first with keyboard paths, quick rounds default Off, the four accent themes with a v1 theme migration, adoption of `design/` as the design system); milestone MD, bringing the design forward (D-18, 2026-11-21). Everything else marked NEW or CHANGE still awaits sign-off.
 
 Status tags on features: **BUILT** (in v1, keep), **CHANGE** (in v1, behaviour changes), **NEW** (not in v1). Evidence references (E#) and decisions (D-#) point to `RESEARCH_REVIEW.md`.
 
@@ -250,12 +250,14 @@ Blocking items stop the named features only.
 | 2026-11-21 | D-14: desktop browser first, mouse and keyboard; keyboard entry at numbers level (F-5.AC-6) and a keyboard path for every build widget (F-19.AC-6). | How she will use it; `design/README.md`. |
 | 2026-11-21 | D-15: quick rounds default Off (F-10.AC-6, section 8). | Owner's decision to leave timed rounds out for now (Q2). The quick round keeps F-10.AC-5 and F-16.AC-2: slim bar, no digits, no clock. |
 | 2026-11-21 | D-16: accent themes become Cobalt, Ocean, Berry, Graphite; v1 themes outside the set load as Cobalt (F-15.AC-6, F-20.AC-1). | v1's Lime, Coral and Lavender clashed with correct, not-yet and item colours. |
+| 2026-11-21 | D-18: bring the design forward as milestone MD: restyle and re-lay out every existing screen to `design/` (desktop two-column layouts, kit graphics instead of emoji, F-15.AC-6 themes, F-19.AC-5), before M1. Design parts that belong to unbuilt features (session parts, strip, lessons, week goal, say it, how did that feel) wait for their milestones. | Owner wants to review the desktop design on the real app. |
 | 2026-11-21 | D-17: adopt `design/` (direction B, "Star Lines") as the design system; key-screen sizes 390 px and 1280 × 800. | Delivered against `DESIGN_BRIEF.md` §5. |
 
 ## 11. Change log
 
 - **v1.0** (2026-11-20): as-built prototype: 14 skills, three levels, BKT per skill and level, single-ladder placement, 21 error patterns, star chart, gems and shop, grown-up view, read-aloud, artifact account storage.
 - **v2.0-draft** (2026-11-20): research review applied. Adds F-4, F-10, F-13, F-16, F-18, F-21; changes F-2, F-3, F-5 to F-9, F-11, F-12, F-14, F-15, F-17, F-19, F-20. Awaiting approval.
+- **v2.2-draft** (2026-11-21): milestone MD added (D-18); F-19.AC-5 and F-15.AC-6 move from M3 to MD.
 - **v2.1-draft** (2026-11-21): design system delivered and approved amendments applied (D-14 to D-17). Adds F-5.AC-6, F-15.AC-6, F-19.AC-6; changes F-6.AC-2 wording, F-10.AC-6 default, F-20.AC-1, section 7 Devices and Design system, section 8; resolves Q2; approves F-1.AC-2.
 
 ---
@@ -305,9 +307,10 @@ v1 teaching order (also the placement ladder): quantity, numberline, placevalue,
 | Milestone | Contents | Exit check |
 |---|---|---|
 | M0 Port | v1 moved into the repo structure in section 7 with no behaviour change; storage interface; seeded randomness; v1 tests ported. Needs no design input. | F-1, F-2.AC-1/2, F-5.AC-1/2, F-6.AC-1..3, F-7.AC-1..4, F-20.AC-1/3 pass; build is one file. |
+| MD Design (D-18) | Every existing screen restyled and re-laid out to `design/` (tokens, components, desktop and phone layouts, motion rules), F-19.AC-5, F-15.AC-6. No new behaviour beyond what the design itself changes. | M0 criteria still pass; F-19.AC-5 and F-15.AC-6 pass; owner review. |
 | M1 Teach and retain | F-4 lessons for the 14 skills, F-3 notation strip, F-5.AC-3/5/6, F-7.AC-5/6, F-9, F-14. | Those criteria pass; simulation test F-7.AC-7 passes. |
 | M2 Facts, stories, number line, language | F-10, F-11, F-12, F-13. | Those criteria pass. |
-| M3 Safeguards and measurement | F-8, F-16, F-17, F-18, F-19.AC-5/6 and F-15.AC-6 with the design system's assets. | Those criteria pass; drift check clean. |
+| M3 Safeguards and measurement | F-8, F-16, F-17, F-18, F-19.AC-6 with the design system's components. | Those criteria pass; drift check clean. |
 | M4 Toward grade level | F-21, one skill at a time. | Each skill passes F-21.AC-1. |
 
 Acceptance tests run with one command: `npm run accept`. A drift check (inventory of what the code does, mapped to F-# items) is written to `DRIFT_REPORT.md` at the end of each milestone.
